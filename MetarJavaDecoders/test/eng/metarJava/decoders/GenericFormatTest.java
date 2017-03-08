@@ -15,8 +15,9 @@ import static org.junit.Assert.*;
 public class GenericFormatTest {
   
   private static final String LKMT = "METAR LKMT 241812Z 02032KT";
+  private static final String LKMT_VARIATING_WIND = "METAR LKMT 241812Z 02032KT 030V080";
   private static final String LKMT_NO_WIND = "METAR LKMT 241812Z /////KT";
-  private static final String LKPR = "METAR COR LKPR 312345Z 02032G13KT";
+  private static final String LKPR = "METAR COR LKPR 312345Z 02012G25KT";
   private static final String LKPR_NIL = "METAR COR LKPR 312345Z NIL";
   private static final String UUEE = "METAR COR UUEE 312345Z 35037G41MPS";
 
@@ -100,6 +101,7 @@ public class GenericFormatTest {
     assertEquals(new Heading(20), w.getDirection());
     assertEquals(32, w.getSpeed(SpeedUnit.KT));
     assertNull(w.tryGetGustingSpeed(SpeedUnit.KT));
+    assertFalse(w.isVariating());
   }
   
   @Test
@@ -110,9 +112,9 @@ public class GenericFormatTest {
     
     assertNotNull(w);
     assertEquals(new Heading(20), w.getDirection());
-    assertEquals(32, w.getSpeed(SpeedUnit.KT));
+    assertEquals(12, w.getSpeed(SpeedUnit.KT));
     assertNotNull(w.tryGetGustingSpeed(SpeedUnit.KT));
-    assertEquals(13, w.getGustingSpeed(SpeedUnit.KT));
+    assertEquals(25, w.getGustingSpeed(SpeedUnit.KT));
   }
   
   @Test
@@ -126,5 +128,18 @@ public class GenericFormatTest {
     assertEquals(37, w.getSpeed(SpeedUnit.MPS));
     assertNotNull(w.tryGetGustingSpeed(SpeedUnit.KT));
     assertEquals(41, w.getGustingSpeed(SpeedUnit.MPS));
+  }
+  
+  @Test
+  public void testParseWindVariating() {
+    IParse p = new GenericFormat();
+    Report r = p.parse(LKMT_VARIATING_WIND);
+    WindInfo w = r.getWind();
+    
+    assertNotNull(w);
+    assertTrue(w.isVariating());
+    assertNotNull(w.getVariation());
+    assertEquals(new Heading(30), w.getVariation().getFrom());
+    assertEquals(new Heading(80), w.getVariation().getTo());
   }
 }

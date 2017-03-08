@@ -3,6 +3,7 @@ package eng.metarJava;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.exception.NullArgumentException;
 import eng.metarJava.support.Heading;
+import eng.metarJava.support.Variation;
 
 /**
  * Represents info about the wind.
@@ -14,23 +15,42 @@ public class WindInfo {
   private final Heading direction;
   private final double speedInKmh;
   private final Double gustSpeedInKmh;
+  private final Variation<Heading> variation;
 
-  public WindInfo(Heading direction, double speedInKmh, Double gustSpeedInKmh) {
+  public WindInfo(Heading direction, double speedInKmh, Double gustSpeedInKmh,
+          Variation<Heading> variation) {
     if (speedInKmh < 0) {
-      throw new IllegalArgumentException("speedInKmh cannot be negative.");
+      throw new IllegalArgumentException("[speedInKmh] cannot be negative.");
     }
     if (gustSpeedInKmh != null && gustSpeedInKmh < 0) {
-      throw new IllegalArgumentException("gustSpeedInKmh (if used) cannot be negative.");
+      throw new IllegalArgumentException("[gustSpeedInKmh] (if present) cannot be negative.");
     }
+    if (gustSpeedInKmh != null && speedInKmh >= gustSpeedInKmh) {
+      throw new IllegalArgumentException("[gustSpeedInKmh], if present, must be greater than [speedInKmh]");
+    }
+    if (direction == null && variation != null) {
+      throw new IllegalArgumentException("[variation] cannot be set if [direction] is null.");
+    }
+
     this.direction = direction;
     this.speedInKmh = speedInKmh;
     this.gustSpeedInKmh = gustSpeedInKmh;
+    this.variation = variation;
   }
 
   public WindInfo(Heading direction, int speed, Integer gustSpeed, SpeedUnit speedUnit) {
     this(direction,
             SpeedUnit.convert(speed, speedUnit, SpeedUnit.KMH),
-            SpeedUnit.convert(gustSpeed, speedUnit, SpeedUnit.KMH));
+            SpeedUnit.convert(gustSpeed, speedUnit, SpeedUnit.KMH),
+            null);
+  }
+  
+  public WindInfo(Heading direction, int speed, Integer gustSpeed, SpeedUnit speedUnit,
+          Variation<Heading> variation) {
+    this(direction,
+            SpeedUnit.convert(speed, speedUnit, SpeedUnit.KMH),
+            SpeedUnit.convert(gustSpeed, speedUnit, SpeedUnit.KMH),
+            variation);
   }
 
   /**
@@ -100,10 +120,24 @@ public class WindInfo {
   /**
    * Retuns true if wind is variable.
    *
-   * @return Wind is variable if no heading is set.
+   * @return 
+   * Wind is variable if no heading is set.
    */
   public boolean isVariable() {
     return this.direction == null;
+  }
+  
+  /**
+   * Returns true if wind is variating between different headings.
+   * @return 
+   * Wind is variating if heading variations are set.
+   */
+  public boolean isVariating(){
+    return this.variation != null;
+  }
+
+  public Variation<Heading> getVariation() {
+    return variation;
   }
 
   public Double getGustSpeedInKmh() {

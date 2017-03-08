@@ -8,6 +8,7 @@ import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.Heading;
+import eng.metarJava.support.Variation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -107,21 +108,28 @@ class SharedParse {
         isVrb = matcher.group(1).equals("VRB");
         if (!isVrb) {
           hdg = new Heading(groupToInt(matcher.group(1)));
-        } else hdg = null;
+        } else {
+          hdg = null;
+        }
         spd = groupToInt(matcher.group(2));
         if (groupExist(matcher.group(3))) {
           gustSpd = groupToInt(matcher.group(4));
-        } else gustSpd = null;
-        if (matcher.group(5).equals("KT"))
+        } else {
+          gustSpd = null;
+        }
+        if (matcher.group(5).equals("KT")) {
           unit = SpeedUnit.KT;
-        else if (matcher.group(5).equals("KMH"))
+        } else if (matcher.group(5).equals("KMH")) {
           unit = SpeedUnit.KMH;
-        else if (matcher.group(5).equals("MPS"))
+        } else if (matcher.group(5).equals("MPS")) {
           unit = SpeedUnit.MPS;
-        else
+        } else {
           throw new UnsupportedOperationException();
+        }
         rl.move(matcher.group(0).length(), true);
-        ret = new WindInfo(hdg, spd, gustSpd, unit);
+
+        Variation<Heading> variations = decodeHeadingVariations(rl);
+        ret = new WindInfo(hdg, spd, gustSpd, unit, variations);
       } else {
         throw new MissingFieldException(ReportField.wind, rl.getPre(), rl.getPost());
       }
@@ -131,6 +139,23 @@ class SharedParse {
 
   private static boolean groupExist(String groupText) {
     return groupText != null;
+  }
+
+  private static Variation<Heading> decodeHeadingVariations(ReportLine rl) {
+    Variation<Heading> ret =  null;
+    String regex = "(\\d{3})V(\\d{3})";
+    final Pattern pattern = Pattern.compile(regex);
+    final Matcher matcher = pattern.matcher(rl.getPre());
+
+    if (matcher.find()){
+      int from = groupToInt(matcher.group(1));
+      int to = groupToInt(matcher.group(2));
+      ret = new Variation<>(new Heading(from), new Heading(to));
+      
+      rl.move(matcher.group(0).length(), true);      
+    }
+    
+    return ret;
   }
 
 }

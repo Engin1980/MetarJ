@@ -81,4 +81,12 @@ public class Report {
     this.wind = wind;
   }
   
+  private VisibilityInfo visibility;
+  public VisibilityInfo getVisibility() {
+    return visibility;
+  }
+  public void setVisibility(VisibilityInfo visibility) {
+    this.visibility = visibility;
+  }
+  
 }
