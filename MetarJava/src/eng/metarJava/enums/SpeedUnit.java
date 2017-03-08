@@ -18,7 +18,14 @@ public enum SpeedUnit {
     return ret;
   }
   
+  public static Double convert(Integer value, SpeedUnit sourceUnit, SpeedUnit targetUnit){
+    if (value == null) return null;
+    Double ret = convert((double) value, sourceUnit, targetUnit);
+    return ret;
+  }
+  
   public static Double convert(Double value, SpeedUnit sourceUnit, SpeedUnit targetUnit){
+    if (value == null) return null;
     Double inKmh = convertToKmh(value, sourceUnit);
     Double ret = convertFromKmh(inKmh, targetUnit);
     return ret;

@@ -33,23 +33,22 @@ public class Report {
     this.correction = correction;
   }
   
-  private String icao;
+  private String icao = "////";
   public String getIcao() {
     return icao;
   }
   public void setIcao(String icao) {
     if (icao == null) throw new NullArgumentException("icao");
     if (icao.length() != 4) throw new IllegalArgumentException("Icao length must be 4 characters.");
-    if (icao.equals("////")) throw new IllegalArgumentException("ICAO cannot be set to ////");
     this.icao = icao;
   }
   
-  private DayHourMinute time;
-  public DayHourMinute getTime() {
-    return time;
+  private DayHourMinute dayTime;
+  public DayHourMinute getDayTime() {
+    return dayTime;
   }
-  public void setTime(DayHourMinute time) {
-    this.time = time;
+  public void setDayTime(DayHourMinute time) {
+    this.dayTime = time;
   }
   
   /**
