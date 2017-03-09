@@ -1,5 +1,6 @@
 package eng.metarJava.decoders;
 
+import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.VisibilityVariability;
@@ -12,6 +13,9 @@ import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.Heading;
+import eng.metarJava.support.PhenomenaDescriptor;
+import eng.metarJava.support.PhenomenaIntensity;
+import eng.metarJava.support.PhenomenaType;
 import eng.metarJava.support.Variation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -206,27 +210,61 @@ class SharedParse {
   static RunwayVisualRange decodeRunwayVisualRange(ReportLine rl) {
     RunwayVisualRange ret;
 
-    String regex = "R(\\d{2}[RLC]?)\\/(\\d{4})(V(\\d{4}))?";
+    String regex = "^R(\\d{2}[RLC]?)\\/(\\d{4})(V(\\d{4}))?";
     final Pattern pattern = Pattern.compile(regex);
     final Matcher matcher = pattern.matcher(rl.getPre());
     if (matcher.find()) {
       String rwy = matcher.group(1);
       int vis = groupToInt(matcher.group(2));
       Integer varVis;
-      if (groupExist(matcher.group(3))){
+      if (groupExist(matcher.group(3))) {
         varVis = groupToInt(matcher.group(4));
       } else {
         varVis = null;
       }
-      if (varVis == null)
+      if (varVis == null) {
         ret = new RunwayVisualRange(rwy, vis);
-      else
+      } else {
         ret = new RunwayVisualRange(rwy, new Variation<>(vis, varVis));
+      }
 
       rl.move(matcher.group(0).length(), true);
-    } else{
+    } else {
       ret = null;
     }
+    return ret;
+  }
+
+  static PhenomenaInfo decodePhenomena(ReportLine rl) {
+    PhenomenaInfo ret;
+
+    String regex = "^([+-])?([A-Z]{2})?([A-Z]{2}(?<!VC))(VC)? ";
+    final Pattern pattern = Pattern.compile(regex);
+    final Matcher matcher = pattern.matcher(rl.getPre());
+    if (matcher.find()) {
+      PhenomenaIntensity i = PhenomenaIntensity.moderate;
+      if (groupExist(matcher.group(1))) {
+        if (matcher.group(1).equals("+")) {
+          i = PhenomenaIntensity.heavy;
+        } else if (matcher.group(1).equals("-")) {
+          i = PhenomenaIntensity.light;
+        } else {
+          throw new UnsupportedOperationException("Unknown phenomena intensity");
+        }
+      }
+      PhenomenaDescriptor d = PhenomenaDescriptor.none;
+      if (groupExist(matcher.group(2))) {
+        d = PhenomenaDescriptor.valueOf(matcher.group(2));
+      }
+      PhenomenaType t = PhenomenaType.valueOf(matcher.group(3));
+      boolean isVC = groupExist(matcher.group(4));
+      
+      ret = new PhenomenaInfo(i, d, t, isVC);
+      rl.move(matcher.group(0).length(), isVC);
+    } else {
+      ret = null;
+    }
+
     return ret;
   }
 

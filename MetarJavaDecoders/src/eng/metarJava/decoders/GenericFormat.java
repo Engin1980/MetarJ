@@ -1,5 +1,6 @@
 package eng.metarJava.decoders;
 
+import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.Report;
 import eng.metarJava.RunwayVisualRange;
 
@@ -25,6 +26,7 @@ public class GenericFormat implements IParse {
     ret.setWind(SharedParse.decodeWind(rl));
     ret.setVisibility(SharedParse.decodeVisibility(rl));
     decodeRunwayVisualRanges(ret, rl);
+    decodePhenomenas(ret, rl);
     
     return ret;
   }
@@ -35,6 +37,16 @@ public class GenericFormat implements IParse {
     while (rvr != null){
       ret.getRunwayVisualRanges().add(rvr);
       rvr = SharedParse.decodeRunwayVisualRange(rl);
+    }
+  }
+
+  private void decodePhenomenas(Report ret, ReportLine rl) {
+    PhenomenaInfo pi;
+    
+    pi = SharedParse.decodePhenomena(rl);
+    while (pi != null){
+      ret.getPhenomenas().add(pi);
+      pi = SharedParse.decodePhenomena(rl);
     }
   }
 }

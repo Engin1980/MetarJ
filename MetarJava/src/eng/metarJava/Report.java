@@ -95,5 +95,10 @@ public class Report {
   public List<RunwayVisualRange> getRunwayVisualRanges() {
     return runwayVisualRanges;
   }
+
+  private List<PhenomenaInfo> phenomenas = new ArrayList<>();
+  public List<PhenomenaInfo> getPhenomenas() {
+    return phenomenas;
+  }
   
 }
