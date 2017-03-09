@@ -1,9 +1,12 @@
 package eng.metarJava.decoders;
 
+import eng.metarJava.VisibilityInfo;
+import eng.metarJava.VisibilityVariability;
 import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.exceptions.MissingFieldException;
 import eng.metarJava.decoders.exceptions.ParseException;
 import eng.metarJava.decoders.fields.ReportField;
+import eng.metarJava.enums.Direction;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.support.DayHourMinute;
@@ -86,7 +89,7 @@ class SharedParse {
 
   static WindInfo decodeWind(ReportLine rl) {
     WindInfo ret;
-    final String regexSet = "(VRB|\\d{3})(\\d{2})(G(\\d{2}))?(KT|KMH|MPS)";
+    final String regexSet = "^(VRB|\\d{3})(\\d{2})(G(\\d{2}))?(KT|KMH|MPS)";
 
     boolean isUnset = decodeFixedString(rl, "/////KT")
             || decodeFixedString(rl, "/////MPS")
@@ -142,19 +145,60 @@ class SharedParse {
   }
 
   private static Variation<Heading> decodeHeadingVariations(ReportLine rl) {
-    Variation<Heading> ret =  null;
-    String regex = "(\\d{3})V(\\d{3})";
+    Variation<Heading> ret = null;
+    String regex = "^(\\d{3})V(\\d{3})";
     final Pattern pattern = Pattern.compile(regex);
     final Matcher matcher = pattern.matcher(rl.getPre());
 
-    if (matcher.find()){
+    if (matcher.find()) {
       int from = groupToInt(matcher.group(1));
       int to = groupToInt(matcher.group(2));
       ret = new Variation<>(new Heading(from), new Heading(to));
-      
-      rl.move(matcher.group(0).length(), true);      
+
+      rl.move(matcher.group(0).length(), true);
     }
-    
+
+    return ret;
+  }
+
+  static VisibilityInfo decodeVisibility(ReportLine rl) {
+    VisibilityInfo ret;
+
+    boolean isCavok = decodeFixedString(rl, "CAVOK");
+    if (isCavok) {
+      ret = new VisibilityInfo(null, false, null);
+    } else {
+      String regex = "^(\\d{4})(NDV)?";
+      final Pattern pattern = Pattern.compile(regex);
+      final Matcher matcher = pattern.matcher(rl.getPre());
+      if (matcher.find()) {
+        int vis = groupToInt(matcher.group(1));
+        boolean isNVD = groupExist(matcher.group(2));
+        rl.move(matcher.group(0).length(), true);
+        VisibilityVariability var = decodeVisibilityVariability(rl);
+        ret = new VisibilityInfo(vis, isNVD, var);
+      } else {
+        throw new MissingFieldException(ReportField.visibility, rl.getPre(), rl.getPost());
+      }
+    }
+
+    return ret;
+  }
+
+  private static VisibilityVariability decodeVisibilityVariability(ReportLine rl) {
+    VisibilityVariability ret = null;
+
+    String regex = "^(\\d{4})([NSEW])";
+    final Pattern pattern = Pattern.compile(regex);
+    final Matcher matcher = pattern.matcher(rl.getPre());
+    if (matcher.find()) {
+      int vis = groupToInt(matcher.group(1));
+      String dir = matcher.group(2);
+      Direction d = Direction.parse(dir.charAt(0));
+      ret = new VisibilityVariability(vis, d);
+
+      rl.move(matcher.group(0).length(), true);
+    }
     return ret;
   }
 

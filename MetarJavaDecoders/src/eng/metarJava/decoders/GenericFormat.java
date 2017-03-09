@@ -22,6 +22,7 @@ public class GenericFormat implements IParse {
     
     ret.setAuto(SharedParse.decodeAuto(rl));
     ret.setWind(SharedParse.decodeWind(rl));
+    ret.setVisibility(SharedParse.decodeVisibility(rl));
     
     return ret;
   }
