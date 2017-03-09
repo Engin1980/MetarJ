@@ -1,6 +1,7 @@
 package eng.metarJava.decoders;
 
 import eng.metarJava.Report;
+import eng.metarJava.RunwayVisualRange;
 
 /**
  *
@@ -23,8 +24,17 @@ public class GenericFormat implements IParse {
     ret.setAuto(SharedParse.decodeAuto(rl));
     ret.setWind(SharedParse.decodeWind(rl));
     ret.setVisibility(SharedParse.decodeVisibility(rl));
+    decodeRunwayVisualRanges(ret, rl);
     
     return ret;
   }
-  
+
+  private void decodeRunwayVisualRanges(Report ret, ReportLine rl) {
+    RunwayVisualRange rvr;
+    rvr = SharedParse.decodeRunwayVisualRange(rl);
+    while (rvr != null){
+      ret.getRunwayVisualRanges().add(rvr);
+      rvr = SharedParse.decodeRunwayVisualRange(rl);
+    }
+  }
 }

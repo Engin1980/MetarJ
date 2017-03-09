@@ -8,6 +8,8 @@ package eng.metarJava;
 import eng.metarJava.enums.*;
 import eng.metarJava.exception.NullArgumentException;
 import eng.metarJava.support.DayHourMinute;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -87,6 +89,11 @@ public class Report {
   }
   public void setVisibility(VisibilityInfo visibility) {
     this.visibility = visibility;
+  }
+  
+  private List<RunwayVisualRange> runwayVisualRanges = new ArrayList<>();
+  public List<RunwayVisualRange> getRunwayVisualRanges() {
+    return runwayVisualRanges;
   }
   
 }

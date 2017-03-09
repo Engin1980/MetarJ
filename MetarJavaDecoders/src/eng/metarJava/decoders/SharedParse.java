@@ -1,5 +1,6 @@
 package eng.metarJava.decoders;
 
+import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.VisibilityVariability;
 import eng.metarJava.WindInfo;
@@ -198,6 +199,33 @@ class SharedParse {
       ret = new VisibilityVariability(vis, d);
 
       rl.move(matcher.group(0).length(), true);
+    }
+    return ret;
+  }
+
+  static RunwayVisualRange decodeRunwayVisualRange(ReportLine rl) {
+    RunwayVisualRange ret;
+
+    String regex = "R(\\d{2}[RLC]?)\\/(\\d{4})(V(\\d{4}))?";
+    final Pattern pattern = Pattern.compile(regex);
+    final Matcher matcher = pattern.matcher(rl.getPre());
+    if (matcher.find()) {
+      String rwy = matcher.group(1);
+      int vis = groupToInt(matcher.group(2));
+      Integer varVis;
+      if (groupExist(matcher.group(3))){
+        varVis = groupToInt(matcher.group(4));
+      } else {
+        varVis = null;
+      }
+      if (varVis == null)
+        ret = new RunwayVisualRange(rwy, vis);
+      else
+        ret = new RunwayVisualRange(rwy, new Variation<>(vis, varVis));
+
+      rl.move(matcher.group(0).length(), true);
+    } else{
+      ret = null;
     }
     return ret;
   }
