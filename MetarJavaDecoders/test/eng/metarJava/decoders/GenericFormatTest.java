@@ -1,6 +1,7 @@
 package eng.metarJava.decoders;
 
 import eng.metarJava.Report;
+import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.WindInfo;
 import eng.metarJava.enums.Direction;
@@ -19,7 +20,7 @@ public class GenericFormatTest {
   private static final String LKMT = "METAR LKMT 241812Z 02032KT 5000NDV";
   private static final String LKMT_VARIATING_WIND = "METAR LKMT 241812Z 02032KT 030V080 CAVOK";
   private static final String LKMT_NO_WIND = "METAR LKMT 241812Z /////KT CAVOK";
-  private static final String LKPR = "METAR COR LKPR 312345Z 02012G25KT 2000 0800E";
+  private static final String LKPR = "METAR COR LKPR 312345Z 02012G25KT 2000 0800E R06/0700 R24C/0200V0500";
   private static final String LKPR_NIL = "METAR COR LKPR 312345Z NIL";
   private static final String UUEE = "METAR COR UUEE 312345Z 35037G41MPS CAVOK";
 
@@ -185,5 +186,29 @@ public class GenericFormatTest {
     assertTrue(v.isVariating());
     assertEquals(800, v.getVariability().getVisibilityInMeters());
     assertEquals(Direction.east, v.getVariability().getDirection());
+  }
+  
+  @Test
+  public void testParseRunwayVisualRange() {
+    IParse p = new GenericFormat();
+    Report r = p.parse(LKPR);
+    RunwayVisualRange rvr;
+    
+    assertEquals(2, r.getRunwayVisualRanges().size());
+    
+    rvr = r.getRunwayVisualRanges().get(0);
+    assertFalse(rvr.isVariating());
+    assertEquals("06", rvr.getRunwayDesignator());
+    assertNotNull(rvr.getVisibilityInMeters());
+    assertNull(rvr.getVariatingVisibilityInMeters());
+    assertEquals(700, (int) rvr.getVisibilityInMeters());
+    
+    rvr = r.getRunwayVisualRanges().get(1);
+    assertTrue(rvr.isVariating());
+    assertEquals("24C", rvr.getRunwayDesignator());
+    assertNull(rvr.getVisibilityInMeters());
+    assertNotNull(rvr.getVariatingVisibilityInMeters());
+    assertEquals(200, (int) rvr.getVariatingVisibilityInMeters().getFrom());
+    assertEquals(500, (int) rvr.getVariatingVisibilityInMeters().getTo());
   }
 }
