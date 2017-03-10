@@ -151,8 +151,12 @@ public class Report {
     this.runwayWindshears = runwayWindshear;
   }
   
-  private final List<RunwayState> runwayStates = new ArrayList<>();
-  public List<RunwayState> getRunwayStates() {
-    return runwayStates;
+  private RunwayStatesInfo runwayStateInfo;
+  public RunwayStatesInfo getRunwayStateInfo() {
+    return runwayStateInfo;
   }
+  public void setRunwayStateInfo(RunwayStatesInfo runwayStateInfo) {
+    this.runwayStateInfo = runwayStateInfo;
+  }
+  
 }

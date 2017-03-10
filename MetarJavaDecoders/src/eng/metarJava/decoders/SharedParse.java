@@ -2,6 +2,8 @@ package eng.metarJava.decoders;
 
 import eng.metarJava.CloudInfo;
 import eng.metarJava.PhenomenaInfo;
+import eng.metarJava.RunwayState;
+import eng.metarJava.RunwayStatesInfo;
 import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.RunwayWindshearInfo;
 import eng.metarJava.VisibilityInfo;
@@ -23,8 +25,11 @@ import eng.metarJava.support.PhenomenaDescriptor;
 import eng.metarJava.support.PhenomenaIntensity;
 import eng.metarJava.support.PhenomenaType;
 import eng.metarJava.support.Variation;
+import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -397,22 +402,63 @@ class SharedParse {
   }
 
   static RunwayWindshearInfo decodeWindShears(ReportLine rl) {
-    RunwayWindshearInfo ret = new RunwayWindshearInfo();
+    RunwayWindshearInfo ret;
 
     if (decodeFixedString(rl, "WS ALL RWY")) {
-      ret.setAllRunways(true);
+      ret = new RunwayWindshearInfo(true);
     } else {
+      Set<String> tmp = new HashSet();
       String regex = "^WS R(\\d{2}[RLC]?)";
       final Pattern pattern = Pattern.compile(regex);
       Matcher matcher = pattern.matcher(rl.getPre());
       if (matcher.find()) {
         String r = matcher.group(1);
-        ret.add(r);
+        tmp.add(r);
         rl.move(matcher.group(0).length(), true);
         matcher = pattern.matcher(rl.getPre());
       }
+      ret = new RunwayWindshearInfo(tmp);
     }
 
+    return ret;
+  }
+
+  /**
+   * Skips sea temperature and state. Not important for aviation.
+   * @param rl 
+   */
+  static void decodeSeaTemperatureAndState(ReportLine rl) {
+    String regex = "^SM?\\d{2}\\/S\\d{1}";
+    final Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(rl.getPre());
+    if (matcher.find()) {
+      rl.move(matcher.group(0).length(), true);
+    }
+  }
+
+  static RunwayStatesInfo decodeRunwayStateInfo(ReportLine rl) {
+    if (decodeFixedString(rl, "SNOCLO"))
+      return new RunwayStatesInfo(true);
+    
+    List<RunwayState> rss = new ArrayList();
+    String regex = "^R(\\d{2}[RLC]?)\\/([0-9\\/])([0-9\\/])(\\d{2}|\\/\\/)(\\d{2}|\\/\\/)";
+    final Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(rl.getPre());
+    while (matcher.find()) {
+      
+      String rwy = matcher.group(1);
+      char deposit = matcher.group(2).charAt(0);
+      char contamination = matcher.group(3).charAt(0);
+      String depth = matcher.group(4);
+      String brake = matcher.group(5);
+      
+      RunwayState rs = new RunwayState(rwy, deposit, contamination, depth, brake);
+      rss.add(rs);
+      
+      rl.move(matcher.group(0).length(), true);
+      matcher = pattern.matcher(rl.getPre());
+    }
+    RunwayStatesInfo ret = new RunwayStatesInfo(rss);
     return ret;
   }
 }
