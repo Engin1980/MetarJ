@@ -1,5 +1,6 @@
 package eng.metarJava.decoders;
 
+import eng.metarJava.CloudInfo;
 import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.VisibilityInfo;
@@ -8,15 +9,21 @@ import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.exceptions.MissingFieldException;
 import eng.metarJava.decoders.exceptions.ParseException;
 import eng.metarJava.decoders.fields.ReportField;
+import eng.metarJava.enums.CloudAmount;
+import eng.metarJava.enums.CloudInfoSpecialStates;
 import eng.metarJava.enums.Direction;
 import eng.metarJava.enums.ReportType;
+import eng.metarJava.enums.CloudMassSignificantFlag;
 import eng.metarJava.enums.SpeedUnit;
+import eng.metarJava.support.CloudMass;
 import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.Heading;
 import eng.metarJava.support.PhenomenaDescriptor;
 import eng.metarJava.support.PhenomenaIntensity;
 import eng.metarJava.support.PhenomenaType;
 import eng.metarJava.support.Variation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -258,13 +265,108 @@ class SharedParse {
       }
       PhenomenaType t = PhenomenaType.valueOf(matcher.group(3));
       boolean isVC = groupExist(matcher.group(4));
-      
+
       ret = new PhenomenaInfo(i, d, t, isVC);
       rl.move(matcher.group(0).length(), isVC);
     } else {
       ret = null;
     }
 
+    return ret;
+  }
+
+  static CloudInfo decodeClouds(ReportLine rl) {
+    CloudInfo ret;
+    if (decodeFixedString(rl, "NSC")) {
+      ret = new CloudInfo(CloudInfoSpecialStates.NSC);
+    } else if (decodeFixedString(rl, "NCD")) {
+      ret = new CloudInfo(CloudInfoSpecialStates.NCD);
+    } else {
+      String vvRegex = "^VV(\\d{3})";
+      final Pattern vvPattern = Pattern.compile(vvRegex);
+      final Matcher matcher = vvPattern.matcher(rl.getPre());
+      if (matcher.find()) {
+        // is VV
+        int vv = groupToInt(matcher.group(1));
+        ret = new CloudInfo(vv);
+        rl.move(matcher.group(0).length(), true);
+      } else {
+        List<CloudMass> cls = decodeCloudAmounts(rl);
+        if (cls.isEmpty()) {
+          throw new MissingFieldException(ReportField.clouds, rl.getPre(), rl.getPost());
+        } else {
+          ret = new CloudInfo(cls);
+        }
+      }
+    }
+    return ret;
+  }
+
+  private static List<CloudMass> decodeCloudAmounts(ReportLine rl) {
+    List<CloudMass> ret = new ArrayList<>();
+
+    String regex = "^([A-Z]{3})(\\d{3})(TCU|CB)?";
+    final Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(rl.getPre());
+    while (matcher.find()) {
+      String tmp = matcher.group(1);
+      CloudAmount ca = CloudAmount.valueOf(tmp);
+      int alt = groupToInt(matcher.group(2));
+      CloudMassSignificantFlag flag = CloudMassSignificantFlag.none;
+      if (groupExist(matcher.group(3))) {
+        flag = CloudMassSignificantFlag.valueOf(matcher.group(3));
+      }
+      CloudMass cm = new CloudMass(ca, alt, flag);
+      ret.add(cm);
+      rl.move(matcher.group(0).length(), true);
+      matcher = pattern.matcher(rl.getPre());
+    }
+    return ret;
+  }
+
+  /**
+   * Returns two element array - first element is temperature, second is dewPoint.
+   *
+   * @param rl report line
+   * @return
+   */
+  static Integer[] decodeTemperatureAndDewPoint(ReportLine rl) {
+    Integer[] ret;
+
+    String regex = "^(M)?(\\d{2})\\/(M)?(\\d{2})";
+    final Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(rl.getPre());
+    if (matcher.find()) {
+      int temp = groupToInt(matcher.group(2));
+      int dew = groupToInt(matcher.group(4));
+      if (groupExist(matcher.group(1))) {
+        temp = -temp;
+      }
+      if (groupExist(matcher.group(3))) {
+        dew = -dew;
+      }
+
+      ret = new Integer[2];
+      ret[0] = temp;
+      ret[1] = dew;
+
+      rl.move(matcher.group(0).length(), true);
+    } else {
+      throw new MissingFieldException(ReportField.temperatureDewPoint, rl.getPre(), rl.getPost());
+    }
+    return ret;
+  }
+
+  static int decodePressureInHp(ReportLine rl) {
+    int ret;
+    String regex = "^Q(\\d{4})";
+    final Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(rl.getPre());
+    if (matcher.find()) {
+      ret = groupToInt(matcher.group(1));
+    } else {
+      throw new MissingFieldException(ReportField.pressure, rl.getPre(), rl.getPost());
+    }
     return ret;
   }
 

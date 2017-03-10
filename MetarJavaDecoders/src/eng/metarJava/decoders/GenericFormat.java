@@ -27,6 +27,9 @@ public class GenericFormat implements IParse {
     ret.setVisibility(SharedParse.decodeVisibility(rl));
     decodeRunwayVisualRanges(ret, rl);
     decodePhenomenas(ret, rl);
+    ret.setClouds(SharedParse.decodeClouds(rl));
+    decodeTempAndDew(ret,rl);
+    ret.setPressureInHp(SharedParse.decodePressureInHp(rl));
     
     return ret;
   }
@@ -48,5 +51,12 @@ public class GenericFormat implements IParse {
       ret.getPhenomenas().add(pi);
       pi = SharedParse.decodePhenomena(rl);
     }
+  }
+
+  private void decodeTempAndDew(Report ret, ReportLine rl) {
+    Integer [] tmp = SharedParse.decodeTemperatureAndDewPoint(rl);
+    
+    ret.setTemperature(tmp[0]);
+    ret.setDewPoint(tmp[1]);
   }
 }

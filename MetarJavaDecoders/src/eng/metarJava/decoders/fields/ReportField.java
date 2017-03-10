@@ -9,5 +9,8 @@ public enum ReportField {
   icao,
   dayTime,
   wind,
-  visibility
+  visibility,
+  clouds,
+  temperatureDewPoint,
+  pressure
 }

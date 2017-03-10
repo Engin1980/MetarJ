@@ -16,6 +16,7 @@ import java.util.List;
  * @author Marek Vajgl
  */
 public class Report {
+
   private ReportType type;
   public ReportType getType() {
     return type;
@@ -23,7 +24,7 @@ public class Report {
   public void setType(ReportType type) {
     this.type = type;
   }
-  
+
   /**
    * COR
    */
@@ -34,17 +35,21 @@ public class Report {
   public void setCorrection(boolean correction) {
     this.correction = correction;
   }
-  
+
   private String icao = "////";
   public String getIcao() {
     return icao;
   }
   public void setIcao(String icao) {
-    if (icao == null) throw new NullArgumentException("icao");
-    if (icao.length() != 4) throw new IllegalArgumentException("Icao length must be 4 characters.");
+    if (icao == null) {
+      throw new NullArgumentException("icao");
+    }
+    if (icao.length() != 4) {
+      throw new IllegalArgumentException("Icao length must be 4 characters.");
+    }
     this.icao = icao;
   }
-  
+
   private DayHourMinute dayTime;
   public DayHourMinute getDayTime() {
     return dayTime;
@@ -52,7 +57,7 @@ public class Report {
   public void setDayTime(DayHourMinute time) {
     this.dayTime = time;
   }
-  
+
   /**
    * NIL
    */
@@ -63,7 +68,7 @@ public class Report {
   public void setNil(boolean nil) {
     this.nil = nil;
   }
-  
+
   /**
    * AUTO
    */
@@ -74,7 +79,7 @@ public class Report {
   public void setAuto(boolean auto) {
     this.auto = auto;
   }
-  
+
   private WindInfo wind;
   public WindInfo getWind() {
     return wind;
@@ -82,7 +87,7 @@ public class Report {
   public void setWind(WindInfo wind) {
     this.wind = wind;
   }
-  
+
   private VisibilityInfo visibility;
   public VisibilityInfo getVisibility() {
     return visibility;
@@ -90,15 +95,48 @@ public class Report {
   public void setVisibility(VisibilityInfo visibility) {
     this.visibility = visibility;
   }
-  
-  private List<RunwayVisualRange> runwayVisualRanges = new ArrayList<>();
+
+  private final List<RunwayVisualRange> runwayVisualRanges = new ArrayList<>();
   public List<RunwayVisualRange> getRunwayVisualRanges() {
     return runwayVisualRanges;
   }
 
-  private List<PhenomenaInfo> phenomenas = new ArrayList<>();
+  private final List<PhenomenaInfo> phenomenas = new ArrayList<>();
   public List<PhenomenaInfo> getPhenomenas() {
     return phenomenas;
   }
+
+  private CloudInfo clouds;
+  public CloudInfo getClouds() {
+    return clouds;
+  }
+  public void setClouds(CloudInfo clouds) {
+    this.clouds = clouds;
+  }
+
+  private int temperature;
+  public int getTemperature() {
+    return temperature;
+  }
+  public void setTemperature(int temperature) {
+    this.temperature = temperature;
+  }
+
+  private int dewPoint;
+  public int getDewPoint() {
+    return dewPoint;
+  }
+  public void setDewPoint(int dewPoint) {
+    this.dewPoint = dewPoint;
+  }
   
+  private int pressureInHp;
+  public int getPressureInHp() {
+    return pressureInHp;
+  }
+  public void setPressureInHp(int pressureInHp) {
+    this.pressureInHp = pressureInHp;
+  }
+  
+
 }
