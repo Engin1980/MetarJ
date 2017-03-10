@@ -3,6 +3,7 @@ package eng.metarJava.decoders;
 import eng.metarJava.CloudInfo;
 import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.RunwayVisualRange;
+import eng.metarJava.RunwayWindshearInfo;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.VisibilityVariability;
 import eng.metarJava.WindInfo;
@@ -357,17 +358,61 @@ class SharedParse {
     return ret;
   }
 
-  static int decodePressureInHp(ReportLine rl) {
+  static int decodePressureInHpa(ReportLine rl) {
     int ret;
     String regex = "^Q(\\d{4})";
     final Pattern pattern = Pattern.compile(regex);
     Matcher matcher = pattern.matcher(rl.getPre());
     if (matcher.find()) {
       ret = groupToInt(matcher.group(1));
+      rl.move(matcher.group(0).length(), true);
     } else {
       throw new MissingFieldException(ReportField.pressure, rl.getPre(), rl.getPost());
     }
     return ret;
   }
 
+  static PhenomenaInfo decodeRecentPhenomena(ReportLine rl) {
+    PhenomenaInfo ret;
+
+    String regex = "^RE([A-Z]{2})?([A-Z]{2}(?<!VC))(VC)? ";
+    final Pattern pattern = Pattern.compile(regex);
+    final Matcher matcher = pattern.matcher(rl.getPre());
+    if (matcher.find()) {
+      PhenomenaIntensity i = PhenomenaIntensity.moderate;
+      PhenomenaDescriptor d = PhenomenaDescriptor.none;
+      if (groupExist(matcher.group(1))) {
+        d = PhenomenaDescriptor.valueOf(matcher.group(1));
+      }
+      PhenomenaType t = PhenomenaType.valueOf(matcher.group(2));
+      boolean isVC = groupExist(matcher.group(3));
+
+      ret = new PhenomenaInfo(i, d, t, isVC);
+      rl.move(matcher.group(0).length(), isVC);
+    } else {
+      ret = null;
+    }
+
+    return ret;
+  }
+
+  static RunwayWindshearInfo decodeWindShears(ReportLine rl) {
+    RunwayWindshearInfo ret = new RunwayWindshearInfo();
+
+    if (decodeFixedString(rl, "WS ALL RWY")) {
+      ret.setAllRunways(true);
+    } else {
+      String regex = "^WS R(\\d{2}[RLC]?)";
+      final Pattern pattern = Pattern.compile(regex);
+      Matcher matcher = pattern.matcher(rl.getPre());
+      if (matcher.find()) {
+        String r = matcher.group(1);
+        ret.add(r);
+        rl.move(matcher.group(0).length(), true);
+        matcher = pattern.matcher(rl.getPre());
+      }
+    }
+
+    return ret;
+  }
 }

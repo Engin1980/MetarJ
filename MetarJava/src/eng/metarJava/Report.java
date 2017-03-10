@@ -130,13 +130,29 @@ public class Report {
     this.dewPoint = dewPoint;
   }
   
-  private int pressureInHp;
-  public int getPressureInHp() {
-    return pressureInHp;
+  private int pressureInHpa;
+  public int getPressureInHpa() {
+    return pressureInHpa;
   }
-  public void setPressureInHp(int pressureInHp) {
-    this.pressureInHp = pressureInHp;
+  public void setPressureInHpa(int pressureInHpa) {
+    this.pressureInHpa = pressureInHpa;
   }
   
-
+  private final List<PhenomenaInfo> recentPhenomenas = new ArrayList<>();
+  public List<PhenomenaInfo> getRecentPhenomenas() {
+    return recentPhenomenas;
+  }
+  
+  private RunwayWindshearInfo runwayWindshears;
+  public RunwayWindshearInfo getRunwayWindshears() {
+    return runwayWindshears;
+  }
+  public void setRunwayWindshears(RunwayWindshearInfo runwayWindshear) {
+    this.runwayWindshears = runwayWindshear;
+  }
+  
+  private final List<RunwayState> runwayStates = new ArrayList<>();
+  public List<RunwayState> getRunwayStates() {
+    return runwayStates;
+  }
 }
