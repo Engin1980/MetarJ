@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="eng.metarJava.demoClient.FrmMainController">
+  <stylesheets>
+    <URL value="@frmmain.css" />
+  </stylesheets>
+   <children>
+      <BorderPane prefHeight="431.0" prefWidth="611.0">
+         <top>
+            <FlowPane orientation="VERTICAL" prefHeight="65.0" prefWidth="611.0" BorderPane.alignment="CENTER">
+               <children>
+                  <FlowPane prefHeight="33.0" prefWidth="608.0">
+                     <children>
+                        <Label text="Enter station code:" />
+                        <TextField fx:id="txtIcao" promptText="(ICAO code)" text="LKPR" />
+                        <Button fx:id="btnDownload" mnemonicParsing="false" onAction="#btnDownload_onAction" text="Download" />
+                     </children>
+                  </FlowPane>
+                  <FlowPane prefHeight="19.0" prefWidth="200.0">
+                     <children>
+                        <TextField id="txtMetar" fx:id="txtMetar" prefHeight="25.0" prefWidth="134.0" />
+                        <Button id="btnDecode" fx:id="btnDecode" mnemonicParsing="false" onAction="#btnDecode_onAction" text="Decode" />
+                     </children>
+                  </FlowPane>
+               </children>
+            </FlowPane>
+         </top>
+         <center>
+            <TreeView fx:id="tvw" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+         </center>
+         <bottom>
+            <Label fx:id="lblState" text="Label" BorderPane.alignment="CENTER" />
+         </bottom>
+      </BorderPane>
+   </children>
+</AnchorPane>
