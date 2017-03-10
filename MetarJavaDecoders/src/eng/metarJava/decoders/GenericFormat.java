@@ -36,6 +36,7 @@ public class GenericFormat implements IParse {
     ret.setRunwayWindshears(SharedParse.decodeWindShears(rl));
     SharedParse.decodeSeaTemperatureAndState(rl); // not valid for aviation
     ret.setRunwayStateInfo(SharedParse.decodeRunwayStateInfo(rl));
+    ret.setTrendInfo(SharedParse.decodeTrendInfo(rl));
     
     return ret;
   }

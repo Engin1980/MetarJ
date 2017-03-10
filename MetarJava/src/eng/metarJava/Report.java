@@ -159,4 +159,13 @@ public class Report {
     this.runwayStateInfo = runwayStateInfo;
   }
   
+  private TrendInfo trendInfo;
+  public TrendInfo getTrendInfo() {
+    return trendInfo;
+  }
+  public void setTrendInfo(TrendInfo trendInfo) {
+    this.trendInfo = trendInfo;
+  }
+  
+  
 }

@@ -6,6 +6,7 @@ import eng.metarJava.RunwayState;
 import eng.metarJava.RunwayStatesInfo;
 import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.RunwayWindshearInfo;
+import eng.metarJava.TrendInfo;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.VisibilityVariability;
 import eng.metarJava.WindInfo;
@@ -461,4 +462,12 @@ class SharedParse {
     RunwayStatesInfo ret = new RunwayStatesInfo(rss);
     return ret;
   }
+
+  static TrendInfo decodeTrendInfo(ReportLine rl) {
+    if (decodeFixedString(rl, "NOSIG"))
+      return new TrendInfo(true);
+    
+    throw new UnsupportedOperationException("Trend decoding is not supported yet.");
+  }
+  
 }

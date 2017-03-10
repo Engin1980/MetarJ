@@ -486,4 +486,14 @@ public class GenericFormatTest {
     assertEquals("39", rs.getDepositDepth());
     assertEquals("//", rs.getBrakingAction());
   }
+  
+  @Test
+  public void testParseNosig() {
+    IParse p = new GenericFormat();
+    Report r = p.parse(LKMT);
+
+    assertNotNull(r.getTrendInfo());
+    assertTrue(r.getTrendInfo().isIsNoSignificantChange());
+    assertNull(r.getTrendInfo().getTrends());
+  }
 }
