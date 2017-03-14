@@ -17,7 +17,60 @@ public class WindInfo {
   private final Double gustSpeedInKmh;
   private final Variation<Heading> variation;
 
-  public WindInfo(Heading direction, double speedInKmh, Double gustSpeedInKmh,
+  public static WindInfo create(Heading direction, double speedInKmh) {
+    if (direction == null) {
+      throw new NullArgumentException("[direction]");
+    }
+    WindInfo ret = createWithOptionals(direction, speedInKmh, null, null);
+    return ret;
+  }
+
+  public static WindInfo create(Heading direction, double speedInKmh, double gustSpeedInKmh) {
+    if (direction == null) {
+      throw new NullArgumentException("[direction]");
+    }
+    WindInfo ret = createWithOptionals(direction, speedInKmh, gustSpeedInKmh, null);
+    return ret;
+  }
+
+  public static WindInfo create(Heading direction, double speedInKmh, Variation<Heading> variation) {
+    if (direction == null) {
+      throw new NullArgumentException("[direction]");
+    }
+    if (variation == null) {
+      throw new NullArgumentException("[variation]");
+    }
+    WindInfo ret = createWithOptionals(direction, speedInKmh, null, variation);
+    return ret;
+  }
+
+  public static WindInfo create(Heading direction, double speedInKmh, double gustSpeedInKmh, Variation<Heading> variation) {
+    if (direction == null) {
+      throw new NullArgumentException("[direction]");
+    }
+    if (variation == null) {
+      throw new NullArgumentException("[variation]");
+    }
+    WindInfo ret = createWithOptionals(direction, speedInKmh, gustSpeedInKmh, variation);
+    return ret;
+  }
+
+  public static WindInfo createVRB(double speedInKmh) {
+    WindInfo ret = createWithOptionals(null, speedInKmh, null, null);
+    return ret;
+  }
+
+  public static WindInfo createVRB(double speedInKmh, double gustSpeedInKmh) {
+    WindInfo ret = createWithOptionals(null, speedInKmh, gustSpeedInKmh, null);
+    return ret;
+  }
+
+  public static WindInfo createWithOptionals(Heading directionOrNull, double speedInKmh, Double gustSpeedInKmhOrNull, Variation<Heading> variationOrNull) {
+    WindInfo ret = new WindInfo(directionOrNull, speedInKmh, gustSpeedInKmhOrNull, variationOrNull);
+    return ret;
+  }
+
+  protected WindInfo(Heading direction, double speedInKmh, Double gustSpeedInKmh,
           Variation<Heading> variation) {
     if (speedInKmh < 0) {
       throw new IllegalArgumentException("[speedInKmh] cannot be negative.");
@@ -36,21 +89,6 @@ public class WindInfo {
     this.speedInKmh = speedInKmh;
     this.gustSpeedInKmh = gustSpeedInKmh;
     this.variation = variation;
-  }
-
-  public WindInfo(Heading direction, int speed, Integer gustSpeed, SpeedUnit speedUnit) {
-    this(direction,
-            SpeedUnit.convert(speed, speedUnit, SpeedUnit.KMH),
-            SpeedUnit.convert(gustSpeed, speedUnit, SpeedUnit.KMH),
-            null);
-  }
-  
-  public WindInfo(Heading direction, int speed, Integer gustSpeed, SpeedUnit speedUnit,
-          Variation<Heading> variation) {
-    this(direction,
-            SpeedUnit.convert(speed, speedUnit, SpeedUnit.KMH),
-            SpeedUnit.convert(gustSpeed, speedUnit, SpeedUnit.KMH),
-            variation);
   }
 
   /**
@@ -120,19 +158,18 @@ public class WindInfo {
   /**
    * Retuns true if wind is variable.
    *
-   * @return 
-   * Wind is variable if no heading is set.
+   * @return Wind is variable if no heading is set.
    */
   public boolean isVariable() {
     return this.direction == null;
   }
-  
+
   /**
    * Returns true if wind is variating between different headings.
-   * @return 
-   * Wind is variating if heading variations are set.
+   *
+   * @return Wind is variating if heading variations are set.
    */
-  public boolean isVariating(){
+  public boolean isVariating() {
     return this.variation != null;
   }
 

@@ -1,100 +1,38 @@
 package eng.metarJava;
 
 import eng.metarJava.enums.CloudInfoSpecialStates;
+import eng.metarJava.exception.NonsenseRequestException;
 import eng.metarJava.support.CloudMass;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
  *
  * @author Marek Vajgl
  */
-public class CloudInfo {
+public class CloudInfo extends TrendCloudInfo {
 
-  private final List<CloudMass> masses;
-  private final Integer verticalVisibilityInHundredFeet;
-  private final CloudInfoSpecialStates specialState;
-
-  /**
-   * Creates Cloud info with singificant cloud layers reported.
-   *
-   * @param cloudMass
-   */
-  public CloudInfo(CloudMass... cloudMass) {
-    this.masses = Arrays.asList(cloudMass);
-    this.verticalVisibilityInHundredFeet = null;
-    this.specialState = CloudInfoSpecialStates.none;
+  public static CloudInfo create(List<CloudMass> cloudMasses){
+    CloudInfo ret = new CloudInfo(cloudMasses, null, CloudInfoSpecialStates.none);
+    return ret;
   }
-
-  /**
-   * Creates Cloud info with singificant cloud layers reported.
-   *
-   * @param cloudMasses
-   */
-  public CloudInfo(List<CloudMass> cloudMasses) {
-    this.masses = cloudMasses;
-    this.verticalVisibilityInHundredFeet = null;
-    this.specialState = CloudInfoSpecialStates.none;
+  public static CloudInfo createWithVV(int verticalVisibilityInHundredFeet){
+    CloudInfo ret = new CloudInfo(null, verticalVisibilityInHundredFeet, CloudInfoSpecialStates.none);
+    return ret;
   }
-
-  /**
-   * Creates Cloud info as Vertical Visibility value
-   *
-   * @param verticalVisiblityInHundredFeet
-   */
-  public CloudInfo(int verticalVisiblityInHundredFeet) {
-    this.masses = null;
-    this.verticalVisibilityInHundredFeet = verticalVisiblityInHundredFeet;
-    this.specialState = CloudInfoSpecialStates.none;
+  public static CloudInfo createNSC(){
+    CloudInfo ret = new CloudInfo(null, null, CloudInfoSpecialStates.NSC);
+    return ret;
   }
-
-  /**
-   * Creates Cloud info with special state
-   *
-   * @param state
-   */
-  public CloudInfo(CloudInfoSpecialStates state) {
-    if (state == CloudInfoSpecialStates.none) {
-      throw new IllegalArgumentException("[state] with value [none] is not valid. Either significant state must be specified (NCD/NSC) or cloud mass or vertical visibility must be specified (different constructors).");
-    }
-    this.masses = null;
-    this.verticalVisibilityInHundredFeet = null;
-    this.specialState = state;
-  }
-
-  public List<CloudMass> getMasses() {
-    return masses;
-  }
-
-  public Integer getVerticalVisibilityInHundredFeet() {
-    return verticalVisibilityInHundredFeet;
-  }
-
-  public int getVerticalVisibilityInFeet(){
-    if (this.isVerticalVisibility() == false)
-      throw new UnsupportedOperationException("Unable to use this method if no vertical visibility is specified.");
-    return this.verticalVisibilityInHundredFeet * 100;
+  public static CloudInfo createNCD(){
+    CloudInfo ret = new CloudInfo(null, null, CloudInfoSpecialStates.NCD);
+    return ret;
   }
   
-  public boolean isVerticalVisibility(){
-    return this.verticalVisibilityInHundredFeet != null;
-  }
-  
-  public boolean isNSC(){
-    return this.specialState == CloudInfoSpecialStates.NSC;
+  protected CloudInfo(List<CloudMass> masses, Integer verticalVisibilityInHundredFeet, CloudInfoSpecialStates specialState) {
+    super(masses, verticalVisibilityInHundredFeet, specialState);
   }
   
   public boolean isNCD(){
-    return this.specialState == CloudInfoSpecialStates.NCD;
-  }
-  
-  public boolean isSpecialState(){
-    return this.specialState != CloudInfoSpecialStates.none;
-  }
-  
-  public CloudInfoSpecialStates getSpecialState() {
-    return specialState;
+    return super.getSpecialState() == CloudInfoSpecialStates.NCD;
   }
 }

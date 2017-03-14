@@ -10,8 +10,13 @@ public class RunwayState {
   private final char contamination;
   private final String depositDepth;
   private final String brakingAction;
+  
+  public static RunwayState create(String designator, char deposit, char contamination, String depositDepth, String brakingAction){
+    RunwayState ret = new RunwayState(designator, deposit, contamination, depositDepth, brakingAction);
+    return ret;
+  }
 
-  public RunwayState(String designator, char deposit, char contamination, String depositDepth, String brakingAction) {
+  protected RunwayState(String designator, char deposit, char contamination, String depositDepth, String brakingAction) {
     this.designator = designator;
     this.deposit = deposit;
     this.contamination = contamination;

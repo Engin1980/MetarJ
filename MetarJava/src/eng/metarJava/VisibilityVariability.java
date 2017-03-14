@@ -9,8 +9,13 @@ import eng.metarJava.enums.Direction;
 public class VisibilityVariability {
   private final int visibilityInMeters;
   private final Direction direction;
+  
+  public static VisibilityVariability create(int visibilityInMeters, Direction direction){
+    VisibilityVariability ret  = new VisibilityVariability(visibilityInMeters, direction);
+    return ret;
+  }
 
-  public VisibilityVariability(int visibilityInMeters, Direction direction) {
+  protected VisibilityVariability(int visibilityInMeters, Direction direction) {
     if (visibilityInMeters < 0)
       throw new IllegalArgumentException("[visibilityInMeters] must be zero or positive.");
     this.visibilityInMeters = visibilityInMeters;

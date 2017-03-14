@@ -10,20 +10,27 @@ import java.util.List;
 public class RunwayStatesInfo {
   private final boolean snowClosed;
   private final List<RunwayState> runwayStates;
-
-  public RunwayStatesInfo(boolean isSnowClosed) {
-    if (!isSnowClosed){
-      throw new IllegalArgumentException("This constructor may be called only with [isSnowClosed] as true. Specify runway data otherwise (use different constructor).");
-    }
-    this.snowClosed = true;
-    this.runwayStates = null;
+  
+  public static RunwayStatesInfo createSNOCLO(){
+    RunwayStatesInfo ret = new RunwayStatesInfo(true, null);
+    return ret;
+  }
+  
+  public static RunwayStatesInfo create(List<RunwayState> runwayStates){
+    RunwayStatesInfo ret = new RunwayStatesInfo(false, runwayStates);
+    return ret;
   }
 
-  public RunwayStatesInfo(List<RunwayState> runwayStates) {
-    if (runwayStates == null)
+  protected RunwayStatesInfo(boolean snowClosed, List<RunwayState> runwayStates) {
+    if (snowClosed){
+      this.snowClosed = true;
+    this.runwayStates = null;
+    } else {
+      if (runwayStates == null)
       throw new NullArgumentException("[runwayStates]");
     this.snowClosed = false;
     this.runwayStates = runwayStates;
+    }
   }
 
   public boolean isSnowClosed() {

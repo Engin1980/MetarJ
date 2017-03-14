@@ -5,62 +5,89 @@ package eng.metarJava;
  *
  * @author Marek Vajgl
  */
-public class VisibilityInfo {
+public class VisibilityInfo extends TrendVisibilityInfo {
 
-  private final Integer visibilityInMeters;
   private final boolean noDirectionalVisibility;
   private final VisibilityVariability variability;
 
-  public VisibilityInfo(Integer visibilityInMeters, boolean noDirectionalVisibility, VisibilityVariability variability) {
-    if (visibilityInMeters != null && visibilityInMeters < 0) {
-      throw new IllegalArgumentException("[visibilityInMeters], if not null, must be zero or positive.");
-    }
-    if (noDirectionalVisibility && variability != null) {
-      throw new IllegalArgumentException("If [noDirectionalVisibility] is true, variability cannot be set.");
-    }
-    this.visibilityInMeters = visibilityInMeters;
-    this.noDirectionalVisibility = noDirectionalVisibility;
-    this.variability = variability;
+  /**
+   * Creates new visibility info by distance in meters.
+   * @param visibilityInMeters
+   * @return 
+   */
+  public static VisibilityInfo create(double visibilityInMeters){
+    VisibilityInfo ret = new VisibilityInfo(visibilityInMeters, false, false, null);
+    return ret;
+  }
+  
+  /**
+   * Creates new visibility info by distance and distance variability.
+   * @param visibilityInMeters
+   * @param variability
+   * @return 
+   */
+  public static VisibilityInfo create(double visibilityInMeters, VisibilityVariability variability){
+    VisibilityInfo ret = new VisibilityInfo(visibilityInMeters, false, false, variability);
+    return ret;
+  }
+  
+  /**
+   * Creates new visibility with NDV - no-direction-visibility flag set on.
+   * @param visibilityInMeters
+   * @return 
+   */
+  public static VisibilityInfo createWithNDV(double visibilityInMeters){
+    VisibilityInfo ret = new VisibilityInfo(visibilityInMeters, false, true, null);
+    return ret;
+  }
+  
+  /**
+   * Creates CAVOK visiblity.
+   * @return 
+   */
+  public static VisibilityInfo createCAVOK(){
+    VisibilityInfo ret = new VisibilityInfo(0, true, false, null);
+    return ret;
   }
 
-  /** 
+  protected VisibilityInfo(
+          double visibilityInMeters, boolean isCAVOK,
+          boolean noDirectionalVisibility, 
+          VisibilityVariability variability) {
+    super(visibilityInMeters, isCAVOK);
+    if (isCAVOK){
+      this.noDirectionalVisibility = false;
+      this.variability = null;
+    } else {
+      this.noDirectionalVisibility = noDirectionalVisibility;
+      this.variability = variability;
+    }
+  }
+  
+  /**
    * Return if NDV flag is set.
+   *
    * @return True or false if NDV is set.
    */
-  public boolean isNoDirectionalVisibility(){
+  public boolean isNoDirectionalVisibility() {
     return this.noDirectionalVisibility;
-  }
-  
-  /**
-   * Gets visibility in meters.
-   * @return 
-   */
-  public Integer getVisibilityInMeters() {
-    return visibilityInMeters;
   }
 
   /**
-   * Return if visibility is CAVOK.
-   * @return 
-   * Visibility is CaVOk if visibilityInMeters is not set.
-   */
-  public boolean isCaVOk() {
-    return visibilityInMeters == null;
-  }
-  
-  /**
    * Return true if visibility is variating.
-   * @return 
+   *
+   * @return
    */
-  public boolean isVariating(){
+  public boolean isVariating() {
     return this.variability != null;
   }
-  
+
   /**
    * Return variability if visibility is variating, or null.
-   * @return 
+   *
+   * @return
    */
-  public VisibilityVariability getVariability(){
+  public VisibilityVariability getVariability() {
     return this.variability;
-  } 
+  }
 }

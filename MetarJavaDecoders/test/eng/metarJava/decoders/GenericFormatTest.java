@@ -5,6 +5,7 @@ import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.Report;
 import eng.metarJava.RunwayState;
 import eng.metarJava.RunwayVisualRange;
+import eng.metarJava.TrendReport;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.WindInfo;
 import eng.metarJava.enums.CloudAmount;
@@ -12,6 +13,8 @@ import eng.metarJava.enums.Direction;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.CloudMassSignificantFlag;
 import eng.metarJava.enums.SpeedUnit;
+import eng.metarJava.enums.TrendReportTimeIndication;
+import eng.metarJava.enums.TrendReportType;
 import eng.metarJava.support.CloudMass;
 import eng.metarJava.support.Heading;
 import eng.metarJava.support.PhenomenaDescriptor;
@@ -28,7 +31,7 @@ public class GenericFormatTest {
 
   private static final String LKMT
           = "METAR LKMT 241812Z 02032KT 5000NDV RA +SN BLSNVC SCT060 12/05 Q0996 WS R22 "
-          + "SNOCLO NOSIG";
+          + "SNOCLO BECMG AT1900 01015KT CAVOK";
   private static final String LKPD
           = "METAR LKPD 241812Z 02032KT 030V080 CAVOK VV030 12/05 Q1002 RETSRA NOSIG";
   private static final String LKTB
@@ -36,7 +39,8 @@ public class GenericFormatTest {
   private static final String LKPR
           = "METAR COR LKPR 312345Z 02012G25KT 2000 0800E R06/0700 R24C/0200V0500"
           + "+TSSQVC FEW012 SCT030CB OVC050TCU 12/05 Q1002 RETSRA RESA WS ALL RWY "
-          + "R24/589999 R06/2039// NOSIG";
+          + "R24/589999 R06/2039// "
+          + "BECMG AT1900 01015KT 4000";
   private static final String XXYY
           = "METAR COR XXYY 312345Z NIL";
   private static final String UUEE
@@ -171,7 +175,7 @@ public class GenericFormatTest {
     VisibilityInfo v = r.getVisibility();
 
     assertNotNull(v);
-    assertTrue(v.isCaVOk());
+    assertTrue(v.isCAVOK());
     assertFalse(v.isNoDirectionalVisibility());
     assertFalse(v.isVariating());
   }
@@ -183,7 +187,7 @@ public class GenericFormatTest {
     VisibilityInfo v = r.getVisibility();
 
     assertNotNull(v);
-    assertFalse(v.isCaVOk());
+    assertFalse(v.isCAVOK());
     assertTrue(v.isNoDirectionalVisibility());
     assertNotNull(v.getVisibilityInMeters());
     assertEquals(5000, (int) v.getVisibilityInMeters());
@@ -197,7 +201,7 @@ public class GenericFormatTest {
     VisibilityInfo v = r.getVisibility();
 
     assertNotNull(v);
-    assertFalse(v.isCaVOk());
+    assertFalse(v.isCAVOK());
     assertFalse(v.isNoDirectionalVisibility());
     assertNotNull(v.getVisibilityInMeters());
     assertEquals(2000, (int) v.getVisibilityInMeters());
@@ -290,9 +294,9 @@ public class GenericFormatTest {
     assertFalse(ci.isNCD());
     assertFalse(ci.isNSC());
     assertFalse(ci.isSpecialState());
-    assertNull(ci.getMasses());
+    assertFalse(ci.isWithMasses());
 
-    assertEquals((Integer) 30, ci.getVerticalVisibilityInHundredFeet());
+    assertEquals(30, ci.getVerticalVisibilityInHundredFeet());
     assertEquals(3000, ci.getVerticalVisibilityInFeet());
   }
 
@@ -307,7 +311,7 @@ public class GenericFormatTest {
     assertFalse(ci.isNCD());
     assertTrue(ci.isNSC());
     assertTrue(ci.isSpecialState());
-    assertNull(ci.getMasses());
+    assertFalse(ci.isWithMasses());
   }
 
   @Test
@@ -321,7 +325,7 @@ public class GenericFormatTest {
     assertTrue(ci.isNCD());
     assertFalse(ci.isNSC());
     assertTrue(ci.isSpecialState());
-    assertNull(ci.getMasses());
+    assertFalse(ci.isWithMasses());
   }
 
   @Test
@@ -478,7 +482,7 @@ public class GenericFormatTest {
     assertEquals('8', rs.getContamination());
     assertEquals("99", rs.getDepositDepth());
     assertEquals("99", rs.getBrakingAction());
-    
+
     rs = r.getRunwayStateInfo().getRunwayStates().get(1);
     assertEquals("06", rs.getDesignator());
     assertEquals('2', rs.getDeposit());
@@ -486,14 +490,69 @@ public class GenericFormatTest {
     assertEquals("39", rs.getDepositDepth());
     assertEquals("//", rs.getBrakingAction());
   }
-  
+
   @Test
   public void testParseNosig() {
     IParse p = new GenericFormat();
-    Report r = p.parse(LKMT);
+    Report r = p.parse(LKPD);
 
     assertNotNull(r.getTrendInfo());
     assertTrue(r.getTrendInfo().isIsNoSignificantChange());
     assertNull(r.getTrendInfo().getTrends());
+  }
+
+  @Test
+  public void testParseOther() {
+    String s = "METAR LKPR 131400Z VRB02KT CAVOK 08/M03 Q1024 NOSIG";
+    IParse p = new GenericFormat();
+    Report r;
+
+    r = p.parse(s);
+  }
+
+  @Test
+  public void testParseTrend() {
+    IParse p = new GenericFormat();
+    Report r = p.parse(LKMT);
+
+    assertNotNull(r.getTrendInfo());
+    assertFalse(r.getTrendInfo().isIsNoSignificantChange());
+    assertEquals(1, r.getTrendInfo().getTrends().size());
+
+    TrendReport tr = r.getTrendInfo().getTrends().get(0);
+    assertEquals(TrendReportType.BECMG, tr.getType());
+  }
+
+  @Test
+  public void testParseTrendVisibilityCavok() {
+    IParse p = new GenericFormat();
+    Report r = p.parse(LKMT);
+
+    assertNotNull(r.getTrendInfo());
+    assertFalse(r.getTrendInfo().isIsNoSignificantChange());
+    assertEquals(1, r.getTrendInfo().getTrends().size());
+    TrendReport tr = r.getTrendInfo().getTrends().get(0);
+
+    assertTrue(tr.getVisibility().isCAVOK());
+    try {
+      tr.getVisibility().getVisibilityInMeters();
+      fail();
+    } catch (Throwable t) {
+    }
+  }
+
+  @Test
+  public void testParseTrendVisibility() {
+    IParse p = new GenericFormat();
+    Report r = p.parse(LKPR);
+
+    assertNotNull(r.getTrendInfo());
+    assertFalse(r.getTrendInfo().isIsNoSignificantChange());
+    assertEquals(1, r.getTrendInfo().getTrends().size());
+    TrendReport tr = r.getTrendInfo().getTrends().get(0);
+
+    assertFalse(tr.getVisibility().isCAVOK());
+    assertNotNull(tr.getVisibility().getVisibilityInMeters());
+    assertEquals(4000, (int) tr.getVisibility().getVisibilityInMeters());
   }
 }

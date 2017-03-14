@@ -11,8 +11,13 @@ public class PhenomenaInfo {
   private final PhenomenaDescriptor descriptor;
   private final PhenomenaType type;
   private final boolean inVicinity;
+  
+  public static PhenomenaInfo create(PhenomenaIntensity intensity, PhenomenaDescriptor descriptor, PhenomenaType type, boolean inVicinity){
+    PhenomenaInfo ret = new PhenomenaInfo(intensity, descriptor, type, inVicinity);
+    return ret;
+  }
 
-  public PhenomenaInfo(PhenomenaIntensity intensity, PhenomenaDescriptor descriptor, PhenomenaType type, boolean inVicinity) {
+  protected PhenomenaInfo(PhenomenaIntensity intensity, PhenomenaDescriptor descriptor, PhenomenaType type, boolean inVicinity) {
     this.intensity = intensity;
     this.descriptor = descriptor;
     this.type = type;
@@ -34,5 +39,4 @@ public class PhenomenaInfo {
   public boolean isInVicinity() {
     return inVicinity;
   }
-  
 }

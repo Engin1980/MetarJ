@@ -12,5 +12,7 @@ public enum ReportField {
   visibility,
   clouds,
   temperatureDewPoint,
-  pressure
+  pressure,
+  trendTime,
+  trendVisibility
 }

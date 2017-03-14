@@ -7,37 +7,54 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="eng.metarJava.demoClient.FrmMainController">
+<AnchorPane id="AnchorPane" prefHeight="700.0" prefWidth="700.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eng.metarJava.demoClient.FrmMainController">
   <stylesheets>
     <URL value="@frmmain.css" />
   </stylesheets>
    <children>
-      <BorderPane prefHeight="431.0" prefWidth="611.0">
+      <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <bottom>
+            <Label fx:id="lblState" text="--" BorderPane.alignment="CENTER" />
+         </bottom>
          <top>
-            <FlowPane orientation="VERTICAL" prefHeight="65.0" prefWidth="611.0" BorderPane.alignment="CENTER">
+            <VBox BorderPane.alignment="CENTER">
                <children>
-                  <FlowPane prefHeight="33.0" prefWidth="608.0">
+                  <FlowPane>
                      <children>
+                        <Button fx:id="btnDownload" mnemonicParsing="false" onAction="#btnDownload_onAction" text="Download" />
                         <Label text="Enter station code:" />
                         <TextField fx:id="txtIcao" promptText="(ICAO code)" text="LKPR" />
-                        <Button fx:id="btnDownload" mnemonicParsing="false" onAction="#btnDownload_onAction" text="Download" />
                      </children>
                   </FlowPane>
-                  <FlowPane prefHeight="19.0" prefWidth="200.0">
-                     <children>
-                        <TextField id="txtMetar" fx:id="txtMetar" prefHeight="25.0" prefWidth="134.0" />
-                        <Button id="btnDecode" fx:id="btnDecode" mnemonicParsing="false" onAction="#btnDecode_onAction" text="Decode" />
-                     </children>
-                  </FlowPane>
+                  <TextField fx:id="txtMetar" promptText="Enter METAR code here" />
+                  <Button fx:id="btnDecode" mnemonicParsing="false" onAction="#btnDecode_onAction" text="Decode" />
                </children>
-            </FlowPane>
+            </VBox>
          </top>
          <center>
-            <TreeView fx:id="tvw" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+              <tabs>
+                <Tab closable="false" text="Private variables">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TreeView fx:id="tvw" layoutX="139.0" layoutY="103.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab closable="false" text="Properties readings">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TreeView fx:id="tvwG" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
          </center>
-         <bottom>
-            <Label fx:id="lblState" text="Label" BorderPane.alignment="CENTER" />
-         </bottom>
       </BorderPane>
    </children>
 </AnchorPane>
