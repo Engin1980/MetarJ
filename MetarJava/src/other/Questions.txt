@@ -1,0 +1,2 @@
+1) Enum hodnota může být null. Má smysl pak dělat pro enum .none hodnoty, nebo prostě to zlomit
+a říct, že když je enum .none, tak bude "null" a .none hodnoty zrušit?

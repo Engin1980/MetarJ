@@ -25,6 +25,7 @@ import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.enums.TrendReportTimeIndication;
 import eng.metarJava.enums.TrendReportType;
 import eng.metarJava.CloudMass;
+import eng.metarJava.decoders.exceptions.ParseException;
 import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.Heading;
 import eng.metarJava.support.HourMinute;
@@ -56,7 +57,7 @@ class SharedParse {
   }
 
 // <editor-fold defaultstate="collapsed" desc="Report decoding">
-  private static boolean decodeFixedString(ReportLine rl, String text) {
+  static boolean decodeFixedString(ReportLine rl, String text) {
     boolean ret = false;
     if (rl.getPre().startsWith(text)) {
       ret = true;
@@ -302,19 +303,28 @@ class SharedParse {
       ret = CloudInfo.createNSC();
     } else if (decodeFixedString(rl, "NCD")) {
       ret = CloudInfo.createNCD();
-    } else {
-      String vvRegex = "^VV(\\d{3})";
-      final Pattern vvPattern = Pattern.compile(vvRegex);
-      final Matcher matcher = vvPattern.matcher(rl.getPre());
-      if (matcher.find()) {
-        // is VV
-        int vv = groupToInt(matcher.group(1));
-        ret = CloudInfo.createWithVV(vv);
-        rl.move(matcher.group(0).length(), true);
+    } else if (rl.getPre().startsWith("VV")) {
+      // vertical visibility
+      if (decodeFixedString(rl, "VV///")) {
+        ret = CloudInfo.createWithUnknownVV();
+        rl.move(5, true); // "VV///"
       } else {
-        List<CloudMass> cls = decodeCloudAmounts(rl);
-        ret = CloudInfo.create(cls);
+        String vvRegex = "^VV(\\d{3})";
+        final Pattern vvPattern = Pattern.compile(vvRegex);
+        final Matcher matcher = vvPattern.matcher(rl.getPre());
+        if (matcher.find()) {
+          // is VV
+          int vv = groupToInt(matcher.group(1));
+          ret = CloudInfo.createWithVV(vv);
+          rl.move(matcher.group(0).length(), true);
+        } else {
+          throw new ParseException(ReportField.clouds, "Seems like [VVxxx] pattern, but does not exactly fit and cannot be parsed.", rl.getPost(), rl.getPre(), null);
+        }
       }
+    } else {
+      // cloud masses defined somehow
+      List<CloudMass> cls = decodeCloudAmounts(rl);
+      ret = CloudInfo.create(cls);
     }
     return ret;
   }
@@ -322,19 +332,25 @@ class SharedParse {
   private static List<CloudMass> decodeCloudAmounts(ReportLine rl) {
     List<CloudMass> ret = new ArrayList<>();
 
-    String regex = "^([A-Z]{3})(\\d{3})(TCU|CB)?";
+    String regex = "^(([A-Z]{3})(\\d{3})(TCU|CB|\\/\\/\\/)?)|(\\/\\/\\/\\/\\/\\/(CB|TCU))";
     final Pattern pattern = Pattern.compile(regex);
     Matcher matcher = pattern.matcher(rl.getPre());
     while (matcher.find()) {
-      String tmp = matcher.group(1);
-      CloudAmount ca = CloudAmount.valueOf(tmp);
-      int alt = groupToInt(matcher.group(2));
-      CloudMassSignificantFlag flag = CloudMassSignificantFlag.none;
-      if (groupExist(matcher.group(3))) {
-        flag = CloudMassSignificantFlag.valueOf(matcher.group(3));
+      if (groupExist(matcher.group(1))) {
+        // standard cloud layer mass
+        String tmp = matcher.group(2);
+        CloudAmount ca = CloudAmount.valueOf(tmp);
+        int alt = groupToInt(matcher.group(3));
+        CloudMassSignificantFlag flag = CloudMassSignificantFlag.parse(matcher.group(4));
+        CloudMass cm = CloudMass.create(ca, alt, flag);
+        ret.add(cm);
+        
+      } else if (groupExist(matcher.group(5))) {
+        // unknown cloud layer mass
+        CloudMassSignificantFlag flag = CloudMassSignificantFlag.parse(matcher.group(6));
+        CloudMass cm = CloudMass.createWithoutAmountAndBaseHeight(flag);
+        ret.add(cm);
       }
-      CloudMass cm = CloudMass.create(ca, alt, flag);
-      ret.add(cm);
       rl.move(matcher.group(0).length(), true);
       matcher = pattern.matcher(rl.getPre());
     }
@@ -477,42 +493,7 @@ class SharedParse {
 
   // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Trend report decoding">
-  static TrendInfo decodeTrendInfo(ReportLine rl) {
-    if (decodeFixedString(rl, "NOSIG")) {
-      return new TrendInfo(true);
-    } else {
-      List<TrendReport> reports = new ArrayList<>();
-      TrendReport report = decodeTrendReport(rl);
-      while (report != null) {
-        reports.add(report);
-        report = decodeTrendReport(rl);
-      }
-      return new TrendInfo(reports);
-    }
-  }
-
-  static TrendReport decodeTrendReport(ReportLine rl) {
-    TrendReport ret;
-    if (decodeFixedString(rl, "BECMG")) {
-      ret = new TrendReport();
-      ret.setType(TrendReportType.BECMG);
-
-    } else if (decodeFixedString(rl, "TEMPO")) {
-      ret = new TrendReport();
-      ret.setType(TrendReportType.TEMPO);
-    } else {
-      return null;
-    }
-
-    ret.setTime(decodeTrendReportTime(rl));
-    ret.setWind(decodeWind(rl));
-    ret.setVisibility(decodeTrendVisibility(rl));
-    ret.setPhenomenas(decodeTrendPhenomenas(rl));
-    ret.setCloudInfo(decodeTrendCloud(rl));
-    return ret;
-  }
-
-  private static TrendReportTimeInfo decodeTrendReportTime(ReportLine rl) {
+  static TrendReportTimeInfo decodeTrendReportTime(ReportLine rl, boolean isMandatory) {
     TrendReportTimeInfo ret;
 
     String patternString = "^(AT|FM|TL)(\\d{2})(\\d{2})";
@@ -527,13 +508,17 @@ class SharedParse {
       ret = new TrendReportTimeInfo(trti, new HourMinute(hour, min));
       rl.move(matcher.group(0).length(), true);
     } else {
-      throw new MissingFieldException(ReportField.trendTime, rl.getPre(), rl.getPost());
+      if (isMandatory) {
+        throw new MissingFieldException(ReportField.trendTime, rl.getPre(), rl.getPost());
+      } else {
+        ret = null;
+      }
     }
 
     return ret;
   }
 
-  static TrendVisibilityInfo decodeTrendVisibility(ReportLine rl) {
+  static TrendVisibilityInfo decodeTrendVisibility(ReportLine rl, boolean isMandatory) {
     TrendVisibilityInfo ret;
 
     boolean isCavok = decodeFixedString(rl, "CAVOK");
@@ -548,14 +533,16 @@ class SharedParse {
         rl.move(matcher.group(0).length(), true);
         ret = TrendVisibilityInfo.create(vis);
       } else {
+        if (isMandatory)
         throw new MissingFieldException(ReportField.trendVisibility, rl.getPre(), rl.getPost());
+        else ret = null;
       }
     }
 
     return ret;
   }
 
-  private static TrendPhenomenaInfo decodeTrendPhenomenas(ReportLine rl) {
+  static TrendPhenomenaInfo decodeTrendPhenomenas(ReportLine rl) {
     if (decodeFixedString(rl, "NSW")) {
       return TrendPhenomenaInfo.createNSW();
     } else {

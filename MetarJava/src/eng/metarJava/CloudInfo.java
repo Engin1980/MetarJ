@@ -45,6 +45,15 @@ public class CloudInfo extends TrendCloudInfo {
     CloudInfo ret = new CloudInfo(null, null, CloudInfoSpecialStates.NCD);
     return ret;
   }
+/**
+   * Creates cloud info with VV (variable-visibility) but without known visibility. 
+   * This is typically reported by automated systems.
+   * @return Cloud info object
+   */
+  public static CloudInfo createWithUnknownVV() {
+    CloudInfo ret = new CloudInfo(null, null, CloudInfoSpecialStates.none);
+    return ret;
+  }
   
   protected CloudInfo(List<CloudMass> masses, Integer verticalVisibilityInHundredFeet, CloudInfoSpecialStates specialState) {
     super(masses, verticalVisibilityInHundredFeet, specialState);

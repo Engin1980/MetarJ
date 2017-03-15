@@ -10,11 +10,11 @@ public enum CloudAmount {
    */
   FEW,
   /**
-   * Scattered coverage (3-5/8)
+   * Scattered coverage (3-4/8)
    */
   SCT,
   /**
-   * Broken coverage (6-7/8)
+   * Broken coverage (5-7/8)
    */
   BKN,
   /**

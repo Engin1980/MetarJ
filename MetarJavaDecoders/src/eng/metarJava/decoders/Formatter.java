@@ -6,6 +6,6 @@ import eng.metarJava.Report;
  *
  * @author Marek Vajgl
  */
-public interface IParse {
-  public Report parse(String line);
+public interface Formatter {
+  public String format(Report report);
 }

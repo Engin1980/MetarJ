@@ -97,8 +97,8 @@ public class FrmMainController implements Initializable {
   protected void btnDecode_onAction(ActionEvent event) {
     String metar = txtMetar.getText();
 
-    eng.metarJava.decoders.IParse parser
-            = new eng.metarJava.decoders.GenericFormat();
+    eng.metarJava.decoders.Parser parser
+            = new eng.metarJava.decoders.GenericParser();
 
     eng.metarJava.Report r;
     r = parser.parse(metar);
