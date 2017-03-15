@@ -24,7 +24,7 @@ import eng.metarJava.enums.CloudMassSignificantFlag;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.enums.TrendReportTimeIndication;
 import eng.metarJava.enums.TrendReportType;
-import eng.metarJava.support.CloudMass;
+import eng.metarJava.CloudMass;
 import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.Heading;
 import eng.metarJava.support.HourMinute;
@@ -155,7 +155,7 @@ class SharedParse {
           throw new UnsupportedOperationException();
         }
         rl.move(matcher.group(0).length(), true);
-        
+
         // to kmh
         spd = SpeedUnit.convert(spd, unit, SpeedUnit.KMH);
         gustSpd = SpeedUnit.convert(gustSpd, unit, SpeedUnit.KMH);
@@ -333,7 +333,7 @@ class SharedParse {
       if (groupExist(matcher.group(3))) {
         flag = CloudMassSignificantFlag.valueOf(matcher.group(3));
       }
-      CloudMass cm = new CloudMass(ca, alt, flag);
+      CloudMass cm = CloudMass.create(ca, alt, flag);
       ret.add(cm);
       rl.move(matcher.group(0).length(), true);
       matcher = pattern.matcher(rl.getPre());
@@ -476,7 +476,7 @@ class SharedParse {
   }
 
   // </editor-fold>
-  // <editor-fold defaultstate="collapsed" desc="Trend report decoding">
+// <editor-fold defaultstate="collapsed" desc="Trend report decoding">
   static TrendInfo decodeTrendInfo(ReportLine rl) {
     if (decodeFixedString(rl, "NOSIG")) {
       return new TrendInfo(true);
@@ -554,22 +554,21 @@ class SharedParse {
 
     return ret;
   }
-// </editor-fold>
 
   private static TrendPhenomenaInfo decodeTrendPhenomenas(ReportLine rl) {
-    if (decodeFixedString(rl, "NSW"))
+    if (decodeFixedString(rl, "NSW")) {
       return TrendPhenomenaInfo.createNSW();
-    else{
+    } else {
       List<PhenomenaInfo> pis = new ArrayList();
       PhenomenaInfo pi = decodePhenomena(rl);
-      while (pi != null){
+      while (pi != null) {
         pis.add(pi);
         pi = decodePhenomena(rl);
       }
       return TrendPhenomenaInfo.create(pis);
     }
   }
-  
+
   static TrendCloudInfo decodeTrendCloud(ReportLine rl) {
     TrendCloudInfo ret;
     if (decodeFixedString(rl, "NSC")) {
@@ -592,7 +591,7 @@ class SharedParse {
   }
 
   static String decodeRemark(ReportLine rl) {
-    if (decodeFixedString(rl, "RMK")){
+    if (decodeFixedString(rl, "RMK")) {
       String remark = rl.getPre();
       rl.move(remark.length(), true);
       return remark;
@@ -600,5 +599,5 @@ class SharedParse {
       return null;
     }
   }
-
+// </editor-fold>
 }

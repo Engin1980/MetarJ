@@ -4,7 +4,7 @@ import eng.metarJava.exception.NullArgumentException;
 import java.util.List;
 
 /**
- *
+ * Represents state of the airport ruwnays.
  * @author Marek Vajgl
  */
 public class RunwayStatesInfo {

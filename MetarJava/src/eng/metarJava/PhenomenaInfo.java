@@ -3,7 +3,7 @@ package eng.metarJava;
 import eng.metarJava.support.*;
 
 /**
- *
+ * Represents phenomena description.
  * @author Marek Vajgl
  */
 public class PhenomenaInfo {

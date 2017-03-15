@@ -2,7 +2,6 @@ package eng.metarJava;
 
 import eng.metarJava.enums.CloudInfoSpecialStates;
 import eng.metarJava.exception.NonsenseRequestException;
-import eng.metarJava.support.CloudMass;
 import java.util.List;
 
 /**

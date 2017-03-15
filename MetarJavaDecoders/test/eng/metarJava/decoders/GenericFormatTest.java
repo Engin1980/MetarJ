@@ -15,7 +15,7 @@ import eng.metarJava.enums.CloudMassSignificantFlag;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.enums.TrendReportTimeIndication;
 import eng.metarJava.enums.TrendReportType;
-import eng.metarJava.support.CloudMass;
+import eng.metarJava.CloudMass;
 import eng.metarJava.support.Heading;
 import eng.metarJava.support.PhenomenaDescriptor;
 import eng.metarJava.support.PhenomenaIntensity;
@@ -31,7 +31,7 @@ public class GenericFormatTest {
 
   private static final String LKMT
           = "METAR LKMT 241812Z 02032KT 5000NDV RA +SN BLSNVC SCT060 12/05 Q0996 WS R22 "
-          + "SNOCLO BECMG AT1900 01015KT CAVOK";
+          + "SNOCLO BECMG AT1900 01015KT CAVOK NSW NSC";
   private static final String LKPD
           = "METAR LKPD 241812Z 02032KT 030V080 CAVOK VV030 12/05 Q1002 RETSRA NOSIG";
   private static final String LKTB
@@ -40,7 +40,7 @@ public class GenericFormatTest {
           = "METAR COR LKPR 312345Z 02012G25KT 2000 0800E R06/0700 R24C/0200V0500"
           + "+TSSQVC FEW012 SCT030CB OVC050TCU 12/05 Q1002 RETSRA RESA WS ALL RWY "
           + "R24/589999 R06/2039// "
-          + "BECMG AT1900 01015KT 4000";
+          + "BECMG AT1900 01015KT 4000 +SN VV300";
   private static final String XXYY
           = "METAR COR XXYY 312345Z NIL";
   private static final String UUEE

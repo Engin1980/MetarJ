@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Represents wind-shear warning info about one runway.
  * @author Marek Vajgl
  */
 public class RunwayWindshearInfo {

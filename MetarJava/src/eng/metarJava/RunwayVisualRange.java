@@ -3,7 +3,7 @@ package eng.metarJava;
 import eng.metarJava.support.Variation;
 
 /**
- *
+ * Represens visual range of one runway.
  * @author Marek Vajgl
  */
 public class RunwayVisualRange {

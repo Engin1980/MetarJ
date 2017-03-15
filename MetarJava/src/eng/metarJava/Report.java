@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Represents METAR/SPECI report.
  * @author Marek Vajgl
  */
 public class Report {

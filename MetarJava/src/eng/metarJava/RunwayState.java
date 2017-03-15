@@ -1,7 +1,7 @@
 package eng.metarJava;
 
 /**
- *
+ * Represents state of one runway.
  * @author Marek Vajgl
  */
 public class RunwayState {
