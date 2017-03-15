@@ -24,8 +24,6 @@ public class ParseException extends RuntimeException {
     return unprocessedText;
   }
   
-  
-  
   public ParseException(ReportField reportField, 
           String message, 
           String processedText,

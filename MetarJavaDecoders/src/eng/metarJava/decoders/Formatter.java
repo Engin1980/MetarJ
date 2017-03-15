@@ -1,6 +1,7 @@
 package eng.metarJava.decoders;
 
 import eng.metarJava.Report;
+import java.util.List;
 
 /**
  *
@@ -8,4 +9,5 @@ import eng.metarJava.Report;
  */
 public interface Formatter {
   public String format(Report report);
+  public List<Exception> checkForErrors(Report report);
 }
