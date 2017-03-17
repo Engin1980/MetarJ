@@ -3,6 +3,8 @@ package eng.metarJava.decoders;
 import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.Report;
 import eng.metarJava.RunwayVisualRange;
+import eng.metarJava.TrendInfo;
+import eng.metarJava.TrendReport;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.exceptions.FormatException;
@@ -35,7 +37,7 @@ public class EuropeFormatter implements Formatter {
     sb.append(report.getIcao()).append(" ");
     sb.append(
             String.format("%02d%02d%02dZ", report.getDayTime().getDay(), report.getDayTime().getHour(), report.getDayTime().getMinute())
-    ).append("Z ");
+    ).append(" ");
     if (report.isNil()) {
       sb.append("NIL");
     } else {
@@ -48,6 +50,9 @@ public class EuropeFormatter implements Formatter {
       sb.append(formatVisibility(report, true));
       sb.append(formatRunwayVisibility(report, true));
       sb.append(formatPhenomenas(report, true));
+      sb.append(String.format("%02d/%02d", report.getTemperature(), report.getDewPoint())).append(" ");
+      sb.append(String.format("Q%04d", report.getPressureInHpa())).append(" ");
+      sb.append(formatTrends(report));
     }
 
     return sb.toString();
@@ -108,7 +113,7 @@ public class EuropeFormatter implements Formatter {
     VisibilityInfo vi = report.getVisibility();
 
     if (vi.isCAVOK()) {
-      sb.append("CAVOK ");
+      sb.append("CAVOK");
     } else {
       sb.append(String.format("%04d", (int) vi.getVisibilityInMeters()));
       if (vi.isNoDirectionalVisibility()) {
@@ -197,6 +202,29 @@ public class EuropeFormatter implements Formatter {
       sb.append(" ");
     }
     return sb.toString();
+  }
+
+  private String formatTrends(Report report) {
+    TrendInfo ti = report.getTrendInfo();
+    if (ti.isIsNoSignificantChange()){
+      return "NOSIG";
+    }else {
+      StringBuilder sb = new StringBuilder();
+      boolean isFirst = true;
+      for (TrendReport trend : ti.getTrends()) {
+        if (isFirst)
+          isFirst = false;
+        else
+          sb.append(" ");
+        sb.append(formatTrend(trend));
+      }
+      return sb.toString();
+    }
+  }
+
+  private String formatTrend(TrendReport trend) {
+    //TODO dodelat
+    throw new UnsupportedOperationException();
   }
 
 }

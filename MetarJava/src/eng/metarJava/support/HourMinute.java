@@ -31,7 +31,7 @@ public class HourMinute {
 
   @Override
   public String toString() {
-    String ret = String.format("%02d%02dZ", this.hour, this.minute);
+    String ret = String.format("%02d%02d", this.hour, this.minute);
     return ret;
   }
 

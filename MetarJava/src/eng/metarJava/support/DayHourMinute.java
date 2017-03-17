@@ -28,7 +28,7 @@ public class DayHourMinute extends HourMinute {
 
   @Override
   public String toString() {
-    String ret = String.format("%02d%02d%02dZ", this.day, this.getHour(), this.getMinute());
+    String ret = String.format("%02d%02d%02d", this.day, this.getHour(), this.getMinute());
     return ret;
   }
 }
