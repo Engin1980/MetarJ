@@ -30,7 +30,7 @@ public class GenericParser implements Parser {
     }
 
     ret.setAuto(SharedParse.decodeAuto(rl));
-    ret.setWind(SharedParse.decodeWind(rl));
+    ret.setWind(SharedParse.decodeWind(rl, true));
     ret.setVisibility(SharedParse.decodeVisibility(rl));
     decodeRunwayVisualRanges(ret, rl);
     decodePhenomenas(ret, rl);
@@ -115,7 +115,7 @@ public class GenericParser implements Parser {
     }
 
     ret.setTime(SharedParse.decodeTrendReportTime(rl, false));
-    ret.setWind(SharedParse.decodeWind(rl));
+    ret.setWind(SharedParse.decodeWind(rl, false));
     ret.setVisibility(SharedParse.decodeTrendVisibility(rl, false));
     ret.setPhenomenas(SharedParse.decodeTrendPhenomenas(rl));
     ret.setCloudInfo(SharedParse.decodeTrendCloud(rl));

@@ -1,3 +1,2 @@
-syntax: glob
-*/build/*
-*/dist/*
+/build/
+/dist/

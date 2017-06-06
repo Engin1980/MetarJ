@@ -113,7 +113,7 @@ class SharedParse {
     return ret;
   }
 
-  static WindInfo decodeWind(ReportLine rl) {
+  static WindInfo decodeWind(ReportLine rl, boolean isMandatory) {
     WindInfo ret;
     final String regexSet = "^(VRB|\\d{3})(\\d{2})(G(\\d{2}))?(KT|KMH|MPS)";
 
@@ -164,7 +164,10 @@ class SharedParse {
         Variation<Heading> variations = decodeHeadingVariations(rl);
         ret = WindInfo.createWithOptionals(hdg, spd, gustSpd, variations);
       } else {
-        throw new MissingFieldException(ReportField.wind, rl.getPre(), rl.getPost());
+        if (isMandatory)
+          throw new MissingFieldException(ReportField.wind, rl.getPre(), rl.getPost());
+        else
+          ret = null;
       }
     }
     return ret;
