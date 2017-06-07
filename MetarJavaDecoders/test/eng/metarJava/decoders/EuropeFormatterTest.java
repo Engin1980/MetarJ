@@ -26,6 +26,7 @@ public class EuropeFormatterTest {
     ret.setType(ReportType.METAR);
     ret.setDayTime(new DayHourMinute(7, 15, 50));
     ret.setIcao("LKMT");
+    ret.setCorrection(true);
     ret.setWind(WindInfo.create(new Heading(240), new Speed(13, SpeedUnit.KT)));
     
     return ret;
@@ -63,17 +64,39 @@ public class EuropeFormatterTest {
   }
   
   @Test
+  public void testFormatCOR() {
+    Report ret = generateLKMT();
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR COR ";
+    assertStringStarts(exp, act);
+  }
+  
+  @Test
+  public void testFormatNIL(){
+    Report ret = new Report();
+    ret.setType(ReportType.METAR);
+    ret.setDayTime(new DayHourMinute(7, 15, 50));
+    ret.setIcao("LKMT");
+    ret.setNil(true);
+    
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z NIL";
+    assertStringStarts(exp, act);
+  }
+  
+  @Test
   public void testFormatICAO() {
     Report ret = generateLKMT();
-    assertEquals("LKMT", ret.getIcao());
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR COR LKMT";
+    assertStringStarts(exp, act);
   }
   
   @Test
   public void testWind(){
     Report ret = generateLKMT();
     String act = new EuropeFormatter().format(ret);
-    String exp = "METAR LKMT 071550Z 24013KT";
-    
+    String exp = "METAR COR LKMT 071550Z 24013KT";
     assertStringStarts(exp, act);
   }
   

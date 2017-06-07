@@ -13,9 +13,6 @@
   </stylesheets>
    <children>
       <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <bottom>
-            <Label fx:id="lblState" text="--" BorderPane.alignment="CENTER" />
-         </bottom>
          <top>
             <VBox BorderPane.alignment="CENTER">
                <children>
@@ -64,6 +61,20 @@
               </tabs>
             </TabPane>
          </center>
+         <bottom>
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                  <FlowPane>
+                     <children>
+                        <ComboBox fx:id="cmbFormatters" prefWidth="150.0" />
+                        <Button mnemonicParsing="false" onAction="#btnEncode_onAction" text="Encode" />
+                        <TextField fx:id="txtEncoded" prefHeight="25.0" prefWidth="481.0" />
+                     </children>
+                  </FlowPane>
+                  <Label fx:id="lblState" text="--" />
+               </children>
+            </VBox>
+         </bottom>
       </BorderPane>
    </children>
 </AnchorPane>

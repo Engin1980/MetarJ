@@ -77,6 +77,11 @@ public class EuropeFormatter implements Formatter {
       errors.add(new FormatException(ReportField.dayTime,
               FormatException.ErrorType.IsNull, "Day-Time cannot be null."));
     }
+    
+    if (report.isNil()){
+      // TODO here should be more tests that everything else is empty.
+      return errors;
+    }
 
     if (report.getWind() == null) {
       errors.add(new FormatException(ReportField.wind, FormatException.ErrorType.IsNull, "Wind cannot be empty."));

@@ -23,6 +23,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
@@ -83,6 +84,10 @@ public class FrmMainController implements Initializable {
   private TextArea txtError;
   @FXML
   private Tab tabError;
+  @FXML
+  private ComboBox cmbFormatters;
+  @FXML
+  private TextField txtEncoded;
 
   /**
    * Initializes the controller class.
@@ -109,6 +114,28 @@ public class FrmMainController implements Initializable {
   }
 
   @FXML
+  public void btnEncode_onAction() {
+    if (lastReport == null) {
+      txtEncoded.setText("Decode something first...");
+    } else {
+      eng.metarJava.decoders.Formatter fmt
+              = new eng.metarJava.decoders.EuropeFormatter();
+
+      String txt;
+
+      try {
+        txt = fmt.format(lastReport);
+        txtEncoded.setText(txt);
+        lblState.setText("Encoded");
+      } catch (Exception ex) {
+        reportException(ex);
+      }
+    }
+  }
+
+  eng.metarJava.Report lastReport = null;
+
+  @FXML
   protected void btnDecode_onAction(ActionEvent event) {
 
     try {
@@ -127,6 +154,7 @@ public class FrmMainController implements Initializable {
       tvwG.setRoot(root);
 
       lblState.setText("Decoded");
+      this.lastReport = r;
     } catch (Exception ex) {
       reportException(ex);
     }
