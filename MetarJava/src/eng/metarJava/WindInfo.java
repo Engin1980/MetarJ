@@ -12,11 +12,18 @@ import eng.metarJava.support.Variation;
  */
 public class WindInfo {
 
+
+
   private final Heading direction;
   private final double speedInKmh;
   private final Double gustSpeedInKmh;
   private final Variation<Heading> variation;
 
+  public static WindInfo createCalm() {
+    WindInfo ret = new WindInfo(new Heading(0), 0, null, null);
+    return ret;
+  }
+    
   public static WindInfo create(Heading direction, double speedInKmh) {
     if (direction == null) {
       throw new NullArgumentException("[direction]");
