@@ -47,7 +47,7 @@ public class EuropeFormatter implements Formatter {
       if (report.isAuto()) {
         sb.append("AUTO ");
       }
-//      sb.append(formatWind(report, true));
+      sb.append(formatWind(report, true));
 //      sb.append(formatVisibility(report, true));
 //      sb.append(formatRunwayVisibility(report, true));
 //      sb.append(formatPhenomenas(report, true));
@@ -95,13 +95,13 @@ public class EuropeFormatter implements Formatter {
     } else {
       sb.append(String.format("%03d", wi.getDirection().getValue()));
     }
-    sb.append(String.format("%02d", wi.getSpeed().getValue(SpeedUnit.KT)));
+    sb.append(String.format("%02d", wi.getSpeed().getIntValue(SpeedUnit.KT)));
     if (wi.isGusting()){
-      sb.append(String.format("G%02d", wi.getGustingSpeed().getValue(SpeedUnit.KT)));
+      sb.append(String.format("G%02d", wi.getGustingSpeed().getIntValue(SpeedUnit.KT)));
     }
     sb.append("KT");
     if (wi.isVariating()) {
-      sb.append(String.format("%03dV%03d",
+      sb.append(String.format(" %03dV%03d",
               wi.getVariation().getFrom().getValue(),
               wi.getVariation().getTo().getValue()));
     }

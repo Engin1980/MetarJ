@@ -22,7 +22,7 @@ public class Speed {
    */
   public int getIntValue(SpeedUnit unit){
     double pom = getValue(unit);
-    int ret = (int) Math.ceil(pom);
+    int ret = (int) Math.round(pom);
     return ret;
   }
   
