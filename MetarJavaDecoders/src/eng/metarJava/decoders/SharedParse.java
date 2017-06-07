@@ -28,6 +28,7 @@ import eng.metarJava.support.Heading;
 import eng.metarJava.support.HourMinute;
 import eng.metarJava.support.PhenomenaIntensity;
 import eng.metarJava.support.PhenomenaType;
+import eng.metarJava.support.Speed;
 import eng.metarJava.support.Variation;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -125,9 +126,11 @@ class SharedParse {
 
       if (matcher.find()) {
         Heading hdg;
-        double spd;
+        Speed spd;
+        int spdVal;
+        Integer gustSpdVal;
         SpeedUnit unit;
-        Double gustSpd;
+        Speed gustSpd;
         boolean isVrb;
 
         isVrb = matcher.group(1).equals("VRB");
@@ -136,11 +139,11 @@ class SharedParse {
         } else {
           hdg = null;
         }
-        spd = groupToInt(matcher.group(2));
+        spdVal = groupToInt(matcher.group(2));
         if (groupExist(matcher.group(3))) {
-          gustSpd = (double) groupToInt(matcher.group(4));
+          gustSpdVal = groupToInt(matcher.group(4));
         } else {
-          gustSpd = null;
+          gustSpdVal = null;
         }
         if (matcher.group(5).equals("KT")) {
           unit = SpeedUnit.KT;
@@ -154,8 +157,11 @@ class SharedParse {
         rl.move(matcher.group(0).length(), true);
 
         // to kmh
-        spd = SpeedUnit.convert(spd, unit, SpeedUnit.KMH);
-        gustSpd = SpeedUnit.convert(gustSpd, unit, SpeedUnit.KMH);
+        spd = new Speed(spdVal, unit);
+        if (gustSpdVal != null)
+          gustSpd = new Speed(gustSpdVal, unit);
+        else
+          gustSpd = null;
 
         Variation<Heading> variations = decodeHeadingVariations(rl);
         ret = WindInfo.createWithOptionals(hdg, spd, gustSpd, variations);

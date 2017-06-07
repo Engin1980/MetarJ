@@ -20,6 +20,7 @@ import eng.metarJava.support.PhenomenaIntensity;
 import eng.metarJava.support.PhenomenaType;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static eng.metarJava.decoders.EAssert.*;
 
 /**
  *
@@ -43,7 +44,7 @@ public class GenericFormatTest {
           = "METAR COR XXYY 312345Z NIL";
   private static final String UUEE
           = "METAR COR UUEE 312345Z 35037G41MPS CAVOK NCD 12/05 Q1002 NOSIG";
-
+  
   @Test
   public void testParseReportType() {
     Parser p = new GenericParser();
@@ -122,8 +123,8 @@ public class GenericFormatTest {
 
     assertNotNull(w);
     assertEquals(new Heading(20), w.getDirection());
-    assertEquals(32, w.getSpeed(SpeedUnit.KT));
-    assertNull(w.tryGetGustingSpeed(SpeedUnit.KT));
+    assertEqualsSpeed(32, w.getSpeed(), SpeedUnit.KT);
+    assertFalse(w.isGusting());
     assertFalse(w.isVariating());
   }
 
@@ -135,9 +136,9 @@ public class GenericFormatTest {
 
     assertNotNull(w);
     assertEquals(new Heading(20), w.getDirection());
-    assertEquals(12, w.getSpeed(SpeedUnit.KT));
-    assertNotNull(w.tryGetGustingSpeed(SpeedUnit.KT));
-    assertEquals(25, w.getGustingSpeed(SpeedUnit.KT));
+    assertEqualsSpeed(12, w.getSpeed(), SpeedUnit.KT);
+    assertTrue(w.isGusting());
+    assertEqualsSpeed(25, w.getGustingSpeed(), SpeedUnit.KT);
   }
 
   @Test
@@ -148,9 +149,9 @@ public class GenericFormatTest {
 
     assertNotNull(w);
     assertEquals(new Heading(350), w.getDirection());
-    assertEquals(37, w.getSpeed(SpeedUnit.MPS));
-    assertNotNull(w.tryGetGustingSpeed(SpeedUnit.KT));
-    assertEquals(41, w.getGustingSpeed(SpeedUnit.MPS));
+    assertEqualsSpeed(37, w.getSpeed(), SpeedUnit.MPS);
+    assertTrue(w.isGusting());
+    assertEqualsSpeed(41, w.getGustingSpeed(), SpeedUnit.MPS);
   }
 
   @Test

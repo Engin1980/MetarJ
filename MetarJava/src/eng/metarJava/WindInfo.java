@@ -3,6 +3,7 @@ package eng.metarJava;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.exception.NullArgumentException;
 import eng.metarJava.support.Heading;
+import eng.metarJava.support.Speed;
 import eng.metarJava.support.Variation;
 
 /**
@@ -15,77 +16,71 @@ public class WindInfo {
 
 
   private final Heading direction;
-  private final double speedInKmh;
-  private final Double gustSpeedInKmh;
+  private final Speed speed;
+  private final Speed gustSpeed;
   private final Variation<Heading> variation;
 
   public static WindInfo createCalm() {
-    WindInfo ret = new WindInfo(new Heading(0), 0, null, null);
+    WindInfo ret = new WindInfo(new Heading(0), new Speed(0, SpeedUnit.KMH), null, null);
     return ret;
   }
     
-  public static WindInfo create(Heading direction, double speedInKmh) {
+  public static WindInfo create(Heading direction, Speed speed) {
     if (direction == null) {
       throw new NullArgumentException("[direction]");
     }
-    WindInfo ret = createWithOptionals(direction, speedInKmh, null, null);
+    WindInfo ret = createWithOptionals(direction, speed, null, null);
     return ret;
   }
 
-  public static WindInfo create(Heading direction, double speedInKmh, double gustSpeedInKmh) {
+  public static WindInfo create(Heading direction, Speed speed, Speed gustSpeed) {
     if (direction == null) {
       throw new NullArgumentException("[direction]");
     }
-    WindInfo ret = createWithOptionals(direction, speedInKmh, gustSpeedInKmh, null);
+    WindInfo ret = createWithOptionals(direction, speed, gustSpeed, null);
     return ret;
   }
 
-  public static WindInfo create(Heading direction, double speedInKmh, Variation<Heading> variation) {
-    if (direction == null) {
-      throw new NullArgumentException("[direction]");
-    }
-    if (variation == null) {
-      throw new NullArgumentException("[variation]");
-    }
-    WindInfo ret = createWithOptionals(direction, speedInKmh, null, variation);
-    return ret;
-  }
-
-  public static WindInfo create(Heading direction, double speedInKmh, double gustSpeedInKmh, Variation<Heading> variation) {
+  public static WindInfo create(Heading direction, Speed speed, Variation<Heading> variation) {
     if (direction == null) {
       throw new NullArgumentException("[direction]");
     }
     if (variation == null) {
       throw new NullArgumentException("[variation]");
     }
-    WindInfo ret = createWithOptionals(direction, speedInKmh, gustSpeedInKmh, variation);
+    WindInfo ret = createWithOptionals(direction, speed, null, variation);
     return ret;
   }
 
-  public static WindInfo createVRB(double speedInKmh) {
-    WindInfo ret = createWithOptionals(null, speedInKmh, null, null);
+  public static WindInfo create(Heading direction, Speed speed, Speed gustSpeed, Variation<Heading> variation) {
+    if (direction == null) {
+      throw new NullArgumentException("[direction]");
+    }
+    if (variation == null) {
+      throw new NullArgumentException("[variation]");
+    }
+    WindInfo ret = createWithOptionals(direction, speed, gustSpeed, variation);
     return ret;
   }
 
-  public static WindInfo createVRB(double speedInKmh, double gustSpeedInKmh) {
-    WindInfo ret = createWithOptionals(null, speedInKmh, gustSpeedInKmh, null);
+  public static WindInfo createVRB(Speed speed) {
+    WindInfo ret = createWithOptionals(null, speed, null, null);
     return ret;
   }
 
-  public static WindInfo createWithOptionals(Heading directionOrNull, double speedInKmh, Double gustSpeedInKmhOrNull, Variation<Heading> variationOrNull) {
-    WindInfo ret = new WindInfo(directionOrNull, speedInKmh, gustSpeedInKmhOrNull, variationOrNull);
+  public static WindInfo createVRB(Speed speed, Speed gustSpeed) {
+    WindInfo ret = createWithOptionals(null, speed, gustSpeed, null);
     return ret;
   }
 
-  protected WindInfo(Heading direction, double speedInKmh, Double gustSpeedInKmh,
+  public static WindInfo createWithOptionals(Heading directionOrNull, Speed speed, Speed gustSpeedOrNull, Variation<Heading> variationOrNull) {
+    WindInfo ret = new WindInfo(directionOrNull, speed, gustSpeedOrNull, variationOrNull);
+    return ret;
+  }
+
+  protected WindInfo(Heading direction, Speed speed, Speed gustSpeed,
           Variation<Heading> variation) {
-    if (speedInKmh < 0) {
-      throw new IllegalArgumentException("[speedInKmh] cannot be negative.");
-    }
-    if (gustSpeedInKmh != null && gustSpeedInKmh < 0) {
-      throw new IllegalArgumentException("[gustSpeedInKmh] (if present) cannot be negative.");
-    }
-    if (gustSpeedInKmh != null && speedInKmh >= gustSpeedInKmh) {
+    if (gustSpeed != null && speed.getValue() >= gustSpeed.getValue()) {
       throw new IllegalArgumentException("[gustSpeedInKmh], if present, must be greater than [speedInKmh]");
     }
     if (direction == null && variation != null) {
@@ -93,8 +88,8 @@ public class WindInfo {
     }
 
     this.direction = direction;
-    this.speedInKmh = speedInKmh;
-    this.gustSpeedInKmh = gustSpeedInKmh;
+    this.speed = speed;
+    this.gustSpeed = gustSpeed;
     this.variation = variation;
   }
 
@@ -107,50 +102,17 @@ public class WindInfo {
     return direction;
   }
 
-  public double getSpeedInKmh() {
-    return speedInKmh;
+  public Speed getSpeed() {
+    return speed;
   }
 
-  /**
-   * Returns speed in specified unit rounded to integer.
-   *
-   * @param unit
-   * @return
-   */
-  public int getSpeed(SpeedUnit unit) {
-    double tmp = SpeedUnit.convert(this.speedInKmh, SpeedUnit.KMH, unit);
-    int ret = (int) Math.round(tmp);
-    return ret;
-  }
-
-  /**
-   * Returns gusting speed or null if there are no gusts.
-   *
-   * @param unit
-   * @return Gusting speed or null.
-   */
-  public Integer tryGetGustingSpeed(SpeedUnit unit) {
-    Double tmp = SpeedUnit.convert(this.gustSpeedInKmh, SpeedUnit.KMH, unit);
-    Integer ret;
-    if (tmp == null) {
-      ret = null;
-    } else {
-      ret = (int) Math.round((double) tmp);
-    }
-    return ret;
-  }
 
   /**
    * Return gusting speed or exception if there are no gusts.
-   *
-   * @param unit
    * @return Gusting speed as double. UnsupportedOperationException if there are no gusts.
    */
-  public int getGustingSpeed(SpeedUnit unit) {
-    if (this.isGusting() == false) {
-      throw new UnsupportedOperationException("Cannot get gusting speed for no gusts. Try [tryGetGustingSpeed()] instead?");
-    }
-    return (int) tryGetGustingSpeed(unit);
+  public Speed getGustingSpeed() {
+    return this.gustSpeed;
   }
 
   /**
@@ -159,7 +121,7 @@ public class WindInfo {
    * @return
    */
   public boolean isGusting() {
-    return this.gustSpeedInKmh != null;
+    return this.gustSpeed != null;
   }
 
   /**
@@ -183,9 +145,4 @@ public class WindInfo {
   public Variation<Heading> getVariation() {
     return variation;
   }
-
-  public Double getGustSpeedInKmh() {
-    return gustSpeedInKmh;
-  }
-
 }
