@@ -7,9 +7,7 @@ import eng.metarJava.RunwayStatesInfo;
 import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.RunwayWindshearInfo;
 import eng.metarJava.TrendCloudInfo;
-import eng.metarJava.TrendInfo;
 import eng.metarJava.TrendPhenomenaInfo;
-import eng.metarJava.TrendReport;
 import eng.metarJava.TrendReportTimeInfo;
 import eng.metarJava.TrendVisibilityInfo;
 import eng.metarJava.VisibilityInfo;
@@ -23,16 +21,13 @@ import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.CloudMassSignificantFlag;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.enums.TrendReportTimeIndication;
-import eng.metarJava.enums.TrendReportType;
 import eng.metarJava.CloudMass;
 import eng.metarJava.decoders.exceptions.ParseException;
 import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.Heading;
 import eng.metarJava.support.HourMinute;
-import eng.metarJava.support.PhenomenaDescriptor;
 import eng.metarJava.support.PhenomenaIntensity;
 import eng.metarJava.support.PhenomenaType;
-import eng.metarJava.support.TryResult;
 import eng.metarJava.support.Variation;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -272,20 +267,21 @@ class SharedParse {
   static PhenomenaInfo decodePhenomena(ReportLine rl) {
     PhenomenaInfo ret;
 
-    String regex = "^(\\+|-|VC)?([A-Z]{2})?([A-Z]{2}) ";
+    String regex = "^(\\+|-|VC)?([A-Z]{2})?([A-Z]{2}(?<!VC))(VC)? ";
     final Pattern pattern = Pattern.compile(regex);
     final Matcher matcher = pattern.matcher(rl.getPre());
     if (matcher.find()) {
       PhenomenaIntensity i = PhenomenaIntensity.moderate;
       List<PhenomenaType> ts = new ArrayList();
       PhenomenaType t;
+      boolean isVC = false;
       if (groupExist(matcher.group(1))) {
         if (matcher.group(1).equals("+")) {
           i = PhenomenaIntensity.heavy;
         } else if (matcher.group(1).equals("-")) {
           i = PhenomenaIntensity.light;
         } else if (matcher.group(1).equals("VC")) {
-          i = PhenomenaIntensity.inVicinity;
+          isVC = true;
         } else {
           throw new UnsupportedOperationException("Unknown phenomena intensity");
         }
@@ -301,8 +297,11 @@ class SharedParse {
       }
       t = PhenomenaType.valueOf(matcher.group(3));
       ts.add(t);
+      
+      if (groupExist(matcher.group(4)))
+        isVC = true;
 
-      ret = PhenomenaInfo.create(i, ts);
+      ret = PhenomenaInfo.create(i, ts, isVC);
       rl.move(matcher.group(0).length(), true);
     } else {
       ret = null;
@@ -463,7 +462,8 @@ class SharedParse {
       t = PhenomenaType.valueOf(matcher.group(2));
       ts.add(t);
 
-      ret = PhenomenaInfo.create(i, ts);
+      // Recent phenomena is expected to never be in-vicinity VC
+      ret = PhenomenaInfo.create(i, ts, false);
       rl.move(matcher.group(0).length(), true);
     } else {
       ret = null;

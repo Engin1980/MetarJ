@@ -11,7 +11,6 @@ import eng.metarJava.decoders.exceptions.FormatException;
 import eng.metarJava.decoders.fields.ReportField;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
-import eng.metarJava.support.PhenomenaDescriptor;
 import eng.metarJava.support.PhenomenaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -190,15 +189,14 @@ public class EuropeFormatter implements Formatter {
         case light:
           sb.append("-");
           break;
-        case inVicinity:
-          sb.append("VC");
-          break;
         default:
           throw new NotImplementedException();
       }
       for (PhenomenaType type : p.getTypes()) {
         sb.append(type.toString());
       }
+      if (p.isInVicinity())
+        sb.append("VC");
     }
 
     if (appendSpace) {
