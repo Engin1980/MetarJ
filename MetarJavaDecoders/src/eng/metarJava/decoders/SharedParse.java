@@ -32,6 +32,7 @@ import eng.metarJava.support.HourMinute;
 import eng.metarJava.support.PhenomenaDescriptor;
 import eng.metarJava.support.PhenomenaIntensity;
 import eng.metarJava.support.PhenomenaType;
+import eng.metarJava.support.TryResult;
 import eng.metarJava.support.Variation;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -164,10 +165,11 @@ class SharedParse {
         Variation<Heading> variations = decodeHeadingVariations(rl);
         ret = WindInfo.createWithOptionals(hdg, spd, gustSpd, variations);
       } else {
-        if (isMandatory)
+        if (isMandatory) {
           throw new MissingFieldException(ReportField.wind, rl.getPre(), rl.getPost());
-        else
+        } else {
           ret = null;
+        }
       }
     }
     return ret;
@@ -270,6 +272,43 @@ class SharedParse {
   static PhenomenaInfo decodePhenomena(ReportLine rl) {
     PhenomenaInfo ret;
 
+    String regex = "^(\\+|-|VC)?([A-Z]{2})?([A-Z]{2}) ";
+    final Pattern pattern = Pattern.compile(regex);
+    final Matcher matcher = pattern.matcher(rl.getPre());
+    if (matcher.find()) {
+      PhenomenaIntensity i = PhenomenaIntensity.moderate;
+      List<PhenomenaType> ts = new ArrayList();
+      PhenomenaType t;
+      if (groupExist(matcher.group(1))) {
+        if (matcher.group(1).equals("+")) {
+          i = PhenomenaIntensity.heavy;
+        } else if (matcher.group(1).equals("-")) {
+          i = PhenomenaIntensity.light;
+        } else if (matcher.group(1).equals("VC")) {
+          i = PhenomenaIntensity.inVicinity;
+        } else {
+          throw new UnsupportedOperationException("Unknown phenomena intensity");
+        }
+      }
+      
+      /* 
+        Phenomena decoding is tricky as metars do not follow
+        standards. Therefore this is very(!) lenient implementation.
+      */
+      if (groupExist(matcher.group(2))) {
+         t = PhenomenaType.valueOf(matcher.group(2));
+         ts.add(t);
+      }
+      t = PhenomenaType.valueOf(matcher.group(3));
+      ts.add(t);
+
+      ret = PhenomenaInfo.create(i, ts);
+      rl.move(matcher.group(0).length(), true);
+    } else {
+      ret = null;
+    }
+
+    /* OLD without vicinity in front of phenomenas
     String regex = "^([+-])?([A-Z]{2})?([A-Z]{2}(?<!VC))(VC)? ";
     final Pattern pattern = Pattern.compile(regex);
     final Matcher matcher = pattern.matcher(rl.getPre());
@@ -296,7 +335,7 @@ class SharedParse {
     } else {
       ret = null;
     }
-
+     */
     return ret;
   }
 
@@ -347,7 +386,7 @@ class SharedParse {
         CloudMassSignificantFlag flag = CloudMassSignificantFlag.parse(matcher.group(4));
         CloudMass cm = CloudMass.create(ca, alt, flag);
         ret.add(cm);
-        
+
       } else if (groupExist(matcher.group(5))) {
         // unknown cloud layer mass
         CloudMassSignificantFlag flag = CloudMassSignificantFlag.parse(matcher.group(6));
@@ -410,20 +449,22 @@ class SharedParse {
   static PhenomenaInfo decodeRecentPhenomena(ReportLine rl) {
     PhenomenaInfo ret;
 
-    String regex = "^RE([A-Z]{2})?([A-Z]{2}(?<!VC))(VC)? ";
+    String regex = "^RE([A-Z]{2})?([A-Z]{2}) ";
     final Pattern pattern = Pattern.compile(regex);
     final Matcher matcher = pattern.matcher(rl.getPre());
+    List<PhenomenaType> ts = new ArrayList();
+    PhenomenaType t;
     if (matcher.find()) {
       PhenomenaIntensity i = PhenomenaIntensity.moderate;
-      PhenomenaDescriptor d = PhenomenaDescriptor.none;
       if (groupExist(matcher.group(1))) {
-        d = PhenomenaDescriptor.valueOf(matcher.group(1));
+        t = PhenomenaType.valueOf(matcher.group(1));
+        ts.add(t);
       }
-      PhenomenaType t = PhenomenaType.valueOf(matcher.group(2));
-      boolean isVC = groupExist(matcher.group(3));
+      t = PhenomenaType.valueOf(matcher.group(2));
+      ts.add(t);
 
-      ret = PhenomenaInfo.create(i, d, t, isVC);
-      rl.move(matcher.group(0).length(), isVC);
+      ret = PhenomenaInfo.create(i, ts);
+      rl.move(matcher.group(0).length(), true);
     } else {
       ret = null;
     }
@@ -536,9 +577,11 @@ class SharedParse {
         rl.move(matcher.group(0).length(), true);
         ret = TrendVisibilityInfo.create(vis);
       } else {
-        if (isMandatory)
-        throw new MissingFieldException(ReportField.trendVisibility, rl.getPre(), rl.getPost());
-        else ret = null;
+        if (isMandatory) {
+          throw new MissingFieldException(ReportField.trendVisibility, rl.getPre(), rl.getPost());
+        } else {
+          ret = null;
+        }
       }
     }
 
@@ -555,7 +598,12 @@ class SharedParse {
         pis.add(pi);
         pi = decodePhenomena(rl);
       }
-      return TrendPhenomenaInfo.create(pis);
+
+      if (pis.isEmpty()) {
+        return TrendPhenomenaInfo.createEmpty();
+      } else {
+        return TrendPhenomenaInfo.create(pis);
+      }
     }
   }
 

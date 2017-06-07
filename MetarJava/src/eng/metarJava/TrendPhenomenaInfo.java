@@ -2,6 +2,7 @@ package eng.metarJava;
 
 import eng.metarJava.exception.NonsenseRequestException;
 import eng.metarJava.exception.NullArgumentException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,24 +21,40 @@ public class TrendPhenomenaInfo {
     }else {
       if (phenomenas == null)
         throw new NullArgumentException("[phenomenas]");
-      if (phenomenas.isEmpty()){
-        throw new IllegalArgumentException("[phenomenas] should not be empty.");
-      }
     this.NSW = false;
     this.phenomenas = phenomenas;
     }
   }
   
+  /**
+   * Create new trend phenomena info for no-significant-weather setting.
+   * @return New instance of phenomenas trend info with NSW flag set.
+   */
   public static TrendPhenomenaInfo createNSW(){
     TrendPhenomenaInfo ret = new TrendPhenomenaInfo(true, null);
     return ret;
   }
+  
+  /**
+   * Creates new trend phenomena info with selected phenomenas.
+   * @param phenomenas Phenomenas to be set.
+   * @return New instance of phenomenas trend info.
+   */
   public static TrendPhenomenaInfo create(List<PhenomenaInfo> phenomenas){
     if (phenomenas == null)
       throw new NullArgumentException("[phenomenas]");
     if (phenomenas.isEmpty())
       throw new IllegalArgumentException("[phenomenas] cannot be empty list.");
     TrendPhenomenaInfo ret = new TrendPhenomenaInfo(false, phenomenas);
+    return ret;
+  }
+  
+  /**
+   * To create new instance for trend, when neither NSW nor some phenomena is reported.
+   * @return New instance of phenomenas trend info.
+   */
+  public static TrendPhenomenaInfo createEmpty(){
+    TrendPhenomenaInfo ret = new TrendPhenomenaInfo(false, new ArrayList<PhenomenaInfo>());
     return ret;
   }
 

@@ -24,6 +24,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -36,22 +38,30 @@ import javafx.scene.control.TreeView;
 public class FrmMainController implements Initializable {
 
   private static boolean isPrimitiveWrapper(Class<?> type) {
-    if (type == Integer.class)
+    if (type == Integer.class) {
       return true;
-    if (type == Double.class)
+    }
+    if (type == Double.class) {
       return true;
-    if (type == Long.class)
+    }
+    if (type == Long.class) {
       return true;
-    if (type == Byte.class)
+    }
+    if (type == Byte.class) {
       return true;
-    if (type == Short.class)
+    }
+    if (type == Short.class) {
       return true;
-    if (type == Float.class)
+    }
+    if (type == Float.class) {
       return true;
-    if (type == Character.class)
+    }
+    if (type == Character.class) {
       return true;
-    if (type == Boolean.class)
+    }
+    if (type == Boolean.class) {
       return true;
+    }
     return false;
   }
 
@@ -69,6 +79,10 @@ public class FrmMainController implements Initializable {
   private TreeView tvw;
   @FXML
   private TreeView tvwG;
+  @FXML
+  private TextArea txtError;
+  @FXML
+  private Tab tabError;
 
   /**
    * Initializes the controller class.
@@ -89,32 +103,38 @@ public class FrmMainController implements Initializable {
       txtMetar.setText(ret);
       lblState.setText("Downloaded...");
     } catch (IOException ex) {
+      reportException(ex);
       lblState.setText("<<error>>:" + ex.getMessage());
     }
   }
 
   @FXML
   protected void btnDecode_onAction(ActionEvent event) {
-    String metar = txtMetar.getText();
 
-    eng.metarJava.decoders.Parser parser
-            = new eng.metarJava.decoders.GenericParser();
+    try {
+      String metar = txtMetar.getText();
 
-    eng.metarJava.Report r;
-    r = parser.parse(metar);
+      eng.metarJava.decoders.Parser parser
+              = new eng.metarJava.decoders.GenericParser();
 
-    TreeItem<String> root = buildObjectTree(r, "Report");
-    tvw.setRoot(root);
-    
-    root = buildGObjectTree(r, "Report");
-    tvwG.setRoot(root);
+      eng.metarJava.Report r;
+      r = parser.parse(metar);
 
-    lblState.setText("Decoded");
+      TreeItem<String> root = buildObjectTree(r, "Report");
+      tvw.setRoot(root);
+
+      root = buildGObjectTree(r, "Report");
+      tvwG.setRoot(root);
+
+      lblState.setText("Decoded");
+    } catch (Exception ex) {
+      reportException(ex);
+    }
   }
 
   private TreeItem<String> buildGObjectTree(Object o, String label) {
     TreeItem<String> ret = new TreeItem<>(getTreeItemLabel(label, o.getClass()));
-    
+
     Class cls = o.getClass();
     List<PropertyDescriptor> pds = getGetMethods(o);
     for (PropertyDescriptor pd : pds) {
@@ -122,19 +142,19 @@ public class FrmMainController implements Initializable {
       String pName = pd.getDisplayName();
       Object pValue = getValueOfProperty(o, pd);
       Class pType = pMethod.getReturnType();
-      
-      if (pValue == null){
+
+      if (pValue == null) {
         String text = getTreeItemLabel(pName, pType, "<null>");
         TreeItem<String> it = new TreeItem<>(text);
         ret.getChildren().add(it);
-      } else if (isPrintableField(pd)){
+      } else if (isPrintableField(pd)) {
         String text = getTreeItemLabel(pName, pType, pValue);
         TreeItem<String> it = new TreeItem<>(text);
         ret.getChildren().add(it);
       } else if (pd.getReadMethod().getReturnType().getName().startsWith("eng.metarJava")) {
         TreeItem<String> local = buildGObjectTree(pValue, pd.getDisplayName());
         ret.getChildren().add(local);
-      } else if (pValue instanceof Iterable){
+      } else if (pValue instanceof Iterable) {
         TreeItem<String> par = new TreeItem("???");
         Iterable iterable = (Iterable) pValue;
         for (Object object : iterable) {
@@ -142,16 +162,16 @@ public class FrmMainController implements Initializable {
           par.getChildren().add(sub);
         }
         par.setValue(getTreeItemLabel(
-                pd.getDisplayName() + " - " + par.getChildren().size()+ 
-                        " items", pValue.getClass()));
+                pd.getDisplayName() + " - " + par.getChildren().size()
+                + " items", pValue.getClass()));
         ret.getChildren().add(par);
-      } 
+      }
     }
     return ret;
   }
-  
-  private List<PropertyDescriptor> getGetMethods(Object o){
-    PropertyDescriptor [] tmp;
+
+  private List<PropertyDescriptor> getGetMethods(Object o) {
+    PropertyDescriptor[] tmp;
     try {
       tmp = Introspector.getBeanInfo(o.getClass()).getPropertyDescriptors();
     } catch (IntrospectionException ex) {
@@ -160,21 +180,21 @@ public class FrmMainController implements Initializable {
     List<PropertyDescriptor> ret = Arrays.asList(tmp);
     return ret;
   }
-  
+
   private TreeItem<String> buildObjectTree(Object o, String label) {
     TreeItem<String> ret = new TreeItem<>(getTreeItemLabel(label, o.getClass()));
-    
+
     Class cls = o.getClass();
     List<Field> privateFields = getPrivateFields(o);
     for (Field privateField : privateFields) {
       Object privateFieldValue = getValueOfField(o, privateField);
-      if (privateFieldValue == null){
+      if (privateFieldValue == null) {
         String name = privateField.getName();
         Class type = privateField.getType();
         String text = getTreeItemLabel(name, type, "<null>");
         TreeItem<String> it = new TreeItem<>(text);
         ret.getChildren().add(it);
-      } else if (isPrintableField(privateField)){
+      } else if (isPrintableField(privateField)) {
         String name = privateField.getName();
         Class type = privateField.getType();
         String value = getValueOfField(o, privateField).toString();
@@ -185,7 +205,7 @@ public class FrmMainController implements Initializable {
         Object val = getValueOfField(o, privateField);
         TreeItem<String> local = buildObjectTree(val, privateField.getName());
         ret.getChildren().add(local);
-      } else if (privateFieldValue instanceof Iterable){
+      } else if (privateFieldValue instanceof Iterable) {
         TreeItem<String> par = new TreeItem("???");
         Iterable iterable = (Iterable) privateFieldValue;
         for (Object object : iterable) {
@@ -193,56 +213,63 @@ public class FrmMainController implements Initializable {
           par.getChildren().add(sub);
         }
         par.setValue(getTreeItemLabel(
-                privateField.getName() + " - " + par.getChildren().size()+ 
-                        " items", privateFieldValue.getClass()));
+                privateField.getName() + " - " + par.getChildren().size()
+                + " items", privateFieldValue.getClass()));
         ret.getChildren().add(par);
-      } 
+      }
     }
     return ret;
   }
-  
-  private static Object getValueOfField(Object o, Field f){
+
+  private static Object getValueOfField(Object o, Field f) {
     Object ret;
     try {
       f.setAccessible(true);
       ret = f.get(o);
-    } catch (IllegalAccessException| IllegalArgumentException ex) {
+    } catch (IllegalAccessException | IllegalArgumentException ex) {
       ret = ex.getMessage();
     }
     return ret;
   }
-  
-  private static boolean isPrintableField(Field field){
-    if (field.getType().isPrimitive())
-      return true;
-    if (isPrimitiveWrapper(field.getType()))
-      return true;
-    if (field.getType().isEnum()){
+
+  private static boolean isPrintableField(Field field) {
+    if (field.getType().isPrimitive()) {
       return true;
     }
-    if (field.getType().equals(String.class))
-      return true;
-    return false;
-  }
-  
-    private static boolean isPrintableField(PropertyDescriptor pd){
-    if (pd.getReadMethod().getReturnType().isPrimitive())
-      return true;
-    if (isPrimitiveWrapper(pd.getReadMethod().getReturnType()))
-      return true;
-    if (pd.getReadMethod().getReturnType().isEnum()){
+    if (isPrimitiveWrapper(field.getType())) {
       return true;
     }
-    if (pd.getReadMethod().getReturnType().equals(String.class))
+    if (field.getType().isEnum()) {
       return true;
+    }
+    if (field.getType().equals(String.class)) {
+      return true;
+    }
     return false;
   }
-  
-  private static String getTreeItemLabel (String name, Class type, Object value){
+
+  private static boolean isPrintableField(PropertyDescriptor pd) {
+    if (pd.getReadMethod().getReturnType().isPrimitive()) {
+      return true;
+    }
+    if (isPrimitiveWrapper(pd.getReadMethod().getReturnType())) {
+      return true;
+    }
+    if (pd.getReadMethod().getReturnType().isEnum()) {
+      return true;
+    }
+    if (pd.getReadMethod().getReturnType().equals(String.class)) {
+      return true;
+    }
+    return false;
+  }
+
+  private static String getTreeItemLabel(String name, Class type, Object value) {
     String ret = String.format("%s [%s] = %s", name, type.getName(), value);
     return ret;
   }
-  private static String getTreeItemLabel (String name, Class type){
+
+  private static String getTreeItemLabel(String name, Class type) {
     String ret = String.format("%s [%s]", name, type.getName());
     return ret;
   }
@@ -266,5 +293,22 @@ public class FrmMainController implements Initializable {
       ret = "<<error>> " + ex.getMessage();
     }
     return ret;
+  }
+
+  private void reportException(Throwable ex) {
+    int indent = 0;
+    StringBuilder sb = new StringBuilder();
+
+    while (ex != null) {
+      for (int i = 0; i < indent; i++) {
+        sb.append(" ");
+      }
+      sb.append("[").append(ex.getClass().getName()).append("] :: ");
+      sb.append(ex.getMessage()).append("\r\n");
+      indent++;
+      ex = ex.getCause();
+    }
+
+    txtError.setText(sb.toString());
   }
 }

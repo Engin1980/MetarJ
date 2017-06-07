@@ -5,6 +5,7 @@
  */
 package eng.metarJava.demoClient;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +33,6 @@ public class Main extends Application {
     }
 
     Scene scene = new Scene(root, 700, 500);
-
     stage.setTitle("FXML Welcome");
     stage.setScene(scene);
     stage.show();

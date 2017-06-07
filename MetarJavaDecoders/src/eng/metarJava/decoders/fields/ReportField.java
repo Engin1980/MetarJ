@@ -11,6 +11,7 @@ public enum ReportField {
   dayTime,
   wind,
   visibility,
+  phenomenas,
   clouds,
   temperatureDewPoint,
   pressure,

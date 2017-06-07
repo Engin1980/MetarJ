@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 public class GenericFormatTest {
 
   private static final String LKMT
-          = "METAR LKMT 241812Z 02032KT 5000NDV RA +SN BLSNVC SCT060 12/05 Q0996 WS R22 "
+          = "METAR LKMT 241812Z 02032KT 5000NDV RA +SN BLSN SCT060 12/05 Q0996 WS R22 "
           + "SNOCLO BECMG AT1900 01015KT CAVOK NSW NSC";
   private static final String LKPD
           = "METAR LKPD 241812Z 02032KT 030V080 CAVOK VV030 12/05 Q1002 RETSRA NOSIG";
@@ -38,7 +38,7 @@ public class GenericFormatTest {
           = "METAR LKTB 241812Z /////KT CAVOK NSC M08/M12 Q1002 NOSIG";
   private static final String LKPR
           = "METAR COR LKPR 312345Z 02012G25KT 2000 0800E R06/0700 R24C/0200V0500"
-          + "+TSSQVC FEW012 SCT030CB OVC050TCU 12/05 Q1002 RETSRA RESA WS ALL RWY "
+          + "VCTSSQ FEW012 SCT030CB OVC050TCU 12/05 Q1002 RETSRA RESA WS ALL RWY "
           + "R24/589999 R06/2039// "
           + "BECMG AT1900 01015KT 4000 +SN VV300";
   private static final String XXYY
@@ -243,21 +243,24 @@ public class GenericFormatTest {
 
     PhenomenaInfo pi = r.getPhenomenas().get(0);
     assertEquals(PhenomenaIntensity.moderate, pi.getIntensity());
-    assertEquals(PhenomenaDescriptor.none, pi.getDescriptor());
-    assertEquals(PhenomenaType.RA, pi.getType());
-    assertFalse(pi.isInVicinity());
+    assertArrayEquals(
+            new PhenomenaType[]{PhenomenaType.RA},
+            pi.getTypes()
+    );
 
     pi = r.getPhenomenas().get(1);
     assertEquals(PhenomenaIntensity.heavy, pi.getIntensity());
-    assertEquals(PhenomenaDescriptor.none, pi.getDescriptor());
-    assertEquals(PhenomenaType.SN, pi.getType());
-    assertFalse(pi.isInVicinity());
+    assertArrayEquals(
+            new PhenomenaType[]{PhenomenaType.SN},
+            pi.getTypes()
+    );
 
     pi = r.getPhenomenas().get(2);
     assertEquals(PhenomenaIntensity.moderate, pi.getIntensity());
-    assertEquals(PhenomenaDescriptor.BL, pi.getDescriptor());
-    assertEquals(PhenomenaType.SN, pi.getType());
-    assertTrue(pi.isInVicinity());
+    assertArrayEquals(
+            new PhenomenaType[]{PhenomenaType.BL, PhenomenaType.SN},
+            pi.getTypes()
+    );
   }
 
   @Test
@@ -268,10 +271,11 @@ public class GenericFormatTest {
     assertEquals(1, r.getPhenomenas().size());
 
     PhenomenaInfo pi = r.getPhenomenas().get(0);
-    assertEquals(PhenomenaIntensity.heavy, pi.getIntensity());
-    assertEquals(PhenomenaDescriptor.TS, pi.getDescriptor());
-    assertEquals(PhenomenaType.SQ, pi.getType());
-    assertTrue(pi.isInVicinity());
+    assertEquals(PhenomenaIntensity.inVicinity, pi.getIntensity());
+    assertArrayEquals(
+            new PhenomenaType[]{PhenomenaType.TS, PhenomenaType.SQ},
+            pi.getTypes()
+    );
   }
 
   @Test
@@ -412,8 +416,10 @@ public class GenericFormatTest {
 
     assertEquals(1, r.getRecentPhenomenas().size());
     pi = r.getRecentPhenomenas().get(0);
-    assertEquals(PhenomenaDescriptor.TS, pi.getDescriptor());
-    assertEquals(PhenomenaType.RA, pi.getType());
+    assertArrayEquals(
+            new PhenomenaType[]{PhenomenaType.TS, PhenomenaType.RA},
+            pi.getTypes()
+    );
   }
 
   @Test
@@ -424,12 +430,18 @@ public class GenericFormatTest {
 
     assertEquals(2, r.getRecentPhenomenas().size());
     pi = r.getRecentPhenomenas().get(0);
-    assertEquals(PhenomenaDescriptor.TS, pi.getDescriptor());
-    assertEquals(PhenomenaType.RA, pi.getType());
+    assertArrayEquals(
+            new PhenomenaType[]{PhenomenaType.TS, PhenomenaType.RA},
+            pi.getTypes()
+    );
+
 
     pi = r.getRecentPhenomenas().get(1);
-    assertEquals(PhenomenaDescriptor.none, pi.getDescriptor());
-    assertEquals(PhenomenaType.SA, pi.getType());
+    assertArrayEquals(
+            new PhenomenaType[]{PhenomenaType.SA},
+            pi.getTypes()
+    );
+
   }
 
   @Test

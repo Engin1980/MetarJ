@@ -52,6 +52,15 @@
                         </AnchorPane>
                   </content>
                 </Tab>
+                  <Tab id="tabError" fx:id="tabError" closable="false" text="Errors">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TextArea id="txtError" fx:id="txtError" layoutX="89.0" layoutY="51.0" text="... no error" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="12.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
               </tabs>
             </TabPane>
          </center>

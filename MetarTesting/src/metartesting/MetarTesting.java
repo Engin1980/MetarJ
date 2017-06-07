@@ -27,8 +27,12 @@ public class MetarTesting {
    */
   public static void main(String[] args) {
 
-    //runFileTest();
-
+    runFileTest();
+    //runSimpleTest();
+    
+  }
+  
+  private static void runSimpleTest(){
     Downloader d = new NoaaGovDownloader();
     
     String ret = "N/A";

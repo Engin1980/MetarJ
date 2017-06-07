@@ -1,6 +1,9 @@
 package eng.metarJava;
 
+import eng.metarJava.exception.NullArgumentException;
 import eng.metarJava.support.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Represents phenomena description.
@@ -8,35 +11,42 @@ import eng.metarJava.support.*;
  */
 public class PhenomenaInfo {
   private final PhenomenaIntensity intensity;
-  private final PhenomenaDescriptor descriptor;
-  private final PhenomenaType type;
-  private final boolean inVicinity;
+  private final PhenomenaType[] types;
   
-  public static PhenomenaInfo create(PhenomenaIntensity intensity, PhenomenaDescriptor descriptor, PhenomenaType type, boolean inVicinity){
-    PhenomenaInfo ret = new PhenomenaInfo(intensity, descriptor, type, inVicinity);
+  public static PhenomenaInfo create(PhenomenaIntensity intensity, PhenomenaType[] types){
+    PhenomenaInfo ret = new PhenomenaInfo(intensity, types);
+    return ret;
+  }
+  public static PhenomenaInfo create(PhenomenaIntensity intensity, List<PhenomenaType> types){
+    PhenomenaType[] arr = types.toArray(new PhenomenaType[0]);
+    PhenomenaInfo ret = new PhenomenaInfo(intensity, arr);
+    return ret;
+  }
+  public static PhenomenaInfo create(PhenomenaIntensity intensity, PhenomenaType type){
+    PhenomenaInfo ret = new PhenomenaInfo(intensity, new PhenomenaType[]{type});
+    return ret;
+  }
+  public static PhenomenaInfo createEmpty(){
+    PhenomenaInfo ret = new PhenomenaInfo(PhenomenaIntensity.moderate, new PhenomenaType[0]);
     return ret;
   }
 
-  protected PhenomenaInfo(PhenomenaIntensity intensity, PhenomenaDescriptor descriptor, PhenomenaType type, boolean inVicinity) {
+  protected PhenomenaInfo(PhenomenaIntensity intensity, PhenomenaType[] types) {
     this.intensity = intensity;
-    this.descriptor = descriptor;
-    this.type = type;
-    this.inVicinity = inVicinity;
+    
+    if (types == null)
+      throw new NullArgumentException("PhenomenaType type array cannot be null. Use empty array if required.");
+    if (types.length > 2)
+      throw new IllegalArgumentException("PhenomenaType[] type array must have at most two elements (currently " + types.length + ".");
+    this.types = Arrays.copyOf(types, types.length);
   }
   
   public PhenomenaIntensity getIntensity() {
     return intensity;
   }
 
-  public PhenomenaDescriptor getDescriptor() {
-    return descriptor;
-  }
-
-  public PhenomenaType getType() {
-    return type;
-  }
-
-  public boolean isInVicinity() {
-    return inVicinity;
+  public PhenomenaType[] getTypes() {
+    PhenomenaType[] ret = Arrays.copyOf(this.types, this.types.length);
+    return ret;
   }
 }
