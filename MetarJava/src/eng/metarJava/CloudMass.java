@@ -118,7 +118,7 @@ public class CloudMass {
             || (amount != null && baseHeight == null)){
       throw new IllegalArgumentException("[amount] and [baseHeight] both must be set or both must be null.");
     }
-    if (baseHeight < 0) {
+    if (baseHeight != null && baseHeight < 0) {
       throw new IllegalArgumentException("[baseHeight] should not be negative.");
     }
     if (amount == null && significantFlag == CloudMassSignificantFlag.none){

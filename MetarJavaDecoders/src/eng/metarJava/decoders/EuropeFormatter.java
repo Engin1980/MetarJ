@@ -1,5 +1,7 @@
 package eng.metarJava.decoders;
 
+import eng.metarJava.CloudInfo;
+import eng.metarJava.CloudMass;
 import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.Report;
 import eng.metarJava.RunwayVisualRange;
@@ -9,6 +11,7 @@ import eng.metarJava.VisibilityInfo;
 import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.exceptions.FormatException;
 import eng.metarJava.decoders.fields.ReportField;
+import eng.metarJava.enums.CloudMassSignificantFlag;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.support.PhenomenaType;
@@ -51,7 +54,9 @@ public class EuropeFormatter implements Formatter {
       sb.append(formatVisibility(report, true));
       sb.append(formatRunwayVisibility(report, true));
       sb.append(formatPhenomenas(report, true));
-//      sb.append(String.format("%02d/%02d", report.getTemperature(), report.getDewPoint())).append(" ");
+      sb.append(formatClouds(report, true));
+      sb.append(formatTemperatureDewPoint(report, true));
+      sb.append(formatPressure(report, true));
 //      sb.append(String.format("Q%04d", report.getPressureInHpa())).append(" ");
 //      sb.append(formatTrends(report));
     }
@@ -77,14 +82,22 @@ public class EuropeFormatter implements Formatter {
       errors.add(new FormatException(ReportField.dayTime,
               FormatException.ErrorType.IsNull, "Day-Time cannot be null."));
     }
-    
-    if (report.isNil()){
+
+    if (report.isNil()) {
       // TODO here should be more tests that everything else is empty.
       return errors;
     }
 
     if (report.getWind() == null) {
       errors.add(new FormatException(ReportField.wind, FormatException.ErrorType.IsNull, "Wind cannot be empty."));
+    }
+
+    if (report.getVisibility() == null) {
+      errors.add(new FormatException(ReportField.visibility, FormatException.ErrorType.IsNull, "Visibility cannot be empty."));
+    }
+
+    if (report.getClouds() == null) {
+      errors.add(new FormatException(ReportField.clouds, FormatException.ErrorType.IsNull, "Cloud cannot be empty."));
     }
 
     return errors;
@@ -101,7 +114,7 @@ public class EuropeFormatter implements Formatter {
       sb.append(String.format("%03d", wi.getDirection().getValue()));
     }
     sb.append(String.format("%02d", wi.getSpeed().getIntValue(SpeedUnit.KT)));
-    if (wi.isGusting()){
+    if (wi.isGusting()) {
       sb.append(String.format("G%02d", wi.getGustingSpeed().getIntValue(SpeedUnit.KT)));
     }
     sb.append("KT");
@@ -198,8 +211,9 @@ public class EuropeFormatter implements Formatter {
           sb.append("-");
           break;
       }
-      if (p.isInVicinity())
+      if (p.isInVicinity()) {
         sb.append("VC");
+      }
       for (PhenomenaType type : p.getTypes()) {
         sb.append(type.toString());
       }
@@ -211,18 +225,69 @@ public class EuropeFormatter implements Formatter {
     return sb.toString();
   }
 
+  private String formatClouds(Report report, boolean appendSpace) {
+    boolean isFirst = true;
+
+    StringBuilder sb = new StringBuilder();
+    CloudInfo ci = report.getClouds();
+    if (ci.isNCD()) {
+      sb.append("NCD");
+    } else if (ci.isNSC()) {
+      sb.append("NSC");
+    } else if (ci.isVerticalVisibility()) {
+      if (ci.getVerticalVisibilityInHundredFeet() == null) {
+        sb.append("VV///");
+      } else {
+        sb.append("VV").append(String.format("%03d", ci.getVerticalVisibilityInHundredFeet()));
+      }
+    } else {
+      for (CloudMass cm : ci.getMasses()) {
+        if (isFirst) {
+          isFirst = false;
+        } else {
+          sb.append(" ");
+        }
+        if (cm.isAmountAndBaseHeightKnown()) {
+          sb
+                  .append(cm.getAmount().toString())
+                  .append(String.format("%03d", cm.getBaseHeightHundredFeet()));
+
+        } else {
+          sb.append("//////");
+        }
+        switch (cm.getSignificantFlag()) {
+          case CB:
+            sb.append("CB");
+            break;
+          case TCU:
+            sb.append("TCU");
+            break;
+          case undetected:
+            sb.append("///");
+            break;
+        }
+      }
+    }
+
+    if (appendSpace) {
+      sb.append(" ");
+    }
+    return sb.toString();
+  }
+
   private String formatTrends(Report report) {
     TrendInfo ti = report.getTrendInfo();
-    if (ti.isIsNoSignificantChange()){
+    if (ti.isIsNoSignificantChange()) {
       return "NOSIG";
-    }else {
+    } else {
       StringBuilder sb = new StringBuilder();
       boolean isFirst = true;
       for (TrendReport trend : ti.getTrends()) {
-        if (isFirst)
+        if (isFirst) {
           isFirst = false;
-        else
+        } else {
           sb.append(" ");
+        }
         sb.append(formatTrend(trend));
       }
       return sb.toString();
@@ -232,6 +297,33 @@ public class EuropeFormatter implements Formatter {
   private String formatTrend(TrendReport trend) {
     //TODO dodelat
     throw new UnsupportedOperationException();
+  }
+
+  private String formatTemperatureDewPoint(Report report, boolean appendSpace) {
+    StringBuilder sb = new StringBuilder();
+    if(report.getTemperature() < 0){
+      sb.append("M");
+    }
+    sb.append(String.format("%02d", Math.abs(report.getTemperature())));
+    sb.append("/");
+    if (report.getDewPoint() < 0)
+      sb.append("M");
+    sb.append(String.format("%02d", Math.abs(report.getDewPoint())));
+    
+    if (appendSpace)
+      sb.append(" ");
+    
+    return sb.toString();
+  }
+
+  private String formatPressure(Report report, boolean appendSpace) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Q").append(String.format("%04d", report.getPressureInHpa()));
+    
+    if (appendSpace)
+      sb.append(" ");
+    
+    return sb.toString();
   }
 
 }

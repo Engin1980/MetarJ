@@ -1,5 +1,7 @@
 package eng.metarJava.decoders;
 
+import eng.metarJava.CloudInfo;
+import eng.metarJava.CloudMass;
 import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.Report;
 import eng.metarJava.RunwayVisualRange;
@@ -7,6 +9,8 @@ import eng.metarJava.VisibilityInfo;
 import eng.metarJava.VisibilityVariability;
 import eng.metarJava.WindInfo;
 import static eng.metarJava.decoders.EAssert.assertStringStarts;
+import eng.metarJava.enums.CloudAmount;
+import eng.metarJava.enums.CloudMassSignificantFlag;
 import eng.metarJava.enums.Direction;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
@@ -16,6 +20,8 @@ import eng.metarJava.support.PhenomenaIntensity;
 import eng.metarJava.support.PhenomenaType;
 import eng.metarJava.support.Speed;
 import eng.metarJava.support.Variation;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -35,6 +41,7 @@ public class EuropeFormatterTest {
     ret.setIcao("LKMT");
     ret.setWind(WindInfo.createCalm());
     ret.setVisibility(VisibilityInfo.createCAVOK());
+    ret.setClouds(CloudInfo.createNCD());
 
     return ret;
   }
@@ -234,6 +241,104 @@ public class EuropeFormatterTest {
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK -RA VCBLSN +SNSH";
+
+    assertStringStarts(exp, act);
+  }
+  
+    @Test
+  public void testCloudNSC() {
+    Report ret = generateReport();
+    ret.setClouds(CloudInfo.createNSC());
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NSC";
+
+    assertStringStarts(exp, act);
+  }
+  
+      @Test
+  public void testCloudNCD() {
+    Report ret = generateReport();
+    ret.setClouds(CloudInfo.createNCD());
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD";
+
+    assertStringStarts(exp, act);
+  }
+  
+      @Test
+  public void testCloudVV() {
+    Report ret = generateReport();
+    ret.setClouds(CloudInfo.createWithVV((Integer) 300));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK VV300";
+
+    assertStringStarts(exp, act);
+  }
+  
+        @Test
+  public void testCloudVVUnknown() {
+    Report ret = generateReport();
+    ret.setClouds(CloudInfo.createWithUnknownVV());
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK VV///";
+
+    assertStringStarts(exp, act);
+  }
+  
+      @Test
+  public void testCloudWithMasses() {
+    Report ret = generateReport();
+    List<CloudMass> cms = new ArrayList();
+    cms.add(CloudMass.create(CloudAmount.SCT, 40));
+    cms.add(CloudMass.create(CloudAmount.OVC, 70, CloudMassSignificantFlag.TCU));
+    cms.add(CloudMass.create(CloudAmount.FEW, 90, CloudMassSignificantFlag.CB));
+    cms.add(CloudMass.create(CloudAmount.OVC, 100, CloudMassSignificantFlag.undetected));
+    cms.add(CloudMass.create(CloudAmount.BKN, 120));
+    cms.add(CloudMass.createWithoutAmountAndBaseHeightCB());
+    cms.add(CloudMass.createWithoutAmountAndBaseHeightTCU());
+    ret.setClouds(CloudInfo.create(cms));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK SCT040 OVC070TCU FEW090CB OVC100/// BKN120 //////CB //////TCU";
+
+    assertStringStarts(exp, act);
+  }
+  
+        @Test
+  public void testTemperatureA() {
+    Report ret = generateReport();
+    ret.setTemperature(10);
+    ret.setDewPoint(5);
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 10/05";
+
+    assertStringStarts(exp, act);
+  }
+    
+        @Test
+  public void testTemperatureB() {
+    Report ret = generateReport();
+    ret.setTemperature(-10);
+    ret.setDewPoint(-5);
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD M10/M05";
+
+    assertStringStarts(exp, act);
+  }
+  
+          @Test
+  public void testPressure() {
+    Report ret = generateReport();
+    ret.setPressureInHpa(995);
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0995";
 
     assertStringStarts(exp, act);
   }

@@ -303,8 +303,8 @@ public class GenericFormatTest {
     assertFalse(ci.isSpecialState());
     assertFalse(ci.isWithMasses());
 
-    assertEquals(30, ci.getVerticalVisibilityInHundredFeet());
-    assertEquals(3000, ci.getVerticalVisibilityInFeet());
+    assertEquals(30, (int) ci.getVerticalVisibilityInHundredFeet());
+    assertEquals(3000, (int) ci.getVerticalVisibilityInFeet());
   }
 
   @Test
