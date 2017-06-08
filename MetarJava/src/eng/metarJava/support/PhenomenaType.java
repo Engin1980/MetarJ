@@ -21,4 +21,65 @@ public enum PhenomenaType {
     }
     return ret;
   }
+    
+    public boolean isPrecipitation(){
+      switch(this){
+        case DZ:
+        case RA:
+        case SN:
+        case SG:
+        case IC:
+        case PL:
+        case GR:
+        case GS:
+        case UP:
+          return true;
+        default:
+          return false;
+      }
+    }
+    
+    public boolean isDescription(){
+      switch(this){
+        case MI:
+        case BR:
+        case PR:
+        case DR:
+        case BL:
+        case SH:
+        case TS:
+        case FZ:
+          return true;
+        default:
+          return false;
+      }
+    }
+    
+    public boolean isObscuration(){
+      switch(this){
+        case BR:
+        case FG:
+        case FU:
+        case VA:
+        case DU:
+        case SA:
+        case HZ:
+          return true;
+        default:
+          return false;
+      }
+    }
+    
+    public boolean isOther(){
+      switch(this){
+        case PO:
+        case SQ:
+        case FC:
+        case SS:
+        case DS:
+          return true;
+        default:
+          return false;
+      }
+    }
 }

@@ -50,7 +50,7 @@ public class EuropeFormatter implements Formatter {
       sb.append(formatWind(report, true));
       sb.append(formatVisibility(report, true));
       sb.append(formatRunwayVisibility(report, true));
-//      sb.append(formatPhenomenas(report, true));
+      sb.append(formatPhenomenas(report, true));
 //      sb.append(String.format("%02d/%02d", report.getTemperature(), report.getDewPoint())).append(" ");
 //      sb.append(String.format("Q%04d", report.getPressureInHpa())).append(" ");
 //      sb.append(formatTrends(report));
@@ -197,14 +197,12 @@ public class EuropeFormatter implements Formatter {
         case light:
           sb.append("-");
           break;
-        default:
-          throw new NotImplementedException();
-      }
-      for (PhenomenaType type : p.getTypes()) {
-        sb.append(type.toString());
       }
       if (p.isInVicinity())
         sb.append("VC");
+      for (PhenomenaType type : p.getTypes()) {
+        sb.append(type.toString());
+      }
     }
 
     if (appendSpace) {
