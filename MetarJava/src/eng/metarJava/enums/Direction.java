@@ -24,4 +24,20 @@ public enum Direction {
         throw new UnsupportedOperationException("Unsupported value [" + direction + "] for direction. Is value uppercase?");
     }
   }
+  
+  @Override
+  public String toString(){
+    switch (this){
+      case east:
+        return "E";
+      case north:
+        return "N";
+      case south:
+        return "S";
+      case west:
+        return "W";
+      default:
+        throw new UnsupportedOperationException();
+    }
+  }
 }

@@ -227,7 +227,6 @@ public class GenericFormatTest {
     rvr = r.getRunwayVisualRanges().get(1);
     assertTrue(rvr.isVariating());
     assertEquals("24C", rvr.getRunwayDesignator());
-    assertNull(rvr.getVisibilityInMeters());
     assertNotNull(rvr.getVariatingVisibilityInMeters());
     assertEquals(200, (int) rvr.getVariatingVisibilityInMeters().getFrom());
     assertEquals(500, (int) rvr.getVariatingVisibilityInMeters().getTo());

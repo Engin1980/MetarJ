@@ -1,8 +1,12 @@
 package eng.metarJava.decoders;
 
 import eng.metarJava.Report;
+import eng.metarJava.RunwayVisualRange;
+import eng.metarJava.VisibilityInfo;
+import eng.metarJava.VisibilityVariability;
 import eng.metarJava.WindInfo;
 import static eng.metarJava.decoders.EAssert.assertStringStarts;
+import eng.metarJava.enums.Direction;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.support.DayHourMinute;
@@ -21,51 +25,29 @@ public class EuropeFormatterTest {
   public EuropeFormatterTest() {
   }
   
-  private Report generateLKMT(){
+  private Report generateReport(){
     Report ret = new Report();
     ret.setType(ReportType.METAR);
     ret.setDayTime(new DayHourMinute(7, 15, 50));
     ret.setIcao("LKMT");
-    ret.setCorrection(true);
-    ret.setWind(WindInfo.create(new Heading(240), new Speed(13, SpeedUnit.KT)));
-    
-    return ret;
-  }
-  
-  private Report generateLKPR(){
-    Report ret = new Report();
-    ret.setType(ReportType.METAR);
-    ret.setDayTime(new DayHourMinute(7, 15, 50));
-    ret.setIcao("LKPR");
-    ret.setWind(WindInfo.create(
-            new Heading(240), 
-            new Speed(13, SpeedUnit.KT), 
-            new Speed(25, SpeedUnit.KT), 
-            new Variation<>(new Heading(210), new Heading(250))));
-    
-    return ret;
-  }
-  
-  private Report generateLKTB(){
-    Report ret = new Report();
-    ret.setType(ReportType.METAR);
-    ret.setDayTime(new DayHourMinute(7, 15, 50));
-    ret.setIcao("LKTB");
     ret.setWind(WindInfo.createCalm());
+    ret.setVisibility(VisibilityInfo.createCAVOK());
     
     return ret;
   }
 
   @Test
   public void testFormatType() {
-    Report ret = generateLKMT();
+    Report ret = generateReport();
     String s = new EuropeFormatter().format(ret);
     assertStringStarts("METAR ", s);
   }
   
   @Test
   public void testFormatCOR() {
-    Report ret = generateLKMT();
+    Report ret = generateReport();
+    ret.setCorrection(true);
+    
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR COR ";
     assertStringStarts(exp, act);
@@ -73,10 +55,7 @@ public class EuropeFormatterTest {
   
   @Test
   public void testFormatNIL(){
-    Report ret = new Report();
-    ret.setType(ReportType.METAR);
-    ret.setDayTime(new DayHourMinute(7, 15, 50));
-    ret.setIcao("LKMT");
+    Report ret = generateReport();
     ret.setNil(true);
     
     String act = new EuropeFormatter().format(ret);
@@ -86,36 +65,118 @@ public class EuropeFormatterTest {
   
   @Test
   public void testFormatICAO() {
-    Report ret = generateLKMT();
+    Report ret = generateReport();
     String act = new EuropeFormatter().format(ret);
-    String exp = "METAR COR LKMT";
+    String exp = "METAR LKMT";
     assertStringStarts(exp, act);
   }
   
   @Test
   public void testWind(){
-    Report ret = generateLKMT();
+    Report ret = generateReport();
+    ret.setWind(WindInfo.create(
+            new Heading(240), 
+            new Speed(13, SpeedUnit.KT)));
+    
     String act = new EuropeFormatter().format(ret);
-    String exp = "METAR COR LKMT 071550Z 24013KT";
+    String exp = "METAR LKMT 071550Z 24013KT";
     assertStringStarts(exp, act);
   }
   
   @Test
   public void testWindGusting(){
-    Report ret = generateLKPR();
+    Report ret = generateReport();
+    ret.setWind(WindInfo.create(
+            new Heading(240), 
+            new Speed(13, SpeedUnit.KT), 
+            new Speed(25, SpeedUnit.KT),
+            new Variation<Heading>(new Heading(210), new Heading(250))));
+    
     String act = new EuropeFormatter().format(ret);
-    String exp = "METAR LKPR 071550Z 24013G25KT 210V250";
+    String exp = "METAR LKMT 071550Z 24013G25KT 210V250";
     
     assertStringStarts(exp, act);
   }
   
   @Test
   public void testWindCalm(){
-    Report ret = generateLKTB();
+    Report ret = generateReport();
     String act = new EuropeFormatter().format(ret);
-    String exp = "METAR LKTB 071550Z 00000KT";
+    String exp = "METAR LKMT 071550Z 00000KT";
     
     assertStringStarts(exp, act);
   }
   
+  @Test
+  public void testVisibilityCAVOK(){
+    Report ret = generateReport();
+    ret.setVisibility(VisibilityInfo.createCAVOK());
+    
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK";
+    
+    assertStringStarts(exp, act);
+  }
+  
+  @Test
+  public void testVisibilityNumber(){
+    Report ret = generateReport();
+    ret.setVisibility(VisibilityInfo.create(5000));
+    
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT 5000";
+    
+    assertStringStarts(exp, act);
+  }  
+  
+  @Test
+  public void testVisibilityNumberNDV(){
+    Report ret = generateReport();
+    ret.setVisibility(VisibilityInfo.createWithNDV(5000));
+    
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT 5000NDV";
+    
+    assertStringStarts(exp, act);
+  }  
+  
+    @Test
+  public void testVisibilityVaring(){
+    Report ret = generateReport();
+    ret.setVisibility(
+            VisibilityInfo.create(
+                    5000, 
+                    VisibilityVariability.create(2000, Direction.north)));
+    
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT 5000 2000N";
+    
+    assertStringStarts(exp, act);
+  }  
+  
+      @Test
+  public void testRunwayVisibilityNumber(){
+    Report ret = generateReport();
+    ret.getRunwayVisualRanges().clear();
+    ret.getRunwayVisualRanges().add(
+            RunwayVisualRange.create("24C", 300));
+    
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK R24C/0300";
+    
+    assertStringStarts(exp, act);
+  } 
+  
+        @Test
+  public void testRunwayVisibilityVariating(){
+    Report ret = generateReport();
+    ret.getRunwayVisualRanges().clear();
+    ret.getRunwayVisualRanges().add(
+            RunwayVisualRange.create("24C", new Variation<>(50, 200)));
+    
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK R24C/0050V0200";
+    
+    assertStringStarts(exp, act);
+  } 
 }

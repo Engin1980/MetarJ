@@ -38,4 +38,9 @@ public class Variation<T> {
   public T getTo() {
     return to;
   }
+  
+  @Override
+  public String toString(){
+    return "[" + this.getFrom() + " .. " + this.getTo() + "]";
+  }
 }
