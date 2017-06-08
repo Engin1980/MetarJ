@@ -92,7 +92,7 @@ public class Report {
     this.icao = icao;
   }
 
-  private DayHourMinute dayTime = new DayHourMinute(0, 0, 0);
+  private DayHourMinute dayTime = new DayHourMinute(1, 1, 1);
 
   /**
    * Represents day, hour and minute of the report in the ZULU time. Mandatory. Default value is 000000Z.
@@ -164,11 +164,11 @@ public class Report {
     this.auto = auto;
   }
 
-  private WindInfo wind = WindInfo.createCalm();
+  private WindInfo wind = null;
 
   /**
-   * Represents wind. Mandatory. Default value is calm wind. Wind can be represented as calm, normal, gusting and varying using
-   * {@linkplain CloudInfo} class. This value cannot be null.
+   * Represents wind. Mandatory. Default value is null, that is no wind reported, like "/////KT". Wind can be represented as calm,
+   * normal, gusting and varying using {@linkplain CloudInfo} class. 
    *
    * @return Object representing wind.
    */
@@ -181,12 +181,8 @@ public class Report {
    *
    * @param wind
    * @see #getWind()
-   * @throws NullArgumentException if [wind] is null.
    */
   public void setWind(WindInfo wind) {
-    if (wind == null) {
-      throw new NullArgumentException("wind");
-    }
     this.wind = wind;
   }
 
@@ -381,9 +377,11 @@ public class Report {
   private TrendInfo trendInfo = TrendInfo.createNOSIG();
 
   /**
-   * Represents weather trend, typically NOSIG, BECMG, TEMPO, etc. This field should(!) be set, however, in some countries it is ommited.
-   * If set, see instance of {@linkplain TrendInfo} for detailed description. Optional, but reccomended. Default value is NOSIG.
-   * @return 
+   * Represents weather trend, typically NOSIG, BECMG, TEMPO, etc. This field should(!) be set, however, in some countries it is
+   * ommited. If set, see instance of {@linkplain TrendInfo} for detailed description. Optional, but reccomended. Default value is
+   * NOSIG.
+   *
+   * @return
    */
   public TrendInfo getTrendInfo() {
     return trendInfo;
@@ -391,7 +389,8 @@ public class Report {
 
   /**
    * See {@linkplain #getTrendInfo() }.
-   * @param trendInfo 
+   *
+   * @param trendInfo
    */
   public void setTrendInfo(TrendInfo trendInfo) {
     this.trendInfo = trendInfo;
@@ -401,7 +400,8 @@ public class Report {
 
   /**
    * Represents remark after the report text. If no remark, null. Optional. Default value is null.
-   * @return 
+   *
+   * @return
    */
   public String getRemark() {
     return remark;
@@ -409,7 +409,8 @@ public class Report {
 
   /**
    * See {@linkplain  #getRemark() }.
-   * @param remark 
+   *
+   * @param remark
    */
   public void setRemark(String remark) {
     this.remark = remark;

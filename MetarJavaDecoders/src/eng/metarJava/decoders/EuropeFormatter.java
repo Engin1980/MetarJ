@@ -66,9 +66,10 @@ public class EuropeFormatter implements Formatter {
       sb.append(formatRemark(report));
     }
 
-    if (sb.charAt(sb.length()-1) == ' ')
-      sb.deleteCharAt(sb.length()-1);
-    
+    if (sb.charAt(sb.length() - 1) == ' ') {
+      sb.deleteCharAt(sb.length() - 1);
+    }
+
     return sb.toString();
   }
 
@@ -96,10 +97,6 @@ public class EuropeFormatter implements Formatter {
       return errors;
     }
 
-    if (report.getWind() == null) {
-      errors.add(new FormatException(ReportField.wind, FormatException.ErrorType.IsNull, "Wind cannot be empty."));
-    }
-
     if (report.getVisibility() == null) {
       errors.add(new FormatException(ReportField.visibility, FormatException.ErrorType.IsNull, "Visibility cannot be empty."));
     }
@@ -116,20 +113,24 @@ public class EuropeFormatter implements Formatter {
 
     StringBuilder sb = new StringBuilder();
 
-    if (wi.isVariable()) {
-      sb.append("VRB");
+    if (wi == null) {
+      sb.append("/////KT");
     } else {
-      sb.append(String.format("%03d", wi.getDirection().getValue()));
-    }
-    sb.append(String.format("%02d", wi.getSpeed().getIntValue(SpeedUnit.KT)));
-    if (wi.isGusting()) {
-      sb.append(String.format("G%02d", wi.getGustingSpeed().getIntValue(SpeedUnit.KT)));
-    }
-    sb.append("KT");
-    if (wi.isVariating()) {
-      sb.append(String.format(" %03dV%03d",
-              wi.getVariation().getFrom().getValue(),
-              wi.getVariation().getTo().getValue()));
+      if (wi.isVariable()) {
+        sb.append("VRB");
+      } else {
+        sb.append(String.format("%03d", wi.getDirection().getValue()));
+      }
+      sb.append(String.format("%02d", wi.getSpeed().getIntValue(SpeedUnit.KT)));
+      if (wi.isGusting()) {
+        sb.append(String.format("G%02d", wi.getGustingSpeed().getIntValue(SpeedUnit.KT)));
+      }
+      sb.append("KT");
+      if (wi.isVariating()) {
+        sb.append(String.format(" %03dV%03d",
+                wi.getVariation().getFrom().getValue(),
+                wi.getVariation().getTo().getValue()));
+      }
     }
 
     if (appendSpace) {
