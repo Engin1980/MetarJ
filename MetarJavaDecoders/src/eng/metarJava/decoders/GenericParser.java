@@ -85,7 +85,7 @@ public class GenericParser implements Parser {
 
   private TrendInfo decodeTrendInfo(ReportLine rl, boolean isMandatory) {
     if (SharedParse.decodeFixedString(rl, "NOSIG")) {
-      return new TrendInfo(true);
+      return TrendInfo.createNOSIG();
     } else {
       List<TrendReport> reports = new ArrayList<>();
       TrendReport report = decodeTrendReport(rl);
@@ -96,7 +96,7 @@ public class GenericParser implements Parser {
       if (!isMandatory && reports.isEmpty()) {
         return null;
       } else {
-        return new TrendInfo(reports);
+        return TrendInfo.create(reports);
       }
     }
   }

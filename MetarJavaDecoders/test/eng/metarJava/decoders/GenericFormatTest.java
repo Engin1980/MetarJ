@@ -539,9 +539,9 @@ public class GenericFormatTest {
 
     assertNotNull(r.getTrendInfo());
     assertFalse(r.getTrendInfo().isIsNoSignificantChange());
-    assertEquals(1, r.getTrendInfo().getTrends().size());
+    assertEquals(1, r.getTrendInfo().getTrends().length);
 
-    TrendReport tr = r.getTrendInfo().getTrends().get(0);
+    TrendReport tr = r.getTrendInfo().getTrends()[0];
     assertEquals(TrendReportType.BECMG, tr.getType());
   }
 
@@ -552,8 +552,8 @@ public class GenericFormatTest {
 
     assertNotNull(r.getTrendInfo());
     assertFalse(r.getTrendInfo().isIsNoSignificantChange());
-    assertEquals(1, r.getTrendInfo().getTrends().size());
-    TrendReport tr = r.getTrendInfo().getTrends().get(0);
+    assertEquals(1, r.getTrendInfo().getTrends().length);
+    TrendReport tr = r.getTrendInfo().getTrends()[0];
 
     assertTrue(tr.getVisibility().isCAVOK());
     try {
@@ -570,8 +570,8 @@ public class GenericFormatTest {
 
     assertNotNull(r.getTrendInfo());
     assertFalse(r.getTrendInfo().isIsNoSignificantChange());
-    assertEquals(1, r.getTrendInfo().getTrends().size());
-    TrendReport tr = r.getTrendInfo().getTrends().get(0);
+    assertEquals(1, r.getTrendInfo().getTrends().length);
+    TrendReport tr = r.getTrendInfo().getTrends()[0];
 
     assertFalse(tr.getVisibility().isCAVOK());
     assertNotNull(tr.getVisibility().getVisibilityInMeters());

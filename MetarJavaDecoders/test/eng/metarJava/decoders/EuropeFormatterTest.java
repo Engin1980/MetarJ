@@ -422,7 +422,7 @@ public class EuropeFormatterTest {
       @Test
   public void testNOSIG() {
     Report ret = generateReport();
-    ret.setTrendInfo(new TrendInfo(true));
+    ret.setTrendInfo(TrendInfo.createNOSIG());
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0000 NOSIG";
