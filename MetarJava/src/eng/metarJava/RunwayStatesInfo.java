@@ -42,6 +42,7 @@ public class RunwayStatesInfo {
   }
   
   public boolean isEmpty(){
-    return this.runwayStates.isEmpty();
+    if (snowClosed) return false;
+    return this.runwayStates == null || this.runwayStates.isEmpty();
   }
 }

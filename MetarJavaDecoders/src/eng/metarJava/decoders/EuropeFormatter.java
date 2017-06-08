@@ -4,7 +4,10 @@ import eng.metarJava.CloudInfo;
 import eng.metarJava.CloudMass;
 import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.Report;
+import eng.metarJava.RunwayState;
+import eng.metarJava.RunwayStatesInfo;
 import eng.metarJava.RunwayVisualRange;
+import eng.metarJava.RunwayWindshearInfo;
 import eng.metarJava.TrendInfo;
 import eng.metarJava.TrendReport;
 import eng.metarJava.VisibilityInfo;
@@ -57,6 +60,9 @@ public class EuropeFormatter implements Formatter {
       sb.append(formatTemperatureDewPoint(report, true));
       sb.append(formatPressure(report, true));
       sb.append(formatRecentPhenomenas(report, true));
+      sb.append(formatWindShears(report, true));
+      sb.append(formatRunwayStatesInfo(report, true));
+      sb.append(formatTrendInfo(report, true));
 
     }
 
@@ -98,7 +104,7 @@ public class EuropeFormatter implements Formatter {
     if (report.getClouds() == null) {
       errors.add(new FormatException(ReportField.clouds, FormatException.ErrorType.IsNull, "Cloud cannot be empty."));
     }
-
+    
     return errors;
   }
 
@@ -359,4 +365,82 @@ public class EuropeFormatter implements Formatter {
     return sb.toString();
   }
 
+  private String formatWindShears(Report report, boolean appendSpace) {
+    if (report.getRunwayWindshears() == null || report.getRunwayWindshears().isEmpty()) {
+      return "";
+    }
+
+    RunwayWindshearInfo rwi = report.getRunwayWindshears();
+    StringBuilder sb = new StringBuilder();
+    boolean isFirst = true;
+    if (rwi.isAllRunways()) {
+      sb.append("WS ALL RWY");
+    } else {
+      sb.append("WS ");
+      for (String rd : rwi.getRunwayDesignators()) {
+        if (isFirst) {
+          isFirst = false;
+        } else {
+          sb.append(" ");
+        }
+        sb.append("R").append(rd);
+      }
+    }
+
+    if (appendSpace) {
+      sb.append(" ");
+    }
+
+    return sb.toString();
+  }
+
+  private String formatRunwayStatesInfo(Report report, boolean appendSpace) {
+    RunwayStatesInfo rsi = report.getRunwayStateInfo();
+    if (rsi == null || rsi.isEmpty()) {
+      return "";
+    }
+
+    boolean isFirst = true;
+    StringBuilder sb = new StringBuilder();
+    if (rsi.isSnowClosed()) {
+      sb.append("SNOCLO");
+    } else {
+      for (RunwayState rs : rsi.getRunwayStates()) {
+        if (isFirst) {
+          isFirst = false;
+        } else {
+          sb.append(" ");
+        }
+
+        sb.append("R").append(rs.getDesignator()).append("/");
+        sb.append(rs.getDeposit());
+        sb.append(rs.getContamination());
+        sb.append(rs.getDepositDepth());
+        sb.append(rs.getBrakingAction());
+      }
+    }
+
+    if (appendSpace) {
+      sb.append(" ");
+    }
+
+    return sb.toString();
+  }
+
+  private String formatTrendInfo(Report report, boolean appendSpace) {
+    if (report.getTrendInfo() == null) return "";
+    
+    StringBuilder sb = new StringBuilder();
+    if (report.getTrendInfo().isIsNoSignificantChange()) {
+      sb.append("NOSIG");
+    } else {
+      throw new RuntimeException("Not yet implemented");
+    }
+
+    if (appendSpace) {
+      sb.append(" ");
+    }
+
+    return sb.toString();
+  }
 }

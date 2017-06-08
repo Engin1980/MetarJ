@@ -151,12 +151,12 @@ public class Report {
     this.runwayWindshears = runwayWindshear;
   }
   
-  private RunwayStatesInfo runwayStateInfo;
+  private RunwayStatesInfo runwayStatesInfo;
   public RunwayStatesInfo getRunwayStateInfo() {
-    return runwayStateInfo;
+    return runwayStatesInfo;
   }
-  public void setRunwayStateInfo(RunwayStatesInfo runwayStateInfo) {
-    this.runwayStateInfo = runwayStateInfo;
+  public void setRunwayStatesInfo(RunwayStatesInfo runwayStatesInfo) {
+    this.runwayStatesInfo = runwayStatesInfo;
   }
   
   private TrendInfo trendInfo;

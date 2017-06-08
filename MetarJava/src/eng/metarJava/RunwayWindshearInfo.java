@@ -23,7 +23,7 @@ public class RunwayWindshearInfo {
     return ret;
   }
 
-  public RunwayWindshearInfo(Set<String> runwayDesignators, boolean isWindshearAllRunways) {
+  protected RunwayWindshearInfo(Set<String> runwayDesignators, boolean isWindshearAllRunways) {
     if (isWindshearAllRunways) {
       this.allRunways = true;
       this.runwayDesignators = null;
@@ -46,7 +46,7 @@ public class RunwayWindshearInfo {
    * @return
    */
   public boolean isEmpty() {
-    return this.runwayDesignators.isEmpty();
+    return (this.runwayDesignators == null || this.runwayDesignators.isEmpty()) && !this.allRunways;
   }
 
   public Set<String> getRunwayDesignators() {

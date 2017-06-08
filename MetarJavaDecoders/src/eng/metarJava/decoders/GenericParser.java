@@ -40,7 +40,7 @@ public class GenericParser implements Parser {
     decodeRecentPhenomenas(ret, rl);
     ret.setRunwayWindshears(SharedParse.decodeWindShears(rl));
     SharedParse.decodeSeaTemperatureAndState(rl); // not valid for aviation
-    ret.setRunwayStateInfo(SharedParse.decodeRunwayStateInfo(rl));
+    ret.setRunwayStatesInfo(SharedParse.decodeRunwayStateInfo(rl));
     ret.setTrendInfo(decodeTrendInfo(rl, false));
     ret.setRemark(SharedParse.decodeRemark(rl));
 

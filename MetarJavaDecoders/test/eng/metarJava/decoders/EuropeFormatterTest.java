@@ -4,7 +4,11 @@ import eng.metarJava.CloudInfo;
 import eng.metarJava.CloudMass;
 import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.Report;
+import eng.metarJava.RunwayState;
+import eng.metarJava.RunwayStatesInfo;
 import eng.metarJava.RunwayVisualRange;
+import eng.metarJava.RunwayWindshearInfo;
+import eng.metarJava.TrendInfo;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.VisibilityVariability;
 import eng.metarJava.WindInfo;
@@ -21,7 +25,10 @@ import eng.metarJava.support.PhenomenaType;
 import eng.metarJava.support.Speed;
 import eng.metarJava.support.Variation;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -353,6 +360,72 @@ public class EuropeFormatterTest {
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0000 RERA RESNSH";
+
+    assertStringStarts(exp, act);
+  }
+  
+  @Test
+  public void testWindShears() {
+    Report ret = generateReport();
+    ret.setRunwayWindshears(RunwayWindshearInfo.createAllRWY());
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0000 WS ALL RWY";
+
+    assertStringStarts(exp, act);
+  }
+  
+    @Test
+  public void testWindShearsSpecific() {
+    Report ret = generateReport();
+    Set<String>rwys = new TreeSet();
+    rwys.add("06");
+    rwys.add("24L");
+    rwys.add("24R");
+    ret.setRunwayWindshears(RunwayWindshearInfo.create(rwys));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0000 WS R06 R24L R24R";
+
+    assertStringStarts(exp, act);
+  }
+    
+  @Test
+  public void testRunwayStateSNOCLO() {
+    Report ret = generateReport();
+    ret.setRunwayStatesInfo(
+            RunwayStatesInfo.createSNOCLO()
+    );
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0000 SNOCLO";
+
+    assertStringStarts(exp, act);
+  }
+  
+    @Test
+  public void testRunwayState() {
+    Report ret = generateReport();
+    List<RunwayState> rs = new ArrayList();
+    rs.add(RunwayState.create("24", '3', '1', "23", "52"));
+    rs.add(RunwayState.create("06", '/', '/', "//", "99"));
+    ret.setRunwayStatesInfo(
+            RunwayStatesInfo.create(rs)
+    );
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0000 R24/312352 R06/////99";
+
+    assertStringStarts(exp, act);
+  }
+  
+      @Test
+  public void testNOSIG() {
+    Report ret = generateReport();
+    ret.setTrendInfo(new TrendInfo(true));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0000 NOSIG";
 
     assertStringStarts(exp, act);
   }
