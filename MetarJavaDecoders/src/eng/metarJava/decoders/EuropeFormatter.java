@@ -17,7 +17,6 @@ import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.support.PhenomenaType;
 import java.util.ArrayList;
 import java.util.List;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *
@@ -57,8 +56,8 @@ public class EuropeFormatter implements Formatter {
       sb.append(formatClouds(report, true));
       sb.append(formatTemperatureDewPoint(report, true));
       sb.append(formatPressure(report, true));
-//      sb.append(String.format("Q%04d", report.getPressureInHpa())).append(" ");
-//      sb.append(formatTrends(report));
+      sb.append(formatRecentPhenomenas(report, true));
+
     }
 
     return sb.toString();
@@ -301,28 +300,62 @@ public class EuropeFormatter implements Formatter {
 
   private String formatTemperatureDewPoint(Report report, boolean appendSpace) {
     StringBuilder sb = new StringBuilder();
-    if(report.getTemperature() < 0){
+    if (report.getTemperature() < 0) {
       sb.append("M");
     }
     sb.append(String.format("%02d", Math.abs(report.getTemperature())));
     sb.append("/");
-    if (report.getDewPoint() < 0)
+    if (report.getDewPoint() < 0) {
       sb.append("M");
+    }
     sb.append(String.format("%02d", Math.abs(report.getDewPoint())));
-    
-    if (appendSpace)
+
+    if (appendSpace) {
       sb.append(" ");
-    
+    }
+
     return sb.toString();
   }
 
   private String formatPressure(Report report, boolean appendSpace) {
     StringBuilder sb = new StringBuilder();
     sb.append("Q").append(String.format("%04d", report.getPressureInHpa()));
-    
-    if (appendSpace)
+
+    if (appendSpace) {
       sb.append(" ");
-    
+    }
+
+    return sb.toString();
+  }
+
+  private String formatRecentPhenomenas(Report report, boolean appendSpace) {
+    if (report.getRecentPhenomenas() == null || report.getRecentPhenomenas().isEmpty()) {
+      return "";
+    }
+    boolean isFirst = true;
+
+    StringBuilder sb = new StringBuilder();
+    for (PhenomenaInfo p : report.getRecentPhenomenas()) {
+      if (isFirst) {
+        isFirst = false;
+      } else {
+        sb.append(" ");
+      }
+
+      sb.append("RE");
+
+      // recent phenomena does not have intensity
+      if (p.isInVicinity()) {
+        sb.append("VC");
+      }
+      for (PhenomenaType type : p.getTypes()) {
+        sb.append(type.toString());
+      }
+    }
+
+    if (appendSpace) {
+      sb.append(" ");
+    }
     return sb.toString();
   }
 

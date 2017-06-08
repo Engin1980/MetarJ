@@ -244,8 +244,8 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
-    @Test
+
+  @Test
   public void testCloudNSC() {
     Report ret = generateReport();
     ret.setClouds(CloudInfo.createNSC());
@@ -255,8 +255,8 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
-      @Test
+
+  @Test
   public void testCloudNCD() {
     Report ret = generateReport();
     ret.setClouds(CloudInfo.createNCD());
@@ -266,8 +266,8 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
-      @Test
+
+  @Test
   public void testCloudVV() {
     Report ret = generateReport();
     ret.setClouds(CloudInfo.createWithVV((Integer) 300));
@@ -277,8 +277,8 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
-        @Test
+
+  @Test
   public void testCloudVVUnknown() {
     Report ret = generateReport();
     ret.setClouds(CloudInfo.createWithUnknownVV());
@@ -288,8 +288,8 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
-      @Test
+
+  @Test
   public void testCloudWithMasses() {
     Report ret = generateReport();
     List<CloudMass> cms = new ArrayList();
@@ -307,8 +307,8 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
-        @Test
+
+  @Test
   public void testTemperatureA() {
     Report ret = generateReport();
     ret.setTemperature(10);
@@ -319,8 +319,8 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-    
-        @Test
+
+  @Test
   public void testTemperatureB() {
     Report ret = generateReport();
     ret.setTemperature(-10);
@@ -331,14 +331,28 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
-          @Test
+
+  @Test
   public void testPressure() {
     Report ret = generateReport();
     ret.setPressureInHpa(995);
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0995";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testRecentPhenomena() {
+    Report ret = generateReport();
+    ret.getRecentPhenomenas().add(
+            PhenomenaInfo.create(PhenomenaIntensity.moderate, PhenomenaType.RA, false));
+    ret.getRecentPhenomenas().add(
+            PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.SN, PhenomenaType.SH}, false));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0000 RERA RESNSH";
 
     assertStringStarts(exp, act);
   }
