@@ -17,10 +17,22 @@ import java.util.List;
  */
 public class Report {
 
-  private ReportType type;
+  private ReportType type = ReportType.METAR;
+  
+  /**
+   * Gets type of the report. METAR and SPECI types are supported. Mandatory.
+   * @return Report type.
+   * This value is mandatory. Default value is {@link eng.metarJava.enums.ReportType#METAR METAR}.
+   * @see eng.metarJava.enums.ReportType
+   */
   public ReportType getType() {
     return type;
   }
+  /**
+   * Sets type. See @link {#getType()} for more info.
+   * @param type 
+   * @see #getType() 
+   */
   public void setType(ReportType type) {
     this.type = type;
   }
@@ -28,10 +40,18 @@ public class Report {
   /**
    * COR
    */
-  private boolean correction;
+  private boolean correction = false;
+  /**
+   * Flag if a report is a correction. Mandatory. Default value is false. 
+   * @return 
+   */
   public boolean isCorrection() {
     return correction;
   }
+  /**
+   * @see #isCorrection()
+   * @param correction 
+   */
   public void setCorrection(boolean correction) {
     this.correction = correction;
   }
@@ -50,10 +70,19 @@ public class Report {
     this.icao = icao;
   }
 
-  private DayHourMinute dayTime;
+  private DayHourMinute dayTime = new DayHourMinute(0,0,0);
+  /**
+   * Represents day, hour and minute of the report in the ZULU time. Mandatory. Default value is 000000Z.
+   * @return 
+   */
   public DayHourMinute getDayTime() {
     return dayTime;
   }
+  /**
+   * 
+   * @param time Value. Cannot be null.
+   * @see #getDayTime() 
+   */
   public void setDayTime(DayHourMinute time) {
     this.dayTime = time;
   }
@@ -80,10 +109,21 @@ public class Report {
     this.auto = auto;
   }
 
-  private WindInfo wind;
+  private WindInfo wind = WindInfo.createCalm();
+  /**
+   * Represents wind. Mandatory. Default value is calm wind.
+   * @return 
+   * Wind can be represented as calm, normal, gusting and varying using {@linkplain CloudInfo} class.
+   * This value cannot be null.
+   */
   public WindInfo getWind() {
     return wind;
   }
+  /**
+   * See {@linkplain #getWind()}
+   * @param wind 
+   * @see #getWind() 
+   */
   public void setWind(WindInfo wind) {
     this.wind = wind;
   }
