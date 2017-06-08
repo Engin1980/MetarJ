@@ -323,7 +323,7 @@ public class Report {
   /**
    * Read-only. Represents recent phenomenas over station. To add phenomena set, use {@linkplain PhenomenaInfo} and add its instance
    * into this collection. Recent phenomenas cannot have intensity other than moderate (see
-   * {@linkplain eng.metarJava.support.PhenomenaIntensity}). Other values are ignored. This list is final and cannot be replaced.
+   * {@link eng.metarJava.enums.PhenomenaIntensity}). Other values are ignored. This list is final and cannot be replaced.
    * Default value is empty list.
    *
    * @return

@@ -1,7 +1,7 @@
 package eng.metarJava.enums;
 
 /**
- *
+ * Represents direction using cardinal points - north, south, east, west.
  * @author Marek Vajgl
  */
 public enum Direction {
@@ -10,6 +10,11 @@ public enum Direction {
   west,
   east;
 
+  /**
+   * Converts one-character N/S/E/W representation into an enum value.
+   * @param direction N/S/E/W character
+   * @return enum representation
+   */
   public static Direction parse(char direction) {
     switch (direction) {
       case 'N':
@@ -25,6 +30,10 @@ public enum Direction {
     }
   }
   
+  /**
+   * Converts enum representation into N/S/E/W uppercase char value.
+   * @return N/S/E/W uppercase char value as string
+   */
   @Override
   public String toString(){
     switch (this){

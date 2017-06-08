@@ -17,7 +17,7 @@ import eng.metarJava.decoders.fields.ReportField;
 import eng.metarJava.enums.CloudMassSignificantFlag;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
-import eng.metarJava.support.PhenomenaType;
+import eng.metarJava.enums.PhenomenaType;
 import java.util.ArrayList;
 import java.util.List;
 

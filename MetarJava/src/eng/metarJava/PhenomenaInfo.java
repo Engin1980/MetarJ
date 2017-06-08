@@ -1,5 +1,7 @@
 package eng.metarJava;
 
+import eng.metarJava.enums.PhenomenaType;
+import eng.metarJava.enums.PhenomenaIntensity;
 import eng.metarJava.exception.NullArgumentException;
 import eng.metarJava.support.*;
 import java.util.Arrays;

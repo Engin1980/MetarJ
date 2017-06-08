@@ -1,4 +1,6 @@
-package eng.metarJava.support;
+package eng.metarJava.enums;
+
+import eng.metarJava.support.TryResult;
 
 /**
  *
