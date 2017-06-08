@@ -63,9 +63,12 @@ public class EuropeFormatter implements Formatter {
       sb.append(formatWindShears(report, true));
       sb.append(formatRunwayStatesInfo(report, true));
       sb.append(formatTrendInfo(report, true));
-
+      sb.append(formatRemark(report));
     }
 
+    if (sb.charAt(sb.length()-1) == ' ')
+      sb.deleteCharAt(sb.length()-1);
+    
     return sb.toString();
   }
 
@@ -104,7 +107,7 @@ public class EuropeFormatter implements Formatter {
     if (report.getClouds() == null) {
       errors.add(new FormatException(ReportField.clouds, FormatException.ErrorType.IsNull, "Cloud cannot be empty."));
     }
-    
+
     return errors;
   }
 
@@ -274,7 +277,7 @@ public class EuropeFormatter implements Formatter {
       }
     }
 
-    if (appendSpace) {
+    if (appendSpace && sb.length() > 0) {
       sb.append(" ");
     }
     return sb.toString();
@@ -395,7 +398,7 @@ public class EuropeFormatter implements Formatter {
   }
 
   private String formatRunwayStatesInfo(Report report, boolean appendSpace) {
-    RunwayStatesInfo rsi = report.getRunwayStateInfo();
+    RunwayStatesInfo rsi = report.getRunwayStatesInfo();
     if (rsi == null || rsi.isEmpty()) {
       return "";
     }
@@ -428,8 +431,10 @@ public class EuropeFormatter implements Formatter {
   }
 
   private String formatTrendInfo(Report report, boolean appendSpace) {
-    if (report.getTrendInfo() == null) return "";
-    
+    if (report.getTrendInfo() == null) {
+      return "";
+    }
+
     StringBuilder sb = new StringBuilder();
     if (report.getTrendInfo().isIsNoSignificantChange()) {
       sb.append("NOSIG");
@@ -442,5 +447,13 @@ public class EuropeFormatter implements Formatter {
     }
 
     return sb.toString();
+  }
+
+  private String formatRemark(Report report) {
+    if (report.getRemark() != null) {
+      return "RMK " + report.getRemark();
+    } else {
+      return "";
+    }
   }
 }

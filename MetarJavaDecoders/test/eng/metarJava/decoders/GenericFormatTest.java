@@ -474,9 +474,9 @@ public class GenericFormatTest {
     Parser p = new GenericParser();
     Report r = p.parse(LKMT);
 
-    assertNotNull(r.getRunwayStateInfo());
-    assertNull(r.getRunwayStateInfo().getRunwayStates());
-    assertTrue(r.getRunwayStateInfo().isSnowClosed());
+    assertNotNull(r.getRunwayStatesInfo());
+    assertNull(r.getRunwayStatesInfo().getRunwayStates());
+    assertTrue(r.getRunwayStatesInfo().isSnowClosed());
   }
 
   @Test
@@ -484,20 +484,20 @@ public class GenericFormatTest {
     Parser p = new GenericParser();
     Report r = p.parse(LKPR);
 
-    assertNotNull(r.getRunwayStateInfo());
-    assertFalse(r.getRunwayStateInfo().isEmpty());
-    assertFalse(r.getRunwayStateInfo().isSnowClosed());
-    assertEquals(2, r.getRunwayStateInfo().getRunwayStates().size());
+    assertNotNull(r.getRunwayStatesInfo());
+    assertFalse(r.getRunwayStatesInfo().isEmpty());
+    assertFalse(r.getRunwayStatesInfo().isSnowClosed());
+    assertEquals(2, r.getRunwayStatesInfo().getRunwayStates().size());
 
     RunwayState rs;
-    rs = r.getRunwayStateInfo().getRunwayStates().get(0);
+    rs = r.getRunwayStatesInfo().getRunwayStates().get(0);
     assertEquals("24", rs.getDesignator());
     assertEquals('5', rs.getDeposit());
     assertEquals('8', rs.getContamination());
     assertEquals("99", rs.getDepositDepth());
     assertEquals("99", rs.getBrakingAction());
 
-    rs = r.getRunwayStateInfo().getRunwayStates().get(1);
+    rs = r.getRunwayStatesInfo().getRunwayStates().get(1);
     assertEquals("06", rs.getDesignator());
     assertEquals('2', rs.getDeposit());
     assertEquals('0', rs.getContamination());

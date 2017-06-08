@@ -30,6 +30,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.layout.Background;
 
 /**
  * FXML Controller class
@@ -126,6 +127,9 @@ public class FrmMainController implements Initializable {
       try {
         txt = fmt.format(lastReport);
         txtEncoded.setText(txt);
+        
+        updateColors();
+        
         lblState.setText("Encoded");
       } catch (Exception ex) {
         reportException(ex);
@@ -161,9 +165,10 @@ public class FrmMainController implements Initializable {
   }
 
   private TreeItem<String> buildGObjectTree(Object o, String label) {
+
     TreeItem<String> ret = new TreeItem<>(getTreeItemLabel(label, o.getClass()));
 
-    Class cls = o.getClass();
+    try{
     List<PropertyDescriptor> pds = getGetMethods(o);
     for (PropertyDescriptor pd : pds) {
       Method pMethod = pd.getReadMethod();
@@ -194,6 +199,9 @@ public class FrmMainController implements Initializable {
                 + " items", pValue.getClass()));
         ret.getChildren().add(par);
       }
+    }
+    } catch (Throwable t){
+      throw new RuntimeException("Failed to extract value of object " + o.getClass().getName() + " with label " + label + ".", t);
     }
     return ret;
   }
@@ -317,7 +325,7 @@ public class FrmMainController implements Initializable {
     Object ret;
     try {
       ret = pd.getReadMethod().invoke(o);
-    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+    } catch (NullPointerException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
       ret = "<<error>> " + ex.getMessage();
     }
     return ret;
@@ -326,6 +334,7 @@ public class FrmMainController implements Initializable {
   private void reportException(Throwable ex) {
     int indent = 0;
     StringBuilder sb = new StringBuilder();
+    StackTraceElement[] stack = new StackTraceElement[0];
 
     while (ex != null) {
       for (int i = 0; i < indent; i++) {
@@ -334,9 +343,36 @@ public class FrmMainController implements Initializable {
       sb.append("[").append(ex.getClass().getName()).append("] :: ");
       sb.append(ex.getMessage()).append("\r\n");
       indent++;
+      stack = ex.getStackTrace();
+      
       ex = ex.getCause();
     }
 
+    sb.append("\r\n\r\n\r\n");
+    for (StackTraceElement ste : stack) {
+      sb
+              .append(ste.getClassName())
+              .append(".")
+              .append(ste.getMethodName())
+              .append(" ( at ")
+              .append(ste.getFileName())
+              .append("::")
+              .append(ste.getLineNumber())
+              .append(")")
+              .append("\r\n");
+    }
+
     txtError.setText(sb.toString());
+  }
+
+  private void updateColors() {
+    String a= txtMetar.getText();
+    String b= txtEncoded.getText();
+    
+    if (a.equals(b)){
+       txtEncoded.setStyle("-fx-text-fill: green;");
+    } else {
+       txtEncoded.setStyle("-fx-text-fill: red;");
+    }
   }
 }

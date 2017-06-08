@@ -152,7 +152,7 @@ public class Report {
   }
   
   private RunwayStatesInfo runwayStatesInfo;
-  public RunwayStatesInfo getRunwayStateInfo() {
+  public RunwayStatesInfo getRunwayStatesInfo() {
     return runwayStatesInfo;
   }
   public void setRunwayStatesInfo(RunwayStatesInfo runwayStatesInfo) {
