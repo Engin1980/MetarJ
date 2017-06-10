@@ -118,7 +118,7 @@ public class GenericParser implements Parser {
     ret.setWind(SharedParse.decodeWind(rl, false));
     ret.setVisibility(SharedParse.decodeTrendVisibility(rl, false));
     ret.setPhenomenas(SharedParse.decodeTrendPhenomenas(rl));
-    ret.setCloudInfo(SharedParse.decodeTrendCloud(rl));
+    ret.setClouds(SharedParse.decodeTrendCloud(rl));
     return ret;
   }
 }

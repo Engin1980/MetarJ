@@ -122,16 +122,16 @@ public class TrendReport {
    *
    * @return
    */
-  public TrendCloudInfo getCloudInfo() {
+  public TrendCloudInfo getClouds() {
     return cloudInfo;
   }
 
   /**
-   * See {@linkplain #getCloudInfo() }.
+   * See {@link #getClouds()}.
    *
    * @param cloudInfo
    */
-  public void setCloudInfo(TrendCloudInfo cloudInfo) {
+  public void setClouds(TrendCloudInfo cloudInfo) {
     this.cloudInfo = cloudInfo;
   }
 

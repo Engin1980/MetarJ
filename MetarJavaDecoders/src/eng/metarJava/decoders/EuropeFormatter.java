@@ -8,16 +8,21 @@ import eng.metarJava.RunwayState;
 import eng.metarJava.RunwayStatesInfo;
 import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.RunwayWindshearInfo;
+import eng.metarJava.TrendCloudInfo;
 import eng.metarJava.TrendInfo;
+import eng.metarJava.TrendPhenomenaInfo;
 import eng.metarJava.TrendReport;
+import eng.metarJava.TrendReportTimeInfo;
+import eng.metarJava.TrendVisibilityInfo;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.exceptions.FormatException;
 import eng.metarJava.decoders.fields.ReportField;
-import eng.metarJava.enums.CloudMassSignificantFlag;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.enums.PhenomenaType;
+import eng.metarJava.enums.TrendReportType;
+import eng.metarJava.support.HourMinute;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -284,30 +289,6 @@ public class EuropeFormatter implements Formatter {
     return sb.toString();
   }
 
-  private String formatTrends(Report report) {
-    TrendInfo ti = report.getTrendInfo();
-    if (ti.isIsNoSignificantChange()) {
-      return "NOSIG";
-    } else {
-      StringBuilder sb = new StringBuilder();
-      boolean isFirst = true;
-      for (TrendReport trend : ti.getTrends()) {
-        if (isFirst) {
-          isFirst = false;
-        } else {
-          sb.append(" ");
-        }
-        sb.append(formatTrend(trend));
-      }
-      return sb.toString();
-    }
-  }
-
-  private String formatTrend(TrendReport trend) {
-    //TODO dodelat
-    throw new UnsupportedOperationException();
-  }
-
   private String formatTemperatureDewPoint(Report report, boolean appendSpace) {
     StringBuilder sb = new StringBuilder();
     if (report.getTemperature() < 0) {
@@ -440,7 +421,15 @@ public class EuropeFormatter implements Formatter {
     if (report.getTrendInfo().isIsNoSignificantChange()) {
       sb.append("NOSIG");
     } else {
-      throw new RuntimeException("Not yet implemented");
+      boolean isFirst = true;
+      for (TrendReport trend : report.getTrendInfo().getTrends()) {
+        if (isFirst) {
+          isFirst = false;
+        } else {
+          sb.append(" ");
+        }
+        sb.append(formatTrend(trend, true));
+      }
     }
 
     if (appendSpace) {
@@ -456,5 +445,181 @@ public class EuropeFormatter implements Formatter {
     } else {
       return "";
     }
+  }
+
+  private String formatTrend(TrendReport trendReport, boolean appendSpace) {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append(formatTrendType(trendReport, true));
+    sb.append(formatTrendTime(trendReport, true));
+    sb.append(formatTrendWind(trendReport, true));
+    sb.append(formatTrendVisibility(trendReport, true));
+    sb.append(formatTrendPhenomena(trendReport, true));
+    sb.append(formatTrendClouds(trendReport, true));
+
+    if (appendSpace) {
+      sb.append(" ");
+    }
+    return sb.toString();
+  }
+
+  private String formatTrendType(TrendReport tr, boolean appendSpace) {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append(tr.getType().toString());
+    if (appendSpace) {
+      sb.append(" ");
+    }
+    return sb.toString();
+  }
+
+  private String formatTrendTime(TrendReport tr, boolean appendSpace) {
+    TrendReportTimeInfo timeInfo = tr.getTime();
+    if (timeInfo == null) {
+      return "";
+    }
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(timeInfo.getIndication().toString());
+    sb.append(String.format("%02d%02d", timeInfo.getTime().getHour(), timeInfo.getTime().getMinute()));
+
+    if (appendSpace) {
+      sb.append(" ");
+    }
+    return sb.toString();
+
+  }
+
+  private String formatTrendWind(TrendReport tr, boolean appendSpace) {
+    if (tr.getWind() == null) {
+      return "";
+    }
+
+    WindInfo wi = tr.getWind();
+    StringBuilder sb = new StringBuilder();
+
+    if (wi.isVariable()) {
+      sb.append("VRB");
+    } else {
+      sb.append(String.format("%03d", wi.getDirection().getValue()));
+    }
+    sb.append(String.format("%02d", wi.getSpeed().getIntValue(SpeedUnit.KT)));
+    if (wi.isGusting()) {
+      sb.append(String.format("G%02d", wi.getGustingSpeed().getIntValue(SpeedUnit.KT)));
+    }
+    sb.append("KT");
+    if (wi.isVariating()) {
+      sb.append(String.format(" %03dV%03d",
+              wi.getVariation().getFrom().getValue(),
+              wi.getVariation().getTo().getValue()));
+    }
+
+    if (appendSpace) {
+      sb.append(" ");
+    }
+    return sb.toString();
+  }
+
+  private String formatTrendVisibility(TrendReport tr, boolean appendSpace) {
+    StringBuilder sb = new StringBuilder();
+    if (appendSpace) {
+      sb.append(" ");
+    }
+
+    TrendVisibilityInfo vi = tr.getVisibility();
+
+    if (vi.isCAVOK()) {
+      sb.append("CAVOK");
+    } else {
+      sb.append(String.format("%04d", (int) vi.getVisibilityInMeters()));
+    }
+
+    return sb.toString();
+  }
+
+  private String formatTrendPhenomena(TrendReport tr, boolean appendSpace) {
+    TrendPhenomenaInfo tpi = tr.getPhenomenas();
+    if (tpi == null
+            || (tpi.isNSW() == false && tpi.getPhenomenas().isEmpty())) {
+      // no trend-phenomena object, or trend-phenomena object with not NSW flag and empty phenomenas.
+      return "";
+    }
+
+    StringBuilder sb = new StringBuilder();
+
+    if (tpi.isNSW()) {
+      sb.append("NSW");
+    } else {
+      boolean isFirst = true;
+
+      for (PhenomenaInfo p : tpi.getPhenomenas()) {
+        if (isFirst) {
+          isFirst = false;
+        } else {
+          sb.append(" ");
+        }
+
+        // trend phenomenas should not have intensities other than moderate
+        if (p.isInVicinity()) {
+          sb.append("VC");
+        }
+        for (PhenomenaType type : p.getTypes()) {
+          sb.append(type.toString());
+        }
+      }
+    }
+
+    if (appendSpace) {
+      sb.append(" ");
+    }
+    return sb.toString();
+  }
+
+  private String formatTrendClouds(TrendReport tr, boolean appendSpace) {
+    StringBuilder sb = new StringBuilder();
+    boolean isFirst = true;
+
+    TrendCloudInfo ci = tr.getClouds();
+    if (ci.isNSC()) {
+      sb.append("NSC");
+    } else if (ci.isVerticalVisibility()) {
+      if (ci.getVerticalVisibilityInHundredFeet() == null) {
+        sb.append("VV///");
+      } else {
+        sb.append("VV").append(String.format("%03d", ci.getVerticalVisibilityInHundredFeet()));
+      }
+    } else {
+      for (CloudMass cm : ci.getMasses()) {
+        if (isFirst) {
+          isFirst = false;
+        } else {
+          sb.append(" ");
+        }
+        if (cm.isAmountAndBaseHeightKnown()) {
+          sb
+                  .append(cm.getAmount().toString())
+                  .append(String.format("%03d", cm.getBaseHeightHundredFeet()));
+
+        } else {
+          sb.append("//////");
+        }
+        switch (cm.getSignificantFlag()) {
+          case CB:
+            sb.append("CB");
+            break;
+          case TCU:
+            sb.append("TCU");
+            break;
+          case undetected:
+            sb.append("///");
+            break;
+        }
+      }
+    }
+
+    if (appendSpace) {
+      sb.append(" ");
+    }
+    return sb.toString();
   }
 }
