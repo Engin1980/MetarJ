@@ -25,6 +25,17 @@ public class TrendInfo {
   }
 
   /**
+   * Creates new trend-info with trend report.
+   *
+   * @param trend Trend report message
+   * @return
+   */
+  public static TrendInfo create(TrendReport trend) {
+    TrendInfo ret = create(new TrendReport[]{trend});
+    return ret;
+  }
+
+  /**
    * Creates new trend-info with trend reports. Set of trends is fixed, non-empty, and cannot be later changed.
    *
    * @param trends non-empty array of trends
@@ -48,7 +59,7 @@ public class TrendInfo {
   }
 
   /**
-   * Creates new instance of TrendInfo object. Only for internal use. For public access, see {@linkplain #create(java.util.List) } 
+   * Creates new instance of TrendInfo object. Only for internal use. For public access, see {@linkplain #create(java.util.List) }
    * or {@linkplain #create(eng.metarJava.TrendReport[]) } methods to create a new instance.
    *
    * @param isNosig

@@ -522,11 +522,9 @@ public class EuropeFormatter implements Formatter {
 
   private String formatTrendVisibility(TrendReport tr, boolean appendSpace) {
     StringBuilder sb = new StringBuilder();
-    if (appendSpace) {
-      sb.append(" ");
-    }
 
     TrendVisibilityInfo vi = tr.getVisibility();
+    if (vi == null) return "";
 
     if (vi.isCAVOK()) {
       sb.append("CAVOK");
@@ -534,6 +532,9 @@ public class EuropeFormatter implements Formatter {
       sb.append(String.format("%04d", (int) vi.getVisibilityInMeters()));
     }
 
+     if (appendSpace) {
+      sb.append(" ");
+    }
     return sb.toString();
   }
 
@@ -580,6 +581,8 @@ public class EuropeFormatter implements Formatter {
     boolean isFirst = true;
 
     TrendCloudInfo ci = tr.getClouds();
+    if (ci == null) return "";
+    
     if (ci.isNSC()) {
       sb.append("NSC");
     } else if (ci.isVerticalVisibility()) {

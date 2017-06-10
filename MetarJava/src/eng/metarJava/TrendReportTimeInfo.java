@@ -11,6 +11,17 @@ import eng.metarJava.support.HourMinute;
 public class TrendReportTimeInfo {
   private final TrendReportTimeIndication indication;
   private final HourMinute time;
+  
+  /**
+   * Creates a new instance. Both parameters are mandatory.
+   * @param indication indication of AT/FM/TL flag
+   * @param time time of occurence in HHMM
+   * @throws NullArgumentException when time is null
+   */
+  public static TrendReportTimeInfo create(TrendReportTimeIndication indication, HourMinute time){
+    TrendReportTimeInfo ret = new TrendReportTimeInfo(indication, time);
+    return ret;
+  }
 
   /**
    * Creates a new instance.

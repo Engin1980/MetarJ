@@ -13,10 +13,10 @@ import eng.metarJava.support.HourMinute;
  */
 public class TrendReport {
 
-  private TrendReportType type;
+  private TrendReportType type = getType().TEMPO;
 
   /**
-   * Represents trend type.
+   * Represents trend type. Default value is {@linkplain TrendReportType#TEMPO}.
    *
    * @return
    */

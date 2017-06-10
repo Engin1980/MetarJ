@@ -8,7 +8,12 @@ import eng.metarJava.RunwayState;
 import eng.metarJava.RunwayStatesInfo;
 import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.RunwayWindshearInfo;
+import eng.metarJava.TrendCloudInfo;
 import eng.metarJava.TrendInfo;
+import eng.metarJava.TrendPhenomenaInfo;
+import eng.metarJava.TrendReport;
+import eng.metarJava.TrendReportTimeInfo;
+import eng.metarJava.TrendVisibilityInfo;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.VisibilityVariability;
 import eng.metarJava.WindInfo;
@@ -22,6 +27,9 @@ import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.Heading;
 import eng.metarJava.enums.PhenomenaIntensity;
 import eng.metarJava.enums.PhenomenaType;
+import eng.metarJava.enums.TrendReportTimeIndication;
+import eng.metarJava.enums.TrendReportType;
+import eng.metarJava.support.HourMinute;
 import eng.metarJava.support.Speed;
 import eng.metarJava.support.Variation;
 import java.util.ArrayList;
@@ -99,8 +107,8 @@ public class EuropeFormatterTest {
     String exp = "METAR LKMT 071550Z 24013KT";
     assertStringStarts(exp, act);
   }
-  
-    @Test
+
+  @Test
   public void testWindEmpty() {
     Report ret = generateReport();
     ret.setWind(null);
@@ -373,7 +381,7 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
+
   @Test
   public void testWindShears() {
     Report ret = generateReport();
@@ -384,11 +392,11 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
-    @Test
+
+  @Test
   public void testWindShearsSpecific() {
     Report ret = generateReport();
-    Set<String>rwys = new TreeSet();
+    Set<String> rwys = new TreeSet();
     rwys.add("06");
     rwys.add("24L");
     rwys.add("24R");
@@ -399,7 +407,7 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-    
+
   @Test
   public void testRunwayStateSNOCLO() {
     Report ret = generateReport();
@@ -412,8 +420,8 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
-    @Test
+
+  @Test
   public void testRunwayState() {
     Report ret = generateReport();
     List<RunwayState> rs = new ArrayList();
@@ -428,14 +436,194 @@ public class EuropeFormatterTest {
 
     assertStringStarts(exp, act);
   }
-  
-      @Test
-  public void testNOSIG() {
+
+  @Test
+  public void testNosig() {
     Report ret = generateReport();
     ret.setTrendInfo(TrendInfo.createNOSIG());
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 NOSIG";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendBecmg() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.BECMG);
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 BECMG";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendTempoAndTime() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    tr.setTime(TrendReportTimeInfo.create(TrendReportTimeIndication.AT, new HourMinute(12, 20)));
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO AT1220";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendWind() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    tr.setWind(WindInfo.create(new Heading(100), new Speed(12, SpeedUnit.KT)));
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO 10012KT";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendVisibilityCavok() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    tr.setVisibility(TrendVisibilityInfo.createCAVOK());
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO CAVOK";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendVisibility() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    tr.setVisibility(TrendVisibilityInfo.create(9999));
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO 9999";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendPhenomenasNSW() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    tr.setPhenomenas(TrendPhenomenaInfo.createNSW());
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO NSW";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendPhenomenasEmptyA() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    tr.setPhenomenas(TrendPhenomenaInfo.createEmpty());
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendPhenomenasEmptyB() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendPhenomenas() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    tr.setPhenomenas(TrendPhenomenaInfo.createEmpty());
+    tr.getPhenomenas().getPhenomenas().add(
+            PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.RA}, false));
+    tr.getPhenomenas().getPhenomenas().add(
+            PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.BL, PhenomenaType.SN}, true));
+    tr.getPhenomenas().getPhenomenas().add(
+            PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.SN, PhenomenaType.SH}, false));
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO RA VCBLSN SNSH";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendCloudNSC() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    tr.setClouds(TrendCloudInfo.createNSC());
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO NSC";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendCloudVV() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    tr.setClouds(TrendCloudInfo.createWithVV(300));
+    ret.setTrendInfo(TrendInfo.create(tr));
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO VV300";
+
+    assertStringStarts(exp, act);
+  }
+
+  @Test
+  public void testTrendCloudWithMasses() {
+    Report ret = generateReport();
+    TrendReport tr = new TrendReport();
+    tr.setType(TrendReportType.TEMPO);
+    
+    List<CloudMass> cms = new ArrayList();
+    cms.add(CloudMass.create(CloudAmount.SCT, 40));
+    cms.add(CloudMass.create(CloudAmount.OVC, 70, CloudMassSignificantFlag.TCU));
+    cms.add(CloudMass.create(CloudAmount.FEW, 90, CloudMassSignificantFlag.CB));
+    cms.add(CloudMass.create(CloudAmount.BKN, 120));
+    tr.setClouds(TrendCloudInfo.create(cms));
+    
+    ret.setTrendInfo(TrendInfo.create(tr));
+    
+
+    String act = new EuropeFormatter().format(ret);
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO SCT040 OVC070TCU FEW090CB BKN120";
 
     assertStringStarts(exp, act);
   }
