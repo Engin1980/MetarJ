@@ -1,9 +1,6 @@
 package eng.metarJava;
 
-import eng.metarJava.enums.TrendReportTimeIndication;
 import eng.metarJava.enums.TrendReportType;
-import eng.metarJava.exception.NullArgumentException;
-import eng.metarJava.support.HourMinute;
 
 /**
  * Represents one trend message different from NOSIG in the report. Message is introduced by TEMPO/BECMG keywords. Messages are

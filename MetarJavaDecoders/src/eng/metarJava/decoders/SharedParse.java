@@ -28,6 +28,7 @@ import eng.metarJava.support.Heading;
 import eng.metarJava.support.HourMinute;
 import eng.metarJava.enums.PhenomenaIntensity;
 import eng.metarJava.enums.PhenomenaType;
+import eng.metarJava.support.ReadOnlyList;
 import eng.metarJava.support.Speed;
 import eng.metarJava.support.Variation;
 import java.util.ArrayList;
@@ -484,7 +485,7 @@ class SharedParse {
     if (decodeFixedString(rl, "WS ALL RWY")) {
       ret = RunwayWindshearInfo.createAllRWY();
     } else {
-      Set<String> tmp = new HashSet();
+      List<String> tmp = new ArrayList();
       String regex = "^WS R(\\d{2}[RLC]?)";
       final Pattern pattern = Pattern.compile(regex);
       Matcher matcher = pattern.matcher(rl.getPre());
@@ -494,7 +495,7 @@ class SharedParse {
         rl.move(matcher.group(0).length(), true);
         matcher = pattern.matcher(rl.getPre());
       }
-      ret = RunwayWindshearInfo.create(tmp);
+      ret = RunwayWindshearInfo.create(new ReadOnlyList(tmp));
     }
 
     return ret;

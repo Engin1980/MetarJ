@@ -1,8 +1,8 @@
 package eng.metarJava;
 
 import eng.metarJava.exception.NullArgumentException;
+import eng.metarJava.support.ReadOnlyList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Represents wind-shear warning info about one runway.
@@ -10,10 +10,15 @@ import java.util.Set;
  */
 public class RunwayWindshearInfo {
 
-  private final Set<String> runwayDesignators;
+  private final ReadOnlyList<String> runwayDesignators;
   private final boolean allRunways;
 
-  public static RunwayWindshearInfo create(Set<String> runwayDesignators) {
+  public static RunwayWindshearInfo create(List<String> runwayDesignators) {
+    RunwayWindshearInfo ret = create(new ReadOnlyList(runwayDesignators));
+    return ret;
+  }
+  
+  public static RunwayWindshearInfo create(ReadOnlyList<String> runwayDesignators) {
     RunwayWindshearInfo ret = new RunwayWindshearInfo(runwayDesignators, false);
     return ret;
   }
@@ -23,7 +28,7 @@ public class RunwayWindshearInfo {
     return ret;
   }
 
-  protected RunwayWindshearInfo(Set<String> runwayDesignators, boolean isWindshearAllRunways) {
+  protected RunwayWindshearInfo(ReadOnlyList<String> runwayDesignators, boolean isWindshearAllRunways) {
     if (isWindshearAllRunways) {
       this.allRunways = true;
       this.runwayDesignators = null;
@@ -49,7 +54,7 @@ public class RunwayWindshearInfo {
     return (this.runwayDesignators == null || this.runwayDesignators.isEmpty()) && !this.allRunways;
   }
 
-  public Set<String> getRunwayDesignators() {
+  public ReadOnlyList<String> getRunwayDesignators() {
     return runwayDesignators;
   }
 

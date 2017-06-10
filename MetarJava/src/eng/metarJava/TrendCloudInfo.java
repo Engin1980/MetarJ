@@ -2,6 +2,7 @@ package eng.metarJava;
 
 import eng.metarJava.enums.CloudInfoSpecialStates;
 import eng.metarJava.exception.NonsenseRequestException;
+import eng.metarJava.support.ReadOnlyList;
 import java.util.List;
 
 /**
@@ -9,12 +10,17 @@ import java.util.List;
  * @author Marek Vajgl
  */
 public class TrendCloudInfo {
-  private final List<CloudMass> masses;
+  private final ReadOnlyList<CloudMass> masses;
   private final Integer verticalVisibilityInHundredFeet;
   private final boolean verticalVisibility;
   private final CloudInfoSpecialStates specialState;
 
   public static TrendCloudInfo create(List<CloudMass> cloudMasses){
+    TrendCloudInfo ret = create (new ReadOnlyList<>(cloudMasses));
+    return ret;
+  }
+  
+  public static TrendCloudInfo create(ReadOnlyList<CloudMass> cloudMasses){
     TrendCloudInfo ret = new TrendCloudInfo(cloudMasses, false, null, CloudInfoSpecialStates.none);
     return ret;
   }
@@ -29,7 +35,7 @@ public class TrendCloudInfo {
   }
   
 
-  protected TrendCloudInfo(List<CloudMass> masses, boolean isVerticalVisibility, Integer verticalVisibilityInHundredFeet, CloudInfoSpecialStates specialState) {
+  protected TrendCloudInfo(ReadOnlyList<CloudMass> masses, boolean isVerticalVisibility, Integer verticalVisibilityInHundredFeet, CloudInfoSpecialStates specialState) {
     if (specialState != CloudInfoSpecialStates.none){
       if (masses != null)
         throw new IllegalArgumentException("[masses] must be null if specialState si set.");
@@ -52,7 +58,7 @@ public class TrendCloudInfo {
     this.specialState = specialState;
   }
 
-  public List<CloudMass> getMasses() {
+  public ReadOnlyList<CloudMass> getMasses() {
     if (masses == null)
       throw new NonsenseRequestException("Unable to get cloud masses for special (VV/NSC/NCD) clouds.");
     return masses;

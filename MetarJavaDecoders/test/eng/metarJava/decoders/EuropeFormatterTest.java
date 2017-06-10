@@ -30,6 +30,7 @@ import eng.metarJava.enums.PhenomenaType;
 import eng.metarJava.enums.TrendReportTimeIndication;
 import eng.metarJava.enums.TrendReportType;
 import eng.metarJava.support.HourMinute;
+import eng.metarJava.support.ReadOnlyList;
 import eng.metarJava.support.Speed;
 import eng.metarJava.support.Variation;
 import java.util.ArrayList;
@@ -192,9 +193,8 @@ public class EuropeFormatterTest {
   @Test
   public void testRunwayVisibilityNumber() {
     Report ret = generateReport();
-    ret.getRunwayVisualRanges().clear();
-    ret.getRunwayVisualRanges().add(
-            RunwayVisualRange.create("24C", 300));
+    ret.setRunwayVisualRanges(new ReadOnlyList(
+            RunwayVisualRange.create("24C", 300)));
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK R24C/0300";
@@ -205,9 +205,8 @@ public class EuropeFormatterTest {
   @Test
   public void testRunwayVisibilityVariating() {
     Report ret = generateReport();
-    ret.getRunwayVisualRanges().clear();
-    ret.getRunwayVisualRanges().add(
-            RunwayVisualRange.create("24C", new Variation<>(50, 200)));
+    ret.setRunwayVisualRanges(new ReadOnlyList(
+            RunwayVisualRange.create("24C", new Variation<>(50, 200))));
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK R24C/0050V0200";
@@ -218,11 +217,9 @@ public class EuropeFormatterTest {
   @Test
   public void testRunwayVisibilityVariatingMultiple() {
     Report ret = generateReport();
-    ret.getRunwayVisualRanges().clear();
-    ret.getRunwayVisualRanges().add(
-            RunwayVisualRange.create("24C", new Variation<>(50, 200)));
-    ret.getRunwayVisualRanges().add(
-            RunwayVisualRange.create("06C", 150));
+    ret.setRunwayVisualRanges(new ReadOnlyList(
+            RunwayVisualRange.create("24C", new Variation<>(50, 200)),
+            RunwayVisualRange.create("06C", 150)));
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK R24C/0050V0200 R06C/0150";
@@ -233,8 +230,8 @@ public class EuropeFormatterTest {
   @Test
   public void testRunwayPhenomenaA() {
     Report ret = generateReport();
-    ret.getPhenomenas().add(
-            PhenomenaInfo.create(PhenomenaIntensity.heavy, PhenomenaType.RA, false));
+    ret.setPhenomenas(
+            new ReadOnlyList<>(PhenomenaInfo.create(PhenomenaIntensity.heavy, PhenomenaType.RA, false)));
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK +RA";
@@ -245,8 +242,8 @@ public class EuropeFormatterTest {
   @Test
   public void testRunwayPhenomenaB() {
     Report ret = generateReport();
-    ret.getPhenomenas().add(
-            PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.TS, PhenomenaType.RA}, true));
+    ret.setPhenomenas(new ReadOnlyList<>(
+            PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.TS, PhenomenaType.RA}, true)));
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK VCTSRA";
@@ -257,12 +254,10 @@ public class EuropeFormatterTest {
   @Test
   public void testRunwayPhenomenaC() {
     Report ret = generateReport();
-    ret.getPhenomenas().add(
-            PhenomenaInfo.create(PhenomenaIntensity.light, new PhenomenaType[]{PhenomenaType.RA}, false));
-    ret.getPhenomenas().add(
-            PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.BL, PhenomenaType.SN}, true));
-    ret.getPhenomenas().add(
-            PhenomenaInfo.create(PhenomenaIntensity.heavy, new PhenomenaType[]{PhenomenaType.SN, PhenomenaType.SH}, false));
+    ret.setPhenomenas(new ReadOnlyList<>(
+            PhenomenaInfo.create(PhenomenaIntensity.light, new PhenomenaType[]{PhenomenaType.RA}, false),
+            PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.BL, PhenomenaType.SN}, true),
+            PhenomenaInfo.create(PhenomenaIntensity.heavy, new PhenomenaType[]{PhenomenaType.SN, PhenomenaType.SH}, false)));
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK -RA VCBLSN +SNSH";
@@ -371,10 +366,9 @@ public class EuropeFormatterTest {
   @Test
   public void testRecentPhenomena() {
     Report ret = generateReport();
-    ret.getRecentPhenomenas().add(
-            PhenomenaInfo.create(PhenomenaIntensity.moderate, PhenomenaType.RA, false));
-    ret.getRecentPhenomenas().add(
-            PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.SN, PhenomenaType.SH}, false));
+    ret.setRecentPhenomenas(new ReadOnlyList<PhenomenaInfo>(
+            PhenomenaInfo.create(PhenomenaIntensity.moderate, PhenomenaType.RA, false),
+            PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.SN, PhenomenaType.SH}, false)));
 
     String act = new EuropeFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 RERA RESNSH";
@@ -396,14 +390,10 @@ public class EuropeFormatterTest {
   @Test
   public void testWindShearsSpecific() {
     Report ret = generateReport();
-    Set<String> rwys = new TreeSet();
-    rwys.add("06");
-    rwys.add("24L");
-    rwys.add("24R");
-    ret.setRunwayWindshears(RunwayWindshearInfo.create(rwys));
+    ret.setRunwayWindshears(RunwayWindshearInfo.create(new ReadOnlyList("06", "24L", "24R")));
 
     String act = new EuropeFormatter().format(ret);
-    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 WS R06 WS R24L R24R";
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 WS R06 WS R24L WS R24R";
 
     assertStringStarts(exp, act);
   }
@@ -564,12 +554,14 @@ public class EuropeFormatterTest {
     TrendReport tr = new TrendReport();
     tr.setType(TrendReportType.TEMPO);
     tr.setPhenomenas(TrendPhenomenaInfo.createEmpty());
-    tr.getPhenomenas().getPhenomenas().add(
+    List<PhenomenaInfo> lst = new ArrayList();
+    lst.add(
             PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.RA}, false));
-    tr.getPhenomenas().getPhenomenas().add(
+    lst.add(
             PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.BL, PhenomenaType.SN}, true));
-    tr.getPhenomenas().getPhenomenas().add(
+    lst.add(
             PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.SN, PhenomenaType.SH}, false));
+    tr.setPhenomenas(TrendPhenomenaInfo.create(lst));
     ret.setTrendInfo(TrendInfo.create(tr));
 
     String act = new EuropeFormatter().format(ret);

@@ -6,6 +6,7 @@ import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.TrendInfo;
 import eng.metarJava.TrendReport;
 import eng.metarJava.enums.TrendReportType;
+import eng.metarJava.support.ReadOnlyList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,21 +50,27 @@ public class GenericParser implements Parser {
 
   private void decodeRunwayVisualRanges(Report ret, ReportLine rl) {
     RunwayVisualRange rvr;
+    List<RunwayVisualRange> lst = new ArrayList();
     rvr = SharedParse.decodeRunwayVisualRange(rl);
+    
     while (rvr != null) {
-      ret.getRunwayVisualRanges().add(rvr);
+      lst.add(rvr);
       rvr = SharedParse.decodeRunwayVisualRange(rl);
     }
+    
+    ret.setRunwayVisualRanges(lst);
   }
 
   private void decodePhenomenas(Report ret, ReportLine rl) {
     PhenomenaInfo pi;
 
     pi = SharedParse.decodePhenomena(rl);
+    List<PhenomenaInfo> pis = new ArrayList<>();
     while (pi != null) {
-      ret.getPhenomenas().add(pi);
+      pis.add(pi);
       pi = SharedParse.decodePhenomena(rl);
     }
+    ret.setPhenomenas(pis);
   }
 
   private void decodeTempAndDew(Report ret, ReportLine rl) {
@@ -77,10 +84,12 @@ public class GenericParser implements Parser {
     PhenomenaInfo pi;
 
     pi = SharedParse.decodeRecentPhenomena(rl);
+    List<PhenomenaInfo> pis = new ArrayList<>();
     while (pi != null) {
-      ret.getRecentPhenomenas().add(pi);
+      pis.add(pi);
       pi = SharedParse.decodeRecentPhenomena(rl);
     }
+    ret.setRecentPhenomenas(pis);
   }
 
   private TrendInfo decodeTrendInfo(ReportLine rl, boolean isMandatory) {

@@ -2,6 +2,7 @@ package eng.metarJava;
 
 import eng.metarJava.exception.NonsenseRequestException;
 import eng.metarJava.exception.NullArgumentException;
+import eng.metarJava.support.ReadOnlyList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
 public class TrendInfo {
 
   private final boolean noSignificantChange;
-  private final TrendReport[] trends;
+  private final ReadOnlyList<TrendReport> trends;
 
   /**
    * Creates new trend-info as NOSIG - no significant change trend.
@@ -31,7 +32,7 @@ public class TrendInfo {
    * @return
    */
   public static TrendInfo create(TrendReport trend) {
-    TrendInfo ret = create(new TrendReport[]{trend});
+    TrendInfo ret = create(new ReadOnlyList(trend));
     return ret;
   }
 
@@ -42,7 +43,7 @@ public class TrendInfo {
    * @return
    */
   public static TrendInfo create(TrendReport[] trends) {
-    TrendInfo ret = new TrendInfo(false, trends);
+    TrendInfo ret = create(new ReadOnlyList(trends));
     return ret;
   }
 
@@ -53,8 +54,18 @@ public class TrendInfo {
    * @return
    */
   public static TrendInfo create(List<TrendReport> trends) {
-    TrendReport[] arr = trends.toArray(new TrendReport[0]);
-    TrendInfo ret = create(arr);
+    TrendInfo ret = create(new ReadOnlyList(trends));
+    return ret;
+  }
+
+  /**
+   * Creates new trend-info with trend reports. Set of trends is fixed, non-empty and cannot be later changed.
+   *
+   * @param trends non-empty list of trends
+   * @return
+   */
+  public static TrendInfo create(ReadOnlyList<TrendReport> trends) {
+    TrendInfo ret = new TrendInfo(false, trends);
     return ret;
   }
 
@@ -67,18 +78,18 @@ public class TrendInfo {
    * @throws IllegalArgumentException if [isNosig] is true and [trends] is not null
    * @throws IllegalArgumentException if [trends] is not null but contains no elements
    */
-  protected TrendInfo(boolean isNosig, TrendReport[] trends) {
+  protected TrendInfo(boolean isNosig, ReadOnlyList<TrendReport> trends) {
     if (isNosig && trends != null) {
       throw new IllegalArgumentException("[trends] must be null if [isNosig] flag is set.");
     }
-    if (trends != null && trends.length == 0) {
+    if (trends != null && trends.isEmpty()) {
       throw new IllegalArgumentException("If [trends] are set, they cannot be empty.");
     }
     this.noSignificantChange = isNosig;
     if (trends == null) {
       this.trends = null;
     } else {
-      this.trends = Arrays.copyOf(trends, trends.length);
+      this.trends = trends;
     }
   }
 
@@ -96,12 +107,7 @@ public class TrendInfo {
    *
    * @return
    */
-  public TrendReport[] getTrends() {
-    if (this.trends == null) {
-      return null;
-    }
-
-    TrendReport[] ret = Arrays.copyOf(this.trends, this.trends.length);
-    return ret;
+  public ReadOnlyList<TrendReport> getTrends() {
+    return this.trends;
   }
 }

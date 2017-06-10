@@ -1,7 +1,7 @@
 package eng.metarJava;
 
 import eng.metarJava.enums.CloudInfoSpecialStates;
-import eng.metarJava.exception.NonsenseRequestException;
+import eng.metarJava.support.ReadOnlyList;
 import java.util.List;
 
 /**
@@ -16,6 +16,16 @@ public class CloudInfo extends TrendCloudInfo {
    * @return Cloud info object
    */
   public static CloudInfo create(List<CloudMass> cloudMasses){
+    CloudInfo ret = create(new ReadOnlyList(cloudMasses));
+    return ret;
+  }
+  
+    /**
+   * Creates cloud info with cloud layers.
+   * @param cloudMasses Layers of the clouds
+   * @return Cloud info object
+   */
+  public static CloudInfo create(ReadOnlyList<CloudMass> cloudMasses){
     CloudInfo ret = new CloudInfo(cloudMasses, false, null, CloudInfoSpecialStates.none);
     return ret;
   }
@@ -64,7 +74,7 @@ public class CloudInfo extends TrendCloudInfo {
     return ret;
   }
   
-  protected CloudInfo(List<CloudMass> masses, boolean isVerticalVisibility, Integer verticalVisibilityInHundredFeet, CloudInfoSpecialStates specialState) {
+  protected CloudInfo(ReadOnlyList<CloudMass> masses, boolean isVerticalVisibility, Integer verticalVisibilityInHundredFeet, CloudInfoSpecialStates specialState) {
     super(masses, isVerticalVisibility, verticalVisibilityInHundredFeet, specialState);
   }
   

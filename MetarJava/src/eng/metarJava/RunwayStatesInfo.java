@@ -1,6 +1,7 @@
 package eng.metarJava;
 
 import eng.metarJava.exception.NullArgumentException;
+import eng.metarJava.support.ReadOnlyList;
 import java.util.List;
 
 /**
@@ -9,7 +10,7 @@ import java.util.List;
  */
 public class RunwayStatesInfo {
   private final boolean snowClosed;
-  private final List<RunwayState> runwayStates;
+  private final ReadOnlyList<RunwayState> runwayStates;
   
   public static RunwayStatesInfo createSNOCLO(){
     RunwayStatesInfo ret = new RunwayStatesInfo(true, null);
@@ -17,11 +18,16 @@ public class RunwayStatesInfo {
   }
   
   public static RunwayStatesInfo create(List<RunwayState> runwayStates){
-    RunwayStatesInfo ret = new RunwayStatesInfo(false, runwayStates);
+    RunwayStatesInfo ret = create (new ReadOnlyList(runwayStates));
+    return ret;
+  }
+  
+  public static RunwayStatesInfo create(ReadOnlyList<RunwayState> runwayStates){
+    RunwayStatesInfo ret = new RunwayStatesInfo(false, new ReadOnlyList(runwayStates));
     return ret;
   }
 
-  protected RunwayStatesInfo(boolean snowClosed, List<RunwayState> runwayStates) {
+  protected RunwayStatesInfo(boolean snowClosed, ReadOnlyList<RunwayState> runwayStates) {
     if (snowClosed){
       this.snowClosed = true;
     this.runwayStates = null;
@@ -37,7 +43,7 @@ public class RunwayStatesInfo {
     return snowClosed;
   }
 
-  public List<RunwayState> getRunwayStates() {
+  public ReadOnlyList<RunwayState> getRunwayStates() {
     return runwayStates;
   }
   

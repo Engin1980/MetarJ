@@ -1,5 +1,6 @@
 package eng.metarJava.support;
 
+import eng.metarJava.exception.NullArgumentException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,15 +16,49 @@ import java.util.Set;
 public class ReadOnlyList<T> implements Iterable<T> {
 
   private final List<T> inner;
-  
-  public ReadOnlyList(List<T> data){
-    this.inner = new ArrayList(data);
+
+  public ReadOnlyList(T... data) {
+    if (data == null) {
+      this.inner = new ArrayList(0);
+    } else {
+      this.inner = new ArrayList(data.length);
+      for (int i = 0; i < data.length; i++) {
+        this.inner.add(data[i]);
+      }
+    }
+    ensureNoItemNull();
   }
-  
-  public ReadOnlyList(Set<T> data){
-    this.inner = new ArrayList(data);
+
+  public ReadOnlyList(Iterable<T> data) {
+    if (data == null) {
+      this.inner = new ArrayList();
+    } else {
+      this.inner = new ArrayList();
+      for (T t : data) {
+        this.inner.add(t);
+      }
+    }
+    ensureNoItemNull();
   }
-  
+
+  public ReadOnlyList(List<T> data) {
+    if (data == null) {
+      this.inner = new ArrayList();
+    } else {
+      this.inner = new ArrayList(data);
+    }
+    ensureNoItemNull();
+  }
+
+  public ReadOnlyList(Set<T> data) {
+    if (data == null) {
+      this.inner = null;
+    } else {
+      this.inner = new ArrayList(data);
+    }
+    ensureNoItemNull();
+  }
+
   public int size() {
     return inner.size();
   }
@@ -73,10 +108,21 @@ public class ReadOnlyList<T> implements Iterable<T> {
   }
 
   public List<T> subList(int fromIndex, int toIndex) {
-   return this.inner.subList(fromIndex, toIndex);
+    return this.inner.subList(fromIndex, toIndex);
   }
-  
-  public List<T> toList(){
+
+  public List<T> toList() {
     return new ArrayList<T>(this.inner);
+  }
+
+  /**
+   * Checks if RO-list contains null and if so, throws an exception.
+   */
+  private void ensureNoItemNull() {
+    for (int i = 0; i < this.size(); i++) {
+      if (this.get(i) == null) {
+        throw new IllegalArgumentException("List cannot contain null values. Null found at index " + i + ".");
+      }
+    }
   }
 }

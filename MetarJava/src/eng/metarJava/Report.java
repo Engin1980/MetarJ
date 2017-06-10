@@ -8,7 +8,7 @@ package eng.metarJava;
 import eng.metarJava.enums.*;
 import eng.metarJava.exception.NullArgumentException;
 import eng.metarJava.support.DayHourMinute;
-import java.util.ArrayList;
+import eng.metarJava.support.ReadOnlyList;
 import java.util.List;
 
 /**
@@ -168,7 +168,7 @@ public class Report {
 
   /**
    * Represents wind. Mandatory. Default value is null, that is no wind reported, like "/////KT". Wind can be represented as calm,
-   * normal, gusting and varying using {@linkplain CloudInfo} class. 
+   * normal, gusting and varying using {@linkplain CloudInfo} class.
    *
    * @return Object representing wind.
    */
@@ -211,29 +211,54 @@ public class Report {
     this.visibility = visibility;
   }
 
-  private final List<RunwayVisualRange> runwayVisualRanges = new ArrayList<>();
+  private ReadOnlyList<RunwayVisualRange> runwayVisualRanges = null;
 
   /**
-   * Read-only. Represents specific runway visual ranges over station - that is visiblity over specified runway, like R24/0300V0500. To
-   * add runway visual range, use {@linkplain RunwayVisualRange} and add its instance into this collection. This list is final and
-   * cannot be replaced. Default value is empty list.
+   * Represents specific runway visual ranges over station - that is visiblity over specified runway, like R24/0300V0500. Optional.
+   * Default value is null.
    *
    * @return
    */
-  public List<RunwayVisualRange> getRunwayVisualRanges() {
+  public ReadOnlyList<RunwayVisualRange> getRunwayVisualRanges() {
     return runwayVisualRanges;
   }
 
-  private final List<PhenomenaInfo> phenomenas = new ArrayList<>();
+  /**
+   * See {@linkplain #getRunwayVisualRanges() }.
+   *
+   * @param value
+   */
+  public void setRunwayVisualRanges(List<RunwayVisualRange> value) {
+    this.setRunwayVisualRanges(new ReadOnlyList(value));
+  }
+  
+  /**
+   * See {@linkplain #getRunwayVisualRanges() }.
+   *
+   * @param value
+   */
+  public void setRunwayVisualRanges(ReadOnlyList<RunwayVisualRange> value) {
+    this.runwayVisualRanges = value;
+  }
+
+  private ReadOnlyList<PhenomenaInfo> phenomenas = null;
 
   /**
-   * Read-only. Represents phenomenas over station. To add phenomena set, use {@linkplain PhenomenaInfo} and add its instance into this
-   * collection. This list is final and cannot be replaced. Default value is empty list.
+   * Represents phenomenas over station. If containing items, represents phenomena over station. If empty or null, means no significant
+   * phenomena over the station. Default value is null.
    *
    * @return
    */
-  public List<PhenomenaInfo> getPhenomenas() {
+  public ReadOnlyList<PhenomenaInfo> getPhenomenas() {
     return phenomenas;
+  }
+
+  public void setPhenomenas(List<PhenomenaInfo> value) {
+    this.setPhenomenas(new ReadOnlyList<>(value));
+  }
+
+  public void setPhenomenas(ReadOnlyList<PhenomenaInfo> value) {
+    this.phenomenas = value;
   }
 
   private CloudInfo clouds = null;
@@ -318,18 +343,50 @@ public class Report {
     this.pressureInHpa = pressureInHpa;
   }
 
-  private final List<PhenomenaInfo> recentPhenomenas = new ArrayList<>();
+  private ReadOnlyList<PhenomenaInfo> recentPhenomenas = null;
 
   /**
-   * Read-only. Represents recent phenomenas over station. To add phenomena set, use {@linkplain PhenomenaInfo} and add its instance
-   * into this collection. Recent phenomenas cannot have intensity other than moderate (see
-   * {@link eng.metarJava.enums.PhenomenaIntensity}). Other values are ignored. This list is final and cannot be replaced.
-   * Default value is empty list.
+   * Represents recent phenomenas over station. If value is null or contains empty list, means no recent phenomena. Otherwise use list
+   * with elements. Recent phenomenas cannot have intensity other than moderate (see {@link eng.metarJava.enums.PhenomenaIntensity})
+   * and cannot have inVicinity - VC - phenomenas. Optional. Default value is null.
    *
    * @return
    */
-  public List<PhenomenaInfo> getRecentPhenomenas() {
+  public ReadOnlyList<PhenomenaInfo> getRecentPhenomenas() {
     return recentPhenomenas;
+  }
+
+  /**
+   * See {@linkplain  #getRecentPhenomenas() }. No recent phenomena can have non-moderate intensity or be in vicinity.
+   *
+   * @param value
+   * @throws IllegalArgumentException if some phenomena in list has intensity different from {@linkplain PhenomenaIntensity#moderate}.
+   * @throws IllegalArgumentException if some phenomena in list has {@linkplain PhenomenaInfo#isInVicinity() } flag set to true.
+   */
+  public void setRecentPhenomenas(List<PhenomenaInfo> value) {
+    setRecentPhenomenas(new ReadOnlyList(value));
+  }
+
+  /**
+   * See {@linkplain  #getRecentPhenomenas() }. No recent phenomena can have non-moderate intensity or be in vicinity.
+   *
+   * @param value
+   * @throws IllegalArgumentException if some phenomena in list has intensity different from {@linkplain PhenomenaIntensity#moderate}.
+   * @throws IllegalArgumentException if some phenomena in list has {@linkplain PhenomenaInfo#isInVicinity() } flag set to true.
+   */
+  public void setRecentPhenomenas(ReadOnlyList<PhenomenaInfo> value) {
+    if (value != null) {
+      for (PhenomenaInfo pi : value) {
+        if (pi.getIntensity() != PhenomenaIntensity.moderate) {
+          throw new IllegalArgumentException("No recent phenomena can have intensity different from moderate.");
+        }
+        if (pi.isInVicinity()) {
+          throw new IllegalArgumentException("No recent phenomena can have flag [isInVicinity] set.");
+        }
+
+      }
+    }
+    this.recentPhenomenas = new ReadOnlyList(value);
   }
 
   private RunwayWindshearInfo runwayWindshears = null;
