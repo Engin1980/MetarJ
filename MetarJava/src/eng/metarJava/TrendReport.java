@@ -7,7 +7,7 @@ import eng.metarJava.support.HourMinute;
 
 /**
  * Represents one trend message different from NOSIG in the report. Message is introduced by TEMPO/BECMG keywords. Messages are
- * captured in {@linkplain TrendInfo} instance (see {@link TrendInfo#getTrends() method), which is in {@linkplain Report}.
+ * captured in {@linkplain TrendInfo} instance (see {@link TrendInfo#getTrends() } method), which is in {@linkplain Report}.
  *
  * @author Marek Vajgl
  */

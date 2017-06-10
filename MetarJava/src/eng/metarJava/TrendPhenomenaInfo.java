@@ -67,4 +67,13 @@ public class TrendPhenomenaInfo {
       throw new NonsenseRequestException("No phenomenas available for NSW (no-significant-weather) settings.");
     return phenomenas;
   }
+
+  /**
+   * Returns true if phenomena-info has no flag and phenomenas collection is empty.
+   * @return 
+   */
+  public boolean isEmpty() {
+    return !isNSW() && (
+            phenomenas == null || phenomenas.isEmpty());
+  }
 }

@@ -7,6 +7,7 @@ package metartesting;
 
 import eng.metarJava.Report;
 import eng.metarJava.decoders.EuropeFormatter;
+import eng.metarJava.decoders.Formatter;
 import eng.metarJava.decoders.GenericParser;
 import eng.metarJava.downloaders.Downloader;
 import eng.metarJava.downloaders.NoaaGovDownloader;
@@ -50,7 +51,8 @@ public class MetarTesting {
 
   private static void runCheck(String inFile, String outFile,
           eng.metarJava.downloaders.Downloader downloader,
-          eng.metarJava.decoders.Parser parser) {
+          eng.metarJava.decoders.Parser parser,
+          eng.metarJava.decoders.Formatter formatter) {
     List<String> codes;
     List<String> errMetars = new ArrayList<>();
     int MAX_ERROR_COUNT = 5;
@@ -63,8 +65,11 @@ public class MetarTesting {
 
     String m;
     Report r;
+    String e;
 
     for (String code : codes) {
+      r = null;
+      e = null;
       if (errMetars.size() >= MAX_ERROR_COUNT) {
         break;
       }
@@ -74,6 +79,7 @@ public class MetarTesting {
         m = downloader.download(code);
       } catch (Throwable t) {
         System.out.println("Failed to download for code " + code + ". Reason: " + t.getMessage());
+        errMetars.add("Decode " + code);
         continue;
       }
       System.out.println("\tdecoding...");
@@ -81,7 +87,20 @@ public class MetarTesting {
         r = parser.parse(m);
       } catch (Throwable t) {
         System.out.println("Failed to decode metar " + m + ". Reason: " + t.getMessage());
-        errMetars.add(m);
+        errMetars.add("Decode " + m);
+      }
+      if (formatter !=null && r != null){
+        System.out.println("\tencoding...");
+        try{
+          e = formatter.format(r);
+        }catch (Throwable t){
+          System.out.println("Failed to encode metar " + m + ". Reason: " + t.getMessage());
+          errMetars.add("Encode " + m);
+        }
+        
+        if (e != null && e.equals(m) == false){
+          errMetars.add("Compare " + m + " -> " + e);
+        }
       }
     }
 
@@ -99,7 +118,8 @@ public class MetarTesting {
     String outFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_L_fails.txt";
     Downloader d = new NoaaGovDownloader();
     Parser p = new GenericParser();
-    runCheck(inFile, outFile, d, p);
+    Formatter f = new EuropeFormatter();
+    runCheck(inFile, outFile, d, p, f);
   }
 
 }

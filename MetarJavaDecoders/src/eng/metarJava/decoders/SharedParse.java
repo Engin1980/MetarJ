@@ -488,7 +488,7 @@ class SharedParse {
       String regex = "^WS R(\\d{2}[RLC]?)";
       final Pattern pattern = Pattern.compile(regex);
       Matcher matcher = pattern.matcher(rl.getPre());
-      if (matcher.find()) {
+      while (matcher.find()) {
         String r = matcher.group(1);
         tmp.add(r);
         rl.move(matcher.group(0).length(), true);

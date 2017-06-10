@@ -403,7 +403,7 @@ public class EuropeFormatterTest {
     ret.setRunwayWindshears(RunwayWindshearInfo.create(rwys));
 
     String act = new EuropeFormatter().format(ret);
-    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 WS R06 R24L R24R";
+    String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 WS R06 WS R24L R24R";
 
     assertStringStarts(exp, act);
   }

@@ -9,7 +9,6 @@ import eng.metarJava.RunwayStatesInfo;
 import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.RunwayWindshearInfo;
 import eng.metarJava.TrendCloudInfo;
-import eng.metarJava.TrendInfo;
 import eng.metarJava.TrendPhenomenaInfo;
 import eng.metarJava.TrendReport;
 import eng.metarJava.TrendReportTimeInfo;
@@ -21,8 +20,6 @@ import eng.metarJava.decoders.fields.ReportField;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.enums.PhenomenaType;
-import eng.metarJava.enums.TrendReportType;
-import eng.metarJava.support.HourMinute;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -361,14 +358,13 @@ public class EuropeFormatter implements Formatter {
     if (rwi.isAllRunways()) {
       sb.append("WS ALL RWY");
     } else {
-      sb.append("WS ");
       for (String rd : rwi.getRunwayDesignators()) {
         if (isFirst) {
           isFirst = false;
         } else {
           sb.append(" ");
         }
-        sb.append("R").append(rd);
+        sb.append("WS R").append(rd);
       }
     }
 
@@ -540,8 +536,7 @@ public class EuropeFormatter implements Formatter {
 
   private String formatTrendPhenomena(TrendReport tr, boolean appendSpace) {
     TrendPhenomenaInfo tpi = tr.getPhenomenas();
-    if (tpi == null
-            || (tpi.isNSW() == false && tpi.getPhenomenas().isEmpty())) {
+    if (tpi == null || tpi.isEmpty()){
       // no trend-phenomena object, or trend-phenomena object with not NSW flag and empty phenomenas.
       return "";
     }
@@ -581,7 +576,7 @@ public class EuropeFormatter implements Formatter {
     boolean isFirst = true;
 
     TrendCloudInfo ci = tr.getClouds();
-    if (ci == null) return "";
+    if (ci == null || ci.isEmpty()) return "";
     
     if (ci.isNSC()) {
       sb.append("NSC");

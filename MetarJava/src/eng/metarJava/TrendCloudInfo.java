@@ -89,4 +89,15 @@ public class TrendCloudInfo {
   public CloudInfoSpecialStates getSpecialState() {
     return specialState;
   }
+
+  /**
+   * Returns true if cloud-info has no state, no vertical visibility and no clouds, so it will not appear in metar report in any style.
+   * @return 
+   */
+  public boolean isEmpty() {
+    return
+            this.isSpecialState() == false  
+            && this.isVerticalVisibility() == false 
+            && this.getMasses().isEmpty();
+  }
 }
