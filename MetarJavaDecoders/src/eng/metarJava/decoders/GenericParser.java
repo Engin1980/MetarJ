@@ -6,7 +6,6 @@ import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.TrendInfo;
 import eng.metarJava.TrendReport;
 import eng.metarJava.enums.TrendReportType;
-import eng.metarJava.support.ReadOnlyList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,11 @@ public class GenericParser implements Parser {
 
   @Override
   public Report parse(String line) {
-    ReportLine rl = new ReportLine(line);
+
+    /**
+     * Added a space at the end as most of the regular expressions are expecting "space" as a delimiter before next section.
+     */
+    ReportLine rl = new ReportLine(line + " ");
     Report ret = new Report();
 
     ret.setType(SharedParse.decodeReportType(rl));
@@ -52,12 +55,12 @@ public class GenericParser implements Parser {
     RunwayVisualRange rvr;
     List<RunwayVisualRange> lst = new ArrayList();
     rvr = SharedParse.decodeRunwayVisualRange(rl);
-    
+
     while (rvr != null) {
       lst.add(rvr);
       rvr = SharedParse.decodeRunwayVisualRange(rl);
     }
-    
+
     ret.setRunwayVisualRanges(lst);
   }
 

@@ -68,7 +68,7 @@ public class EuropeFormatter implements Formatter {
       sb.append(formatRemark(report));
     }
 
-    if (sb.charAt(sb.length() - 1) == ' ') {
+    while (sb.charAt(sb.length() - 1) == ' ') {
       sb.deleteCharAt(sb.length() - 1);
     }
 
