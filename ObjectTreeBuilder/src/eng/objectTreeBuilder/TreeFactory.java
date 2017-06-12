@@ -5,12 +5,18 @@
  */
 package eng.objectTreeBuilder;
 
+import eng.objectTreeBuilder.attributes.DisplayLabel;
+import eng.objectTreeBuilder.attributes.DisplayLabelIndex;
+import eng.objectTreeBuilder.attributes.DisplayValueFromString;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -23,6 +29,7 @@ public class TreeFactory {
   private static final List<Class> SPECIFIC_TYPES = new ArrayList<Class>();
   private static final List<Class> WRAPPER_TYPES = new ArrayList<Class>();
   private static final List<String> IGNORED_GETTERS = new ArrayList<String>();
+  private static final Map<Class, Method> USER_SPECIFIC_TYPES = new HashMap<>();
 
   static {
     SPECIFIC_TYPES.add(String.class);
@@ -40,6 +47,28 @@ public class TreeFactory {
     WRAPPER_TYPES.add(Boolean.class);
 
     IGNORED_GETTERS.add("getClass");
+  }
+
+  public static void registerSpecificTypeDecoders(Class cls) {
+    if (cls == null) {
+      throw new IllegalArgumentException("[cls] cannot be null.");
+    }
+
+    Method[] methods = cls.getDeclaredMethods();
+    for (Method method : methods) {
+      if (method.getName().equals("getSpecificToString") == false) {
+        continue;
+      }
+      if (method.getParameterCount() != 1) {
+        continue;
+      }
+      if (Modifier.isStatic(method.getModifiers()) == false) {
+        continue;
+      }
+
+      Class parType = method.getParameterTypes()[0];
+      USER_SPECIFIC_TYPES.put(parType, method);
+    }
   }
 
   public static TreeNode<ItemInfo> build(Object rootObject) {
@@ -60,7 +89,7 @@ public class TreeFactory {
       case nil:
         ret = getNullNode(label, obj, suggestedTypeOrNull);
         break;
-      case primitiveOrWrapped:
+      case primitiveOrWrappedOrValueFromString:
         ret = getSimpleNode(label, obj);
         break;
       case enumeration:
@@ -93,6 +122,9 @@ public class TreeFactory {
       case specific:
         ret = getSpecificNode(label, obj);
         break;
+      case userSpecific:
+        ret = getUserSpecificNode(label, obj);
+        break;
       case error:
         ret = getErrorNode(label, obj);
         break;
@@ -108,7 +140,7 @@ public class TreeFactory {
     Class cls = obj.getClass();
     Method[] methods = cls.getMethods();
     for (Method method : methods) {
-      if (method.getName().startsWith("get") == false) {
+      if (isGetterName(method.getName()) == false) {
         continue; // only getters
       }
       if (method.getParameterCount() != 0) {
@@ -129,10 +161,18 @@ public class TreeFactory {
   }
 
   private static String decodePropertyName(String name) {
-    if (name.length() == 4) {
-      return Character.toString(Character.toUpperCase(name.charAt(3)));
-    } else {
-      return Character.toString(Character.toUpperCase(name.charAt(3))) + name.substring(4);
+    if (name.startsWith("get")) {
+      if (name.length() == 4) {
+        return Character.toString(Character.toUpperCase(name.charAt(3)));
+      } else {
+        return Character.toString(Character.toUpperCase(name.charAt(3))) + name.substring(4);
+      }
+    } else { // must here start with "is"
+      if (name.length() == 3) {
+        return Character.toString(Character.toUpperCase(name.charAt(2)));
+      } else {
+        return Character.toString(Character.toUpperCase(name.charAt(2))) + name.substring(3);
+      }
     }
   }
 
@@ -150,11 +190,15 @@ public class TreeFactory {
       } else if (cls.isEnum()) {
         return Type.enumeration;
       } else if (cls.isPrimitive()) {
-        return Type.primitiveOrWrapped;
+        return Type.primitiveOrWrappedOrValueFromString;
+      } else if (cls.isAnnotationPresent(DisplayValueFromString.class)) {
+        return Type.primitiveOrWrappedOrValueFromString;
       } else if (WRAPPER_TYPES.contains(cls)) {
-        return Type.primitiveOrWrapped;
+        return Type.primitiveOrWrappedOrValueFromString;
       } else if (SPECIFIC_TYPES.contains(cls)) {
         return Type.specific;
+      } else if (USER_SPECIFIC_TYPES.containsKey(cls)) {
+        return Type.userSpecific;
       } else {
         return Type.complex;
       }
@@ -262,6 +306,36 @@ public class TreeFactory {
     return ret;
   }
 
+  private static TreeNode<ItemInfo> getUserSpecificNode(String label, Object obj) {
+    TreeNode<ItemInfo> ret;
+    Method method = null;
+    try {
+
+      method = USER_SPECIFIC_TYPES.get(obj.getClass());
+
+      if (method == null) {
+        throw new NoSuchMethodException("No user-specific method [decodeSpecific] for parameter " + obj.getClass().getName() + ".");
+      }
+
+      method.setAccessible(true);
+      Object val = method.invoke(null, obj);
+      String str;
+      if (val == null) {
+        str = "null";
+      } else {
+        str = val.toString();
+      }
+
+      ret = new TreeNode<ItemInfo>(new ItemInfo(
+              label, str, extractClassDisplayName(obj.getClass())));
+
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+      ret = new TreeNode<ItemInfo>(new ItemInfo(label, "Error: " + ex.getMessage(), extractClassDisplayName(obj.getClass())));
+    }
+
+    return ret;
+  }
+
   @SuppressWarnings("unused")
   private static String getSpecificToString(java.util.Date date) {
     return date.toString();
@@ -273,17 +347,31 @@ public class TreeFactory {
 
   private static TreeNode<ItemInfo> getErrorNode(String label, Object obj) {
     AnalysisException ae = (AnalysisException) obj;
-    
+
     StringBuilder sb = new StringBuilder();
-    Throwable t = ae;
-    while (t != null){
-      sb.append("[").append(ae.getClass().getName()).append("]:").append(t.getMessage()).append(" -> ");
+    Throwable t = ae.getCause();
+    while (t != null) {
+      sb.append("[").append(t.getClass().getSimpleName()).append("]:").append(t.getMessage()).append(" -> ");
       t = t.getCause();
     }
-    
-    TreeNode<ItemInfo> ret = 
-            new TreeNode<>(
-            new ItemInfo("Error", sb.toString(), extractClassDisplayName(obj.getClass())));
+
+    TreeNode<ItemInfo> ret
+            = new TreeNode<>(
+                    new ItemInfo(label, "Error!", sb.toString()));
+    return ret;
+  }
+
+  private static boolean isGetterName(String name) {
+    boolean ret = false;
+    if (name.startsWith("get")) {
+      if (name.length() > 3 && Character.isUpperCase(name.charAt(3))) {
+        ret = true;
+      }
+    } else if (name.startsWith("is")) {
+      if (name.length() > 2 && Character.isUpperCase(name.charAt(2))) {
+        ret = true;
+      }
+    }
     return ret;
   }
 
@@ -305,6 +393,7 @@ class Getter implements Comparable<Getter> {
   public final String propertyName;
   public final Method method;
   private final DisplayLabel displayLabel;
+  private final DisplayLabelIndex displayIndex;
 
   public Getter(String propertyName, Method method) {
     this.propertyName = propertyName;
@@ -314,6 +403,11 @@ class Getter implements Comparable<Getter> {
       this.displayLabel = method.getAnnotation(DisplayLabel.class);
     } else {
       this.displayLabel = null;
+    }
+    if (method.isAnnotationPresent(DisplayLabelIndex.class)) {
+      this.displayIndex = method.getAnnotation(DisplayLabelIndex.class);
+    } else {
+      this.displayIndex = null;
     }
   }
 
@@ -330,7 +424,7 @@ class Getter implements Comparable<Getter> {
   public String getDisplayName() {
     String ret;
     if (this.displayLabel != null) {
-      ret = this.displayLabel.label();
+      ret = this.displayLabel.value();
     } else {
       ret = this.propertyName;
     }
@@ -341,13 +435,13 @@ class Getter implements Comparable<Getter> {
   public int compareTo(Getter o) {
     int a;
     int b;
-    if (this.displayLabel != null) {
-      a = this.displayLabel.orderIndex();
+    if (this.displayIndex != null) {
+      a = this.displayIndex.value();
     } else {
       a = 0;
     }
-    if (o.displayLabel != null) {
-      b = o.displayLabel.orderIndex();
+    if (o.displayIndex != null) {
+      b = o.displayIndex.value();
     } else {
       b = 0;
     }
@@ -362,8 +456,9 @@ class Getter implements Comparable<Getter> {
 
 enum Type {
   nil,
-  primitiveOrWrapped,
+  primitiveOrWrappedOrValueFromString,
   specific,
+  userSpecific,
   enumeration,
   iterable,
   array,

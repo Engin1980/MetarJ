@@ -5,6 +5,10 @@
  */
 package eng.objectTreeBuilder;
 
+import eng.objectTreeBuilder.attributes.DisplayLabel;
+import eng.objectTreeBuilder.attributes.DisplayLabelIndex;
+import eng.objectTreeBuilder.attributes.DisplayValueFromString;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +23,14 @@ public class ObjectTreeBuilder {
    * @param args the command line arguments
    */
   public static void main(String[] args) {
+
+    Object o = new Value();
+    boolean res = o.getClass().isAnnotationPresent(DisplayValueFromString.class);
+    System.out.println(res);
+
+//    if (true) {
+//      return;
+//    }
     int i = 5;
     Double d = null;
 
@@ -30,6 +42,8 @@ public class ObjectTreeBuilder {
     double[] doubles = new double[]{1, 2, 3, 2, 1};
 
     A a = new A();
+
+    TreeFactory.registerSpecificTypeDecoders(D.class);
 
     TreeNode<ItemInfo> root = TreeFactory.build(a);
 
@@ -61,6 +75,13 @@ class A {
   private String greeting = "nazdar";
   private java.util.Date date = new java.util.Date();
   private eE enuma = eE.jedna;
+  private Value val = new Value();
+  private java.time.LocalDateTime now = java.time.LocalDateTime.now();
+  private boolean funny = true;
+
+  public boolean isFunny() {
+    return funny;
+  }
 
   public A() {
     ints.add(5);
@@ -68,12 +89,14 @@ class A {
     ints.add(9);
   }
 
-  @DisplayLabel(label = "Element X", orderIndex = -2)
+  @DisplayLabel("Element X")
+  @DisplayLabelIndex(-2)
   public int getElementX() {
     return elementX;
   }
 
-  @DisplayLabel(label = "Element Y", orderIndex = -1)
+  @DisplayLabel("Element Y")
+  @DisplayLabelIndex(-1)
   public Double getElementY() {
     return elementY;
   }
@@ -97,8 +120,16 @@ class A {
   public eE getEnuma() {
     return enuma;
   }
-  
-  
+
+  public Value getVal() {
+    return val;
+  }
+
+  @DisplayLabel("Aktuální čas")
+  @DisplayLabelIndex(5)
+  public LocalDateTime getNow() {
+    return now;
+  }
 
 }
 
@@ -106,4 +137,27 @@ enum eE {
   jedna,
   dva,
   tri
+}
+
+@DisplayValueFromString
+class Value {
+
+  private int value = 5;
+
+  public int getValue() {
+    return value;
+  }
+
+  @Override
+  public String toString() {
+    return "Value{" + "value=" + value + '}';
+  }
+
+}
+
+class D {
+
+  private static String getSpecificToString(java.time.LocalDateTime ldt) {
+    return "neneneeeeee";
+  }
 }
