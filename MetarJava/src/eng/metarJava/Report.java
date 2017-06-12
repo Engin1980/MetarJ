@@ -9,6 +9,8 @@ import eng.metarJava.enums.*;
 import eng.metarJava.exception.NullArgumentException;
 import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.ReadOnlyList;
+import eng.objectTreeBuilder.attributes.DisplayLabel;
+import eng.objectTreeBuilder.attributes.DisplayLabelIndex;
 import java.util.List;
 
 /**
@@ -26,6 +28,7 @@ public class Report {
    * @return Report type. This value is mandatory. Default value is {@link eng.metarJava.enums.ReportType#METAR METAR}.
    * @see eng.metarJava.enums.ReportType
    */
+  @DisplayLabelIndex(1)
   public ReportType getType() {
     return type;
   }
@@ -49,6 +52,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(2)
   public boolean isCorrection() {
     return correction;
   }
@@ -70,6 +74,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(3)
   public String getIcao() {
     return icao;
   }
@@ -99,6 +104,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(4)
   public DayHourMinute getDayTime() {
     return dayTime;
   }
@@ -128,6 +134,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(5)
   public boolean isNil() {
     return nil;
   }
@@ -151,6 +158,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(6)
   public boolean isAuto() {
     return auto;
   }
@@ -172,6 +180,7 @@ public class Report {
    *
    * @return Object representing wind.
    */
+  @DisplayLabelIndex(7)
   public WindInfo getWind() {
     return wind;
   }
@@ -194,6 +203,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(8)
   public VisibilityInfo getVisibility() {
     return visibility;
   }
@@ -219,6 +229,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(9)
   public ReadOnlyList<RunwayVisualRange> getRunwayVisualRanges() {
     return runwayVisualRanges;
   }
@@ -231,7 +242,7 @@ public class Report {
   public void setRunwayVisualRanges(List<RunwayVisualRange> value) {
     this.setRunwayVisualRanges(new ReadOnlyList(value));
   }
-  
+
   /**
    * See {@linkplain #getRunwayVisualRanges() }.
    *
@@ -249,6 +260,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(10)
   public ReadOnlyList<PhenomenaInfo> getPhenomenas() {
     return phenomenas;
   }
@@ -270,6 +282,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(11)
   public CloudInfo getClouds() {
     return clouds;
   }
@@ -290,6 +303,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(12)
   public int getTemperature() {
     return temperature;
   }
@@ -310,6 +324,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(13)
   public int getDewPoint() {
     return dewPoint;
   }
@@ -330,6 +345,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(14)
   public int getPressureInHpa() {
     return pressureInHpa;
   }
@@ -352,6 +368,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(15)
   public ReadOnlyList<PhenomenaInfo> getRecentPhenomenas() {
     return recentPhenomenas;
   }
@@ -397,6 +414,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(16)
   public RunwayWindshearInfo getRunwayWindshears() {
     return runwayWindshears;
   }
@@ -418,6 +436,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(17)
   public RunwayStatesInfo getRunwayStatesInfo() {
     return runwayStatesInfo;
   }
@@ -440,6 +459,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(18)
   public TrendInfo getTrendInfo() {
     return trendInfo;
   }
@@ -460,6 +480,7 @@ public class Report {
    *
    * @return
    */
+  @DisplayLabelIndex(19)
   public String getRemark() {
     return remark;
   }

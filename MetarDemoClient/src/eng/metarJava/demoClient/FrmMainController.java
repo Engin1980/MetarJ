@@ -129,9 +129,9 @@ public class FrmMainController implements Initializable {
       try {
         txt = fmt.format(lastReport);
         txtEncoded.setText(txt);
-        
+
         updateColors();
-        
+
         lblState.setText("Encoded");
       } catch (Exception ex) {
         reportException(ex);
@@ -158,8 +158,7 @@ public class FrmMainController implements Initializable {
 
 //      root = buildGObjectTree(r, "Report");
 //      tvwG.setRoot(root);
-
-fillPropertyTree(r);
+      fillPropertyTree(r);
 
       lblState.setText("Decoded");
       this.lastReport = r;
@@ -172,39 +171,39 @@ fillPropertyTree(r);
 
     TreeItem<String> ret = new TreeItem<>(getTreeItemLabel(label, o.getClass()));
 
-    try{
-    List<PropertyDescriptor> pds = getGetMethods(o);
-    for (PropertyDescriptor pd : pds) {
-      Method pMethod = pd.getReadMethod();
-      String pName = pd.getDisplayName();
-      Object pValue = getValueOfProperty(o, pd);
-      Class pType = pMethod.getReturnType();
+    try {
+      List<PropertyDescriptor> pds = getGetMethods(o);
+      for (PropertyDescriptor pd : pds) {
+        Method pMethod = pd.getReadMethod();
+        String pName = pd.getDisplayName();
+        Object pValue = getValueOfProperty(o, pd);
+        Class pType = pMethod.getReturnType();
 
-      if (pValue == null) {
-        String text = getTreeItemLabel(pName, pType, "<null>");
-        TreeItem<String> it = new TreeItem<>(text);
-        ret.getChildren().add(it);
-      } else if (isPrintableField(pd)) {
-        String text = getTreeItemLabel(pName, pType, pValue);
-        TreeItem<String> it = new TreeItem<>(text);
-        ret.getChildren().add(it);
-      } else if (pd.getReadMethod().getReturnType().getName().startsWith("eng.metarJava")) {
-        TreeItem<String> local = buildGObjectTree(pValue, pd.getDisplayName());
-        ret.getChildren().add(local);
-      } else if (pValue instanceof Iterable) {
-        TreeItem<String> par = new TreeItem("???");
-        Iterable iterable = (Iterable) pValue;
-        for (Object object : iterable) {
-          TreeItem<String> sub = buildGObjectTree(object, pd.getReadMethod().getReturnType().getName());
-          par.getChildren().add(sub);
+        if (pValue == null) {
+          String text = getTreeItemLabel(pName, pType, "<null>");
+          TreeItem<String> it = new TreeItem<>(text);
+          ret.getChildren().add(it);
+        } else if (isPrintableField(pd)) {
+          String text = getTreeItemLabel(pName, pType, pValue);
+          TreeItem<String> it = new TreeItem<>(text);
+          ret.getChildren().add(it);
+        } else if (pd.getReadMethod().getReturnType().getName().startsWith("eng.metarJava")) {
+          TreeItem<String> local = buildGObjectTree(pValue, pd.getDisplayName());
+          ret.getChildren().add(local);
+        } else if (pValue instanceof Iterable) {
+          TreeItem<String> par = new TreeItem("???");
+          Iterable iterable = (Iterable) pValue;
+          for (Object object : iterable) {
+            TreeItem<String> sub = buildGObjectTree(object, pd.getReadMethod().getReturnType().getName());
+            par.getChildren().add(sub);
+          }
+          par.setValue(getTreeItemLabel(
+                  pd.getDisplayName() + " - " + par.getChildren().size()
+                  + " items", pValue.getClass()));
+          ret.getChildren().add(par);
         }
-        par.setValue(getTreeItemLabel(
-                pd.getDisplayName() + " - " + par.getChildren().size()
-                + " items", pValue.getClass()));
-        ret.getChildren().add(par);
       }
-    }
-    } catch (Throwable t){
+    } catch (Throwable t) {
       throw new RuntimeException("Failed to extract value of object " + o.getClass().getName() + " with label " + label + ".", t);
     }
     return ret;
@@ -348,7 +347,7 @@ fillPropertyTree(r);
       sb.append(ex.getMessage()).append("\r\n");
       indent++;
       stack = ex.getStackTrace();
-      
+
       ex = ex.getCause();
     }
 
@@ -370,17 +369,24 @@ fillPropertyTree(r);
   }
 
   private void updateColors() {
-    String a= txtMetar.getText();
-    String b= txtEncoded.getText();
-    
-    if (a.equals(b)){
-       txtEncoded.setStyle("-fx-text-fill: green;");
+    String a = txtMetar.getText();
+    String b = txtEncoded.getText();
+
+    if (a.equals(b)) {
+      txtEncoded.setStyle("-fx-text-fill: green;");
     } else {
-       txtEncoded.setStyle("-fx-text-fill: red;");
+      txtEncoded.setStyle("-fx-text-fill: red;");
     }
   }
+  private boolean isUserSpecificInitialzed = false;
 
   private void fillPropertyTree(Report r) {
+
+    if (isUserSpecificInitialzed == false) {
+      isUserSpecificInitialzed = true;
+      eng.objectTreeBuilder.TreeFactory.registerSpecificTypeDecoders(UserSpecificFormatters.class);
+    }
+
     TreeNode<ItemInfo> root = eng.objectTreeBuilder.TreeFactory.build(r);
     TreeItem<ItemInfo> fxRoot = convertTreeNodeToTreeItem(root);
     tvwG.setRoot(fxRoot);
@@ -388,7 +394,7 @@ fillPropertyTree(r);
 
   private TreeItem<ItemInfo> convertTreeNodeToTreeItem(TreeNode<ItemInfo> node) {
     TreeItem<ItemInfo> ret = new TreeItem<>(node.getValue());
-    
+
     for (TreeNode<ItemInfo> child : node.getChildren()) {
       TreeItem<ItemInfo> fxChild = convertTreeNodeToTreeItem(child);
       ret.getChildren().add(fxChild);

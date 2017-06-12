@@ -1,11 +1,13 @@
 package eng.metarJava.support;
 
 import eng.metarJava.enums.SpeedUnit;
+import eng.objectTreeBuilder.attributes.DisplayValueFromString;
 
 /**
  *
  * @author Marek Vajgl
  */
+@DisplayValueFromString
 public class Speed {
   private double valueInKmh;
   

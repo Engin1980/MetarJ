@@ -1,9 +1,12 @@
 package eng.metarJava.support;
 
+import eng.objectTreeBuilder.attributes.DisplayValueFromString;
+
 /**
- *
+ * Represents heading in degrees in range 0 - 359. Exceeding values will be aligned into this range.
  * @author Marek Vajgl
  */
+@DisplayValueFromString
 public class Heading {
 
   private final int value;
