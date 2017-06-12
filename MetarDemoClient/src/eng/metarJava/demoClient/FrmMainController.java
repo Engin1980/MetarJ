@@ -5,7 +5,10 @@
  */
 package eng.metarJava.demoClient;
 
+import eng.metarJava.Report;
 import eng.metarJava.downloaders.NoaaGovDownloader;
+import eng.objectTreeBuilder.ItemInfo;
+import eng.objectTreeBuilder.TreeNode;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -30,7 +33,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.layout.Background;
 
 /**
  * FXML Controller class
@@ -154,8 +156,10 @@ public class FrmMainController implements Initializable {
       TreeItem<String> root = buildObjectTree(r, "Report");
       tvw.setRoot(root);
 
-      root = buildGObjectTree(r, "Report");
-      tvwG.setRoot(root);
+//      root = buildGObjectTree(r, "Report");
+//      tvwG.setRoot(root);
+
+fillPropertyTree(r);
 
       lblState.setText("Decoded");
       this.lastReport = r;
@@ -374,5 +378,21 @@ public class FrmMainController implements Initializable {
     } else {
        txtEncoded.setStyle("-fx-text-fill: red;");
     }
+  }
+
+  private void fillPropertyTree(Report r) {
+    TreeNode<ItemInfo> root = eng.objectTreeBuilder.TreeFactory.build(r);
+    TreeItem<ItemInfo> fxRoot = convertTreeNodeToTreeItem(root);
+    tvwG.setRoot(fxRoot);
+  }
+
+  private TreeItem<ItemInfo> convertTreeNodeToTreeItem(TreeNode<ItemInfo> node) {
+    TreeItem<ItemInfo> ret = new TreeItem<>(node.getValue());
+    
+    for (TreeNode<ItemInfo> child : node.getChildren()) {
+      TreeItem<ItemInfo> fxChild = convertTreeNodeToTreeItem(child);
+      ret.getChildren().add(fxChild);
+    }
+    return ret;
   }
 }
