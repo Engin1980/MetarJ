@@ -114,8 +114,8 @@ public class MetarTesting {
   }
 
   private static void runFileTest() {
-    String inFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_L.txt";
-    String outFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_L_fails.txt";
+    String inFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_E.txt";
+    String outFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_E_fails.txt";
     Downloader d = new NoaaGovDownloader();
     Parser p = new GenericParser();
     Formatter f = new EuropeFormatter();

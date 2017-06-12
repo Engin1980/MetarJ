@@ -140,9 +140,6 @@ public class WindInfo {
     if (gustSpeed != null && speed.getValue() >= gustSpeed.getValue()) {
       throw new IllegalArgumentException("[gustSpeedInKmh], if present, must be greater than [speedInKmh]");
     }
-    if (direction == null && variation != null) {
-      throw new IllegalArgumentException("[variation] cannot be set if [direction] is null.");
-    }
 
     this.direction = direction;
     this.speed = speed;
