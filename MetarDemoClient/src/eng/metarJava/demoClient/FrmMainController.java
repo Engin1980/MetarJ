@@ -9,6 +9,7 @@ import eng.metarJava.Report;
 import eng.metarJava.downloaders.NoaaGovDownloader;
 import eng.objectTreeBuilder.ItemInfo;
 import eng.objectTreeBuilder.TreeNode;
+import java.awt.datatransfer.StringSelection;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -18,10 +19,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -29,6 +34,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
@@ -70,6 +76,8 @@ public class FrmMainController implements Initializable {
   }
 
   @FXML
+  private TabPane tabPane;
+  @FXML
   private Button btnDownload;
   @FXML
   private TextField txtIcao;
@@ -91,6 +99,8 @@ public class FrmMainController implements Initializable {
   private ComboBox cmbFormatters;
   @FXML
   private TextField txtEncoded;
+  @FXML
+  private TextField txtPropertyOutFileName;
 
   /**
    * Initializes the controller class.
@@ -102,6 +112,7 @@ public class FrmMainController implements Initializable {
 
   @FXML
   public void btnDownload_onAction(ActionEvent event) {
+   clearException();
     lblState.setText("... working");
     NoaaGovDownloader d = new NoaaGovDownloader();
     String icao = txtIcao.getText();
@@ -118,6 +129,7 @@ public class FrmMainController implements Initializable {
 
   @FXML
   public void btnEncode_onAction() {
+    clearException();
     if (lastReport == null) {
       txtEncoded.setText("Decode something first...");
     } else {
@@ -143,7 +155,7 @@ public class FrmMainController implements Initializable {
 
   @FXML
   protected void btnDecode_onAction(ActionEvent event) {
-
+clearException();
     try {
       String metar = txtMetar.getText();
 
@@ -334,6 +346,10 @@ public class FrmMainController implements Initializable {
     return ret;
   }
 
+  private void clearException(){
+    txtError.setText("");
+  }
+  
   private void reportException(Throwable ex) {
     int indent = 0;
     StringBuilder sb = new StringBuilder();
@@ -366,6 +382,8 @@ public class FrmMainController implements Initializable {
     }
 
     txtError.setText(sb.toString());
+    
+    tabPane.getSelectionModel().select(2);
   }
 
   private void updateColors() {
@@ -384,10 +402,10 @@ public class FrmMainController implements Initializable {
 
     if (isUserSpecificInitialzed == false) {
       isUserSpecificInitialzed = true;
-      eng.objectTreeBuilder.TreeFactory.registerSpecificTypeDecoders(UserSpecificFormatters.class);
+      eng.objectTreeBuilder.TreePropertyFactory.registerSpecificTypeDecoders(UserSpecificFormatters.class);
     }
 
-    TreeNode<ItemInfo> root = eng.objectTreeBuilder.TreeFactory.build(r);
+    TreeNode<ItemInfo> root = eng.objectTreeBuilder.TreePropertyFactory.build(r);
     TreeItem<ItemInfo> fxRoot = convertTreeNodeToTreeItem(root);
     tvwG.setRoot(fxRoot);
   }
@@ -400,5 +418,35 @@ public class FrmMainController implements Initializable {
       ret.getChildren().add(fxChild);
     }
     return ret;
+  }
+
+  @FXML
+  private void btnSavePropertiesToFile_onAction() {
+    clearException();
+    TreeItem<ItemInfo> root = tvwG.getRoot();
+    StringBuilder sb = new StringBuilder();
+    appendItemToStringBuilder(root, sb, 0);
+    
+    String fileName = txtPropertyOutFileName.getText();
+
+    try {
+      java.nio.file.Files.write(
+              Paths.get(fileName),
+              sb.toString().getBytes());
+      lblState.setText("... saved as text");
+    } catch (IOException ex) {
+      reportException(ex);
+    }
+  }
+
+  private void appendItemToStringBuilder(TreeItem<ItemInfo> root, StringBuilder sb, int i) {
+    for (int j = 0; j < i; j++) {
+      sb.append("  ");
+    }
+    sb.append(root.getValue().toString());
+    sb.append("\r\n");
+    for (TreeItem<ItemInfo> child : root.getChildren()) {
+      appendItemToStringBuilder(child, sb, i + 1);
+    }
   }
 }

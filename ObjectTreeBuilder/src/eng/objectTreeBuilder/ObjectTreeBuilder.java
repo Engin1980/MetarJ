@@ -43,9 +43,9 @@ public class ObjectTreeBuilder {
 
     A a = new A();
 
-    TreeFactory.registerSpecificTypeDecoders(D.class);
+    TreePropertyFactory.registerSpecificTypeDecoders(D.class);
 
-    TreeNode<ItemInfo> root = TreeFactory.build(a);
+    TreeNode<ItemInfo> root = TreePropertyFactory.build(a);
 
     printTree(root);
   }

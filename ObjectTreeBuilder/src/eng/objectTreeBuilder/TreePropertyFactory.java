@@ -22,7 +22,7 @@ import java.util.Map;
  *
  * @author Marek Vajgl
  */
-public class TreeFactory {
+public class TreePropertyFactory {
 
   private static final int MAX_DEPTH = 7;
 
@@ -276,7 +276,7 @@ public class TreeFactory {
     TreeNode<ItemInfo> ret;
     Method method = null;
     try {
-      Method[] ms = TreeFactory.class.getDeclaredMethods();
+      Method[] ms = TreePropertyFactory.class.getDeclaredMethods();
       for (Method m : ms) {
         if (m.getName().equals("getSpecificToString") && m.getParameterCount() == 1 && m.getParameterTypes()[0] == obj.getClass()) {
           method = m;
