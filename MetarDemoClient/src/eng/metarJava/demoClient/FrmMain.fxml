@@ -24,7 +24,12 @@
                      </children>
                   </FlowPane>
                   <TextField fx:id="txtMetar" promptText="Enter METAR code here" />
-                  <Button fx:id="btnDecode" mnemonicParsing="false" onAction="#btnDecode_onAction" text="Decode" />
+                  <FlowPane>
+                     <children>
+                        <ComboBox fx:id="cmbParsers" prefWidth="150.0" />
+                        <Button fx:id="btnDecode" mnemonicParsing="false" onAction="#btnDecode_onAction" text="Decode" />
+                     </children>
+                  </FlowPane>
                </children>
             </VBox>
          </top>
@@ -80,9 +85,9 @@
                      <children>
                         <ComboBox fx:id="cmbFormatters" prefWidth="150.0" />
                         <Button mnemonicParsing="false" onAction="#btnEncode_onAction" text="Encode" />
-                        <TextField fx:id="txtEncoded" prefHeight="25.0" prefWidth="481.0" />
                      </children>
                   </FlowPane>
+                  <TextField fx:id="txtEncoded" prefHeight="25.0" prefWidth="481.0" />
                   <Label fx:id="lblState" text="--" />
                </children>
             </VBox>

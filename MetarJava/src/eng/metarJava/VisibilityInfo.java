@@ -1,5 +1,7 @@
 package eng.metarJava;
 
+import eng.metarJava.enums.DistanceUnit;
+
 /**
  * Represents visibility
  *
@@ -17,6 +19,17 @@ public class VisibilityInfo extends TrendVisibilityInfo {
    */
   public static VisibilityInfo create(double visibilityInMeters){
     VisibilityInfo ret = new VisibilityInfo(visibilityInMeters, false, false, null);
+    return ret;
+  }
+  
+  /**
+   * Creates new visibility info by distance in meters.
+   * @param visibilityInMeters
+   * @return 
+   */
+  public static VisibilityInfo create(double visibility, DistanceUnit unit){
+    double visInM = DistanceUnit.convert(visibility, unit, DistanceUnit.meters);
+    VisibilityInfo ret = new VisibilityInfo(visInM, false, false, null);
     return ret;
   }
   

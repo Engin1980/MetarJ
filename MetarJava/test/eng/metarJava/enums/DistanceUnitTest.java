@@ -32,4 +32,14 @@ public class DistanceUnitTest {
     assertEquals(expectedValue, actualValue, 1e-7);
   }
   
+  @Test
+  public void testConvert_SM_KM_2() {
+    DistanceUnit sourceUnit = DistanceUnit.miles;
+    double sourceValue = 10;
+    DistanceUnit targetUnit = DistanceUnit.kilometers;
+    double expectedValue = 16.09;
+    double actualValue = DistanceUnit.convert(sourceValue, sourceUnit, targetUnit);
+    assertEquals(expectedValue, actualValue, 1e-2);
+  }
+  
 }

@@ -6,6 +6,11 @@
 package eng.metarJava.demoClient;
 
 import eng.metarJava.Report;
+import eng.metarJava.decoders.EUFormatter;
+import eng.metarJava.decoders.EUParser;
+import eng.metarJava.decoders.GenericParser;
+import eng.metarJava.decoders.USFormatter;
+import eng.metarJava.decoders.USParser;
 import eng.metarJava.downloaders.NoaaGovDownloader;
 import eng.objectTreeBuilder.ItemInfo;
 import eng.objectTreeBuilder.TreeNode;
@@ -78,13 +83,9 @@ public class FrmMainController implements Initializable {
   @FXML
   private TabPane tabPane;
   @FXML
-  private Button btnDownload;
-  @FXML
   private TextField txtIcao;
   @FXML
   private TextField txtMetar;
-  @FXML
-  private Button btnDecode;
   @FXML
   private Label lblState;
   @FXML
@@ -94,9 +95,9 @@ public class FrmMainController implements Initializable {
   @FXML
   private TextArea txtError;
   @FXML
-  private Tab tabError;
-  @FXML
   private ComboBox cmbFormatters;
+  @FXML
+  private ComboBox cmbParsers;
   @FXML
   private TextField txtEncoded;
   @FXML
@@ -107,7 +108,10 @@ public class FrmMainController implements Initializable {
    */
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-    // TODO
+    cmbParsers.getItems().addAll("EU Parser", "US Parser", "Generic parser");
+    cmbParsers.getSelectionModel().select(0);
+    cmbFormatters.getItems().addAll("EU Formatter", "US Formatter");
+    cmbFormatters.getSelectionModel().select(0);
   }
 
   @FXML
@@ -133,8 +137,18 @@ public class FrmMainController implements Initializable {
     if (lastReport == null) {
       txtEncoded.setText("Decode something first...");
     } else {
-      eng.metarJava.decoders.Formatter fmt
-              = new eng.metarJava.decoders.EUFormatter();
+      eng.metarJava.decoders.Formatter fmt;
+      
+      switch (cmbFormatters.getSelectionModel().getSelectedIndex()){
+        case 0:
+          fmt = new EUFormatter();
+          break;
+        case 1:
+          fmt = new USFormatter();
+          break;
+        default:
+          throw new UnsupportedOperationException();
+      }
 
       String txt;
 
@@ -159,8 +173,21 @@ clearException();
     try {
       String metar = txtMetar.getText();
 
-      eng.metarJava.decoders.Parser parser
-              = new eng.metarJava.decoders.GenericParser();
+      eng.metarJava.decoders.Parser parser;
+      
+      switch(cmbParsers.getSelectionModel().getSelectedIndex()){
+        case 0:
+          parser = new EUParser();
+          break;
+        case 1:
+          parser = new USParser();
+          break;
+        case 2:
+          parser = new GenericParser();
+          break;
+        default:
+          throw new UnsupportedOperationException();
+      }
 
       eng.metarJava.Report r;
       r = parser.parse(metar);
@@ -168,8 +195,6 @@ clearException();
       TreeItem<String> root = buildObjectTree(r, "Report");
       tvw.setRoot(root);
 
-//      root = buildGObjectTree(r, "Report");
-//      tvwG.setRoot(root);
       fillPropertyTree(r);
 
       lblState.setText("Decoded");

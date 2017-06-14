@@ -56,8 +56,8 @@ public class USParserHelper extends ParserHelper {
                 ReportField.visibility, "Unable to decode visibility from " + matcher.group(0),
                 rl.getPost(), rl.getPre(), null);
       }
-      double distInKm = DistanceUnit.convert(visInSm, DistanceUnit.miles, DistanceUnit.kilometers);
-      ret = VisibilityInfo.create(distInKm);
+      rl.move(matcher.group(0).length(), true);
+      ret = VisibilityInfo.create(visInSm, DistanceUnit.miles);
     } else {
       throw new MissingFieldException(ReportField.visibility, rl.getPre(), rl.getPost());
     }
@@ -71,8 +71,8 @@ public class USParserHelper extends ParserHelper {
     final Pattern pattern = Pattern.compile(regex);
     Matcher matcher = pattern.matcher(rl.getPre());
     if (matcher.find()) {
-      double inHpa = groupToInt(matcher.group(1));
-      ret = PressureUnit.convert(inHpa, PressureUnit.inHq, PressureUnit.hpa);
+      ret = groupToInt(matcher.group(1));
+      ret = ret / 100d;
       rl.move(matcher.group(0).length(), true);
     } else {
       throw new MissingFieldException(ReportField.pressure, rl.getPre(), rl.getPost());

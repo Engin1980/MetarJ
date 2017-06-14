@@ -148,7 +148,8 @@ public class EUFormatter implements Formatter {
     if (vi.isCAVOK()) {
       sb.append("CAVOK");
     } else {
-      sb.append(String.format("%04.0f", vi.getVisibilityInMeters()));
+      double vis = (vi.getVisibilityInMeters() > 9999) ? 9999 : vi.getVisibilityInMeters();
+      sb.append(String.format("%04.0f", vis));
       if (vi.isNoDirectionalVisibility()) {
         sb.append("NDV");
       }
