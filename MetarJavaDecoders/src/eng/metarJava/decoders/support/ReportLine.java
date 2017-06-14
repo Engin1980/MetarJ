@@ -1,10 +1,10 @@
-package eng.metarJava.decoders;
+package eng.metarJava.decoders.support;
 
 /**
  * Internally used for decoding. Not public.
  * @author Marek Vajgl
  */
-class ReportLine {
+public class ReportLine {
   private final StringBuilder pre;
   private final StringBuilder post;
   
@@ -25,7 +25,7 @@ class ReportLine {
     return post.toString();
   }
 
-  void move(int count, boolean moveFollowingSpaces) {
+  public void move(int count, boolean moveFollowingSpaces) {
     String s = pre.substring(0, count);
     pre.replace(0, count, "");
     post.append(s);

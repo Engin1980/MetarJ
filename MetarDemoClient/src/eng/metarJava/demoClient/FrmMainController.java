@@ -134,7 +134,7 @@ public class FrmMainController implements Initializable {
       txtEncoded.setText("Decode something first...");
     } else {
       eng.metarJava.decoders.Formatter fmt
-              = new eng.metarJava.decoders.EuropeFormatter();
+              = new eng.metarJava.decoders.EUFormatter();
 
       String txt;
 

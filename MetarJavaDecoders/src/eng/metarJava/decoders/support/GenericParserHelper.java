@@ -1,4 +1,4 @@
-package eng.metarJava.decoders;
+package eng.metarJava.decoders.support;
 
 import eng.metarJava.CloudInfo;
 import eng.metarJava.PhenomenaInfo;
@@ -22,6 +22,8 @@ import eng.metarJava.enums.CloudMassSignificantFlag;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.enums.TrendReportTimeIndication;
 import eng.metarJava.CloudMass;
+import eng.metarJava.Report;
+import eng.metarJava.decoders.support.ReportLine;
 import eng.metarJava.decoders.exceptions.ParseException;
 import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.Heading;
@@ -42,9 +44,9 @@ import java.util.regex.Pattern;
  *
  * @author Marek Vajgl
  */
-class SharedParse {
+public class GenericParserHelper extends ParserHelper {
 
-  static ReportType decodeReportType(ReportLine rl) {
+  public static ReportType decodeReportType(ReportLine rl) {
     ReportType ret = ReportType.UNKNOWN;
     if (decodeFixedString(rl, "METAR")) {
       ret = ReportType.METAR;
@@ -55,7 +57,7 @@ class SharedParse {
   }
 
 // <editor-fold defaultstate="collapsed" desc="Report decoding">
-  static boolean decodeFixedString(ReportLine rl, String text) {
+  public static boolean decodeFixedString(ReportLine rl, String text) {
     boolean ret = false;
     if (rl.getPre().startsWith(text)) {
       ret = true;
@@ -64,12 +66,12 @@ class SharedParse {
     return ret;
   }
 
-  static boolean decodeCor(ReportLine rl) {
+  public static boolean decodeCor(ReportLine rl) {
     boolean ret = decodeFixedString(rl, "COR");
     return ret;
   }
 
-  static String decodeIcao(ReportLine rl) {
+  public static String decodeIcao(ReportLine rl) {
     String ret;
 
     ret = rl.getPre().substring(0, 4);
@@ -77,12 +79,12 @@ class SharedParse {
     return ret;
   }
 
-  static boolean decodeNil(ReportLine rl) {
+  public static boolean decodeNil(ReportLine rl) {
     boolean ret = decodeFixedString(rl, "NIL");
     return ret;
   }
 
-  static DayHourMinute decodeDayTime(ReportLine rl) {
+  public static DayHourMinute decodeDayTime(ReportLine rl) {
     DayHourMinute ret;
     final String regex = "^(\\d{2})(\\d{2})(\\d{2})Z";
     final Pattern pattern = Pattern.compile(regex);
@@ -101,17 +103,12 @@ class SharedParse {
     return ret;
   }
 
-  static int groupToInt(String txt) {
-    int ret = Integer.parseInt(txt);
-    return ret;
-  }
-
-  static boolean decodeAuto(ReportLine rl) {
+  public static boolean decodeAuto(ReportLine rl) {
     boolean ret = decodeFixedString(rl, "AUTO");
     return ret;
   }
 
-  static WindInfo decodeWind(ReportLine rl, boolean isMandatory) {
+  public static WindInfo decodeWind(ReportLine rl, boolean isMandatory) {
     WindInfo ret;
     final String regexSet = "^(VRB|\\d{3})(\\d{2})(G(\\d{2}))?(KT|KMH|MPS)";
 
@@ -159,10 +156,11 @@ class SharedParse {
 
         // to kmh
         spd = new Speed(spdVal, unit);
-        if (gustSpdVal != null)
+        if (gustSpdVal != null) {
           gustSpd = new Speed(gustSpdVal, unit);
-        else
+        } else {
           gustSpd = null;
+        }
 
         Variation<Heading> variations = decodeHeadingVariations(rl);
         ret = WindInfo.createWithOptionals(hdg, spd, gustSpd, variations);
@@ -177,11 +175,7 @@ class SharedParse {
     return ret;
   }
 
-  private static boolean groupExist(String groupText) {
-    return groupText != null;
-  }
-
-  private static Variation<Heading> decodeHeadingVariations(ReportLine rl) {
+  public static Variation<Heading> decodeHeadingVariations(ReportLine rl) {
     Variation<Heading> ret = null;
     String regex = "^(\\d{3})V(\\d{3})";
     final Pattern pattern = Pattern.compile(regex);
@@ -198,80 +192,7 @@ class SharedParse {
     return ret;
   }
 
-  static VisibilityInfo decodeVisibility(ReportLine rl) {
-    VisibilityInfo ret;
-
-    boolean isCavok = decodeFixedString(rl, "CAVOK");
-    if (isCavok) {
-      ret = VisibilityInfo.createCAVOK();
-    } else {
-      String regex = "^(\\d{4})(NDV)?";
-      final Pattern pattern = Pattern.compile(regex);
-      final Matcher matcher = pattern.matcher(rl.getPre());
-      if (matcher.find()) {
-        int vis = groupToInt(matcher.group(1));
-        boolean isNVD = groupExist(matcher.group(2));
-        rl.move(matcher.group(0).length(), true);
-        VisibilityVariability var = decodeVisibilityVariability(rl);
-        if (isNVD) {
-          ret = VisibilityInfo.createWithNDV(vis);
-        } else {
-          ret = VisibilityInfo.create(vis, var);
-        }
-      } else {
-        throw new MissingFieldException(ReportField.visibility, rl.getPre(), rl.getPost());
-      }
-    }
-
-    return ret;
-  }
-
-  private static VisibilityVariability decodeVisibilityVariability(ReportLine rl) {
-    VisibilityVariability ret = null;
-
-    String regex = "^(\\d{4})([NSEW])";
-    final Pattern pattern = Pattern.compile(regex);
-    final Matcher matcher = pattern.matcher(rl.getPre());
-    if (matcher.find()) {
-      int vis = groupToInt(matcher.group(1));
-      String dir = matcher.group(2);
-      Direction d = Direction.parse(dir.charAt(0));
-      ret = VisibilityVariability.create(vis, d);
-
-      rl.move(matcher.group(0).length(), true);
-    }
-    return ret;
-  }
-
-  static RunwayVisualRange decodeRunwayVisualRange(ReportLine rl) {
-    RunwayVisualRange ret;
-
-    String regex = "^R(\\d{2}[RLC]?)\\/(\\d{4})(V(\\d{4}))?";
-    final Pattern pattern = Pattern.compile(regex);
-    final Matcher matcher = pattern.matcher(rl.getPre());
-    if (matcher.find()) {
-      String rwy = matcher.group(1);
-      int vis = groupToInt(matcher.group(2));
-      Integer varVis;
-      if (groupExist(matcher.group(3))) {
-        varVis = groupToInt(matcher.group(4));
-      } else {
-        varVis = null;
-      }
-      if (varVis == null) {
-        ret = RunwayVisualRange.create(rwy, vis);
-      } else {
-        ret = RunwayVisualRange.create(rwy, new Variation<>(vis, varVis));
-      }
-
-      rl.move(matcher.group(0).length(), true);
-    } else {
-      ret = null;
-    }
-    return ret;
-  }
-
-  static PhenomenaInfo decodePhenomena(ReportLine rl) {
+  public static PhenomenaInfo decodePhenomena(ReportLine rl) {
     PhenomenaInfo ret;
 
     String regex = "^(\\+|-|VC)?([A-Z]{2})?([A-Z]{2}(?<!VC))(VC)? ";
@@ -293,20 +214,21 @@ class SharedParse {
           throw new UnsupportedOperationException("Unknown phenomena intensity");
         }
       }
-      
+
       /* 
         Phenomena decoding is tricky as metars do not follow
         standards. Therefore this is very(!) lenient implementation.
-      */
+       */
       if (groupExist(matcher.group(2))) {
-         t = PhenomenaType.valueOf(matcher.group(2));
-         ts.add(t);
+        t = PhenomenaType.valueOf(matcher.group(2));
+        ts.add(t);
       }
       t = PhenomenaType.valueOf(matcher.group(3));
       ts.add(t);
-      
-      if (groupExist(matcher.group(4)))
+
+      if (groupExist(matcher.group(4))) {
         isVC = true;
+      }
 
       ret = PhenomenaInfo.create(i, ts, isVC);
       rl.move(matcher.group(0).length(), true);
@@ -314,70 +236,32 @@ class SharedParse {
       ret = null;
     }
 
-    /* OLD without vicinity in front of phenomenas
-    String regex = "^([+-])?([A-Z]{2})?([A-Z]{2}(?<!VC))(VC)? ";
-    final Pattern pattern = Pattern.compile(regex);
-    final Matcher matcher = pattern.matcher(rl.getPre());
-    if (matcher.find()) {
-      PhenomenaIntensity i = PhenomenaIntensity.moderate;
-      if (groupExist(matcher.group(1))) {
-        if (matcher.group(1).equals("+")) {
-          i = PhenomenaIntensity.heavy;
-        } else if (matcher.group(1).equals("-")) {
-          i = PhenomenaIntensity.light;
-        } else {
-          throw new UnsupportedOperationException("Unknown phenomena intensity");
-        }
-      }
-      PhenomenaDescriptor d = PhenomenaDescriptor.none;
-      if (groupExist(matcher.group(2))) {
-        d = PhenomenaDescriptor.valueOf(matcher.group(2));
-      }
-      PhenomenaType t = PhenomenaType.valueOf(matcher.group(3));
-      boolean isVC = groupExist(matcher.group(4));
-
-      ret = PhenomenaInfo.create(i, d, t, isVC);
-      rl.move(matcher.group(0).length(), isVC);
-    } else {
-      ret = null;
-    }
-     */
     return ret;
   }
 
-  static CloudInfo decodeClouds(ReportLine rl) {
+  public static CloudInfo decodeCloudsWithVerticalVisibility(ReportLine rl) throws ParseException {
     CloudInfo ret;
-    if (decodeFixedString(rl, "NSC")) {
-      ret = CloudInfo.createNSC();
-    } else if (decodeFixedString(rl, "NCD")) {
-      ret = CloudInfo.createNCD();
-    } else if (rl.getPre().startsWith("VV")) {
-      // vertical visibility
-      if (decodeFixedString(rl, "VV///")) {
-        ret = CloudInfo.createWithUnknownVV();
-        rl.move(5, true); // "VV///"
-      } else {
-        String vvRegex = "^VV(\\d{3})";
-        final Pattern vvPattern = Pattern.compile(vvRegex);
-        final Matcher matcher = vvPattern.matcher(rl.getPre());
-        if (matcher.find()) {
-          // is VV
-          int vv = groupToInt(matcher.group(1));
-          ret = CloudInfo.createWithVV(vv);
-          rl.move(matcher.group(0).length(), true);
-        } else {
-          throw new ParseException(ReportField.clouds, "Seems like [VVxxx] pattern, but does not exactly fit and cannot be parsed.", rl.getPost(), rl.getPre(), null);
-        }
-      }
+    // vertical visibility
+    if (decodeFixedString(rl, "VV///")) {
+      ret = CloudInfo.createWithUnknownVV();
+      rl.move(5, true); // "VV///"
     } else {
-      // cloud masses defined somehow
-      List<CloudMass> cls = decodeCloudAmounts(rl);
-      ret = CloudInfo.create(cls);
+      String vvRegex = "^VV(\\d{3})";
+      final Pattern vvPattern = Pattern.compile(vvRegex);
+      final Matcher matcher = vvPattern.matcher(rl.getPre());
+      if (matcher.find()) {
+        // is VV
+        int vv = groupToInt(matcher.group(1));
+        ret = CloudInfo.createWithVV(vv);
+        rl.move(matcher.group(0).length(), true);
+      } else {
+        throw new ParseException(ReportField.clouds, "Seems like [VVxxx] pattern, but does not exactly fit and cannot be parsed.", rl.getPost(), rl.getPre(), null);
+      }
     }
     return ret;
   }
 
-  private static List<CloudMass> decodeCloudAmounts(ReportLine rl) {
+  public static List<CloudMass> decodeCloudAmounts(ReportLine rl) {
     List<CloudMass> ret = new ArrayList<>();
 
     String regex = "^(([A-Z]{3})(\\d{3})(TCU|CB|\\/\\/\\/)?)|(\\/\\/\\/\\/\\/\\/(CB|TCU))";
@@ -411,8 +295,8 @@ class SharedParse {
    * @param rl report line
    * @return
    */
-  static Integer[] decodeTemperatureAndDewPoint(ReportLine rl) {
-    Integer[] ret;
+  public static TemperatureAndDewPoint decodeTemperatureAndDewPoint(ReportLine rl) {
+    TemperatureAndDewPoint ret;
 
     String regex = "^(M)?(\\d{2})\\/(M)?(\\d{2})";
     final Pattern pattern = Pattern.compile(regex);
@@ -427,9 +311,7 @@ class SharedParse {
         dew = -dew;
       }
 
-      ret = new Integer[2];
-      ret[0] = temp;
-      ret[1] = dew;
+      ret = new TemperatureAndDewPoint((int) temp, (int) dew);
 
       rl.move(matcher.group(0).length(), true);
     } else {
@@ -438,21 +320,7 @@ class SharedParse {
     return ret;
   }
 
-  static int decodePressureInHpa(ReportLine rl) {
-    int ret;
-    String regex = "^Q(\\d{4})";
-    final Pattern pattern = Pattern.compile(regex);
-    Matcher matcher = pattern.matcher(rl.getPre());
-    if (matcher.find()) {
-      ret = groupToInt(matcher.group(1));
-      rl.move(matcher.group(0).length(), true);
-    } else {
-      throw new MissingFieldException(ReportField.pressure, rl.getPre(), rl.getPost());
-    }
-    return ret;
-  }
-
-  static PhenomenaInfo decodeRecentPhenomena(ReportLine rl) {
+  public static PhenomenaInfo decodeRecentPhenomena(ReportLine rl) {
     PhenomenaInfo ret;
 
     String regex = "^RE([A-Z]{2})?([A-Z]{2}) ";
@@ -479,7 +347,7 @@ class SharedParse {
     return ret;
   }
 
-  static RunwayWindshearInfo decodeWindShears(ReportLine rl) {
+  public static RunwayWindshearInfo decodeWindShears(ReportLine rl) {
     RunwayWindshearInfo ret;
 
     if (decodeFixedString(rl, "WS ALL RWY")) {
@@ -506,7 +374,7 @@ class SharedParse {
    *
    * @param rl
    */
-  static void decodeSeaTemperatureAndState(ReportLine rl) {
+  public static void decodeSeaTemperatureAndState(ReportLine rl) {
     String regex = "^SM?\\d{2}\\/S\\d{1}";
     final Pattern pattern = Pattern.compile(regex);
     Matcher matcher = pattern.matcher(rl.getPre());
@@ -515,7 +383,7 @@ class SharedParse {
     }
   }
 
-  static RunwayStatesInfo decodeRunwayStateInfo(ReportLine rl) {
+  public static RunwayStatesInfo decodeRunwayStateInfo(ReportLine rl) {
     if (decodeFixedString(rl, "SNOCLO")) {
       return RunwayStatesInfo.createSNOCLO();
     }
@@ -542,9 +410,30 @@ class SharedParse {
     return ret;
   }
 
+  public static List<PhenomenaInfo> decodePhenomenas(ReportLine rl) {
+    PhenomenaInfo pi = GenericParserHelper.decodePhenomena(rl);
+    List<PhenomenaInfo> ret = new ArrayList<>();
+    while (pi != null) {
+      ret.add(pi);
+      pi = GenericParserHelper.decodePhenomena(rl);
+    }
+    return ret;
+  }
+
+  public static List<PhenomenaInfo> decodeRecentPhenomenas(ReportLine rl) {
+    PhenomenaInfo pi;
+    pi = GenericParserHelper.decodeRecentPhenomena(rl);
+    List<PhenomenaInfo> ret = new ArrayList<>();
+    while (pi != null) {
+      ret.add(pi);
+      pi = GenericParserHelper.decodeRecentPhenomena(rl);
+    }
+    return ret;
+  }
+
   // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Trend report decoding">
-  static TrendReportTimeInfo decodeTrendReportTime(ReportLine rl, boolean isMandatory) {
+  public static TrendReportTimeInfo decodeTrendReportTime(ReportLine rl, boolean isMandatory) {
     TrendReportTimeInfo ret;
 
     String patternString = "^(AT|FM|TL)(\\d{2})(\\d{2})";
@@ -569,7 +458,7 @@ class SharedParse {
     return ret;
   }
 
-  static TrendVisibilityInfo decodeTrendVisibility(ReportLine rl, boolean isMandatory) {
+  public static TrendVisibilityInfo decodeTrendVisibility(ReportLine rl, boolean isMandatory) {
     TrendVisibilityInfo ret;
 
     boolean isCavok = decodeFixedString(rl, "CAVOK");
@@ -595,7 +484,7 @@ class SharedParse {
     return ret;
   }
 
-  static TrendPhenomenaInfo decodeTrendPhenomenas(ReportLine rl) {
+  public static TrendPhenomenaInfo decodeTrendPhenomenas(ReportLine rl) {
     if (decodeFixedString(rl, "NSW")) {
       return TrendPhenomenaInfo.createNSW();
     } else {
@@ -614,7 +503,7 @@ class SharedParse {
     }
   }
 
-  static TrendCloudInfo decodeTrendCloud(ReportLine rl) {
+  public static TrendCloudInfo decodeTrendCloud(ReportLine rl) {
     TrendCloudInfo ret;
     if (decodeFixedString(rl, "NSC")) {
       ret = TrendCloudInfo.createNSC();
@@ -635,7 +524,7 @@ class SharedParse {
     return ret;
   }
 
-  static String decodeRemark(ReportLine rl) {
+  public static String decodeRemark(ReportLine rl) {
     if (decodeFixedString(rl, "RMK")) {
       String remark = rl.getPre();
       rl.move(remark.length(), true);

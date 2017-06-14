@@ -6,7 +6,7 @@
 package metartesting;
 
 import eng.metarJava.Report;
-import eng.metarJava.decoders.EuropeFormatter;
+import eng.metarJava.decoders.EUFormatter;
 import eng.metarJava.decoders.Formatter;
 import eng.metarJava.decoders.GenericParser;
 import eng.metarJava.downloaders.Downloader;
@@ -45,7 +45,7 @@ public class MetarTesting {
     System.out.println(ret);
     
     Report r = new GenericParser().parse(ret);
-    ret = new EuropeFormatter().format(r);
+    ret = new EUFormatter().format(r);
     System.out.println(ret);
   }
 
@@ -118,7 +118,7 @@ public class MetarTesting {
     String outFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_E_fails.txt";
     Downloader d = new NoaaGovDownloader();
     Parser p = new GenericParser();
-    Formatter f = new EuropeFormatter();
+    Formatter f = new EUFormatter();
     runCheck(inFile, outFile, d, p, f);
   }
 

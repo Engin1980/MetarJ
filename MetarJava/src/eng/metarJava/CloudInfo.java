@@ -57,7 +57,7 @@ public class CloudInfo extends TrendCloudInfo {
     return ret;
   }
   /**
-   * Creates cloud info with NCD (no-cloud-detected) state.
+   * Creates cloud info with NCD (no-cloud-detected) (CLR in US) state.
    * @return Cloud info object
    */
   public static CloudInfo createNCD(){

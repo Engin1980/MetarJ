@@ -29,6 +29,11 @@ public class TrendCloudInfo {
     TrendCloudInfo ret = new TrendCloudInfo(null, true, verticalVisibilityInHundredFeet, CloudInfoSpecialStates.none);
     return ret;
   }
+  
+  /**
+   * Creates instance for no-significant clouds (that is NSC in EU or CLR in US reports).
+   * @return 
+   */
   public static TrendCloudInfo createNSC(){
     TrendCloudInfo ret = new TrendCloudInfo(null, false, null, CloudInfoSpecialStates.NSC);
     return ret;
@@ -82,6 +87,18 @@ public class TrendCloudInfo {
   
   public boolean isNSC(){
     return this.specialState == CloudInfoSpecialStates.NSC;
+  }
+  
+  public boolean isNCD(){
+    return this.specialState == CloudInfoSpecialStates.NCD;
+  }
+  
+  /**
+   * Equivalent with {@linkplain isNCD}.
+   * @return 
+   */
+  public boolean isSKC(){
+    return isNCD();
   }
   
   public boolean isSpecialState(){

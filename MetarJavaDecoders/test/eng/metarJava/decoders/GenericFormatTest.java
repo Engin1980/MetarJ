@@ -47,7 +47,7 @@ public class GenericFormatTest {
   
   @Test
   public void testParseReportType() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
 
     ReportType exp = ReportType.METAR;
@@ -58,7 +58,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseCor() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r;
 
     r = p.parse(LKPR);
@@ -70,7 +70,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseIcao() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r;
 
     r = p.parse(LKPR);
@@ -82,7 +82,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseDayTime() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
 
     assertNotNull(r.getDayTime());
@@ -93,7 +93,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseNil() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(XXYY);
 
     assertTrue(r.isNil());
@@ -101,7 +101,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseNilFalse() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
 
     assertFalse(r.isNil());
@@ -109,7 +109,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseWindUnset() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKTB);
 
     assertNull(r.getWind());
@@ -117,7 +117,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseWind() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
     WindInfo w = r.getWind();
 
@@ -130,7 +130,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseWindGust() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
     WindInfo w = r.getWind();
 
@@ -143,7 +143,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseWindGustAndMps() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(UUEE);
     WindInfo w = r.getWind();
 
@@ -156,7 +156,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseWindVariating() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPD);
     WindInfo w = r.getWind();
 
@@ -169,7 +169,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseVisibilityCavok() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPD);
     VisibilityInfo v = r.getVisibility();
 
@@ -181,7 +181,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseVisibilityValueAndNDV() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
     VisibilityInfo v = r.getVisibility();
 
@@ -195,7 +195,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseVisibilityVariating() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
     VisibilityInfo v = r.getVisibility();
 
@@ -211,7 +211,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseRunwayVisualRange() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
     RunwayVisualRange rvr;
 
@@ -221,20 +221,19 @@ public class GenericFormatTest {
     assertFalse(rvr.isVariating());
     assertEquals("06", rvr.getRunwayDesignator());
     assertNotNull(rvr.getVisibilityInMeters());
-    assertNull(rvr.getVariatingVisibilityInMeters());
-    assertEquals(700, (int) rvr.getVisibilityInMeters());
+    assertEquals(700, (int)(double) rvr.getVisibilityInMeters());
 
     rvr = r.getRunwayVisualRanges().get(1);
     assertTrue(rvr.isVariating());
     assertEquals("24C", rvr.getRunwayDesignator());
     assertNotNull(rvr.getVariatingVisibilityInMeters());
-    assertEquals(200, (int) rvr.getVariatingVisibilityInMeters().getFrom());
-    assertEquals(500, (int) rvr.getVariatingVisibilityInMeters().getTo());
+    assertEquals(200, (int)(double) rvr.getVariatingVisibilityInMeters().getFrom());
+    assertEquals(500, (int)(double) rvr.getVariatingVisibilityInMeters().getTo());
   }
 
   @Test
   public void testParsePhenomenaA() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
 
     assertEquals(3, r.getPhenomenas().size());
@@ -266,7 +265,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParsePhenomenaB() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
 
     assertEquals(1, r.getPhenomenas().size());
@@ -283,7 +282,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParsePhenomenaC() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPD);
 
     assertNotNull(r.getPhenomenas());
@@ -292,7 +291,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseCloudsVV() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPD);
     CloudInfo ci = r.getClouds();
 
@@ -309,7 +308,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseCloudsNSC() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKTB);
     CloudInfo ci = r.getClouds();
 
@@ -323,7 +322,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseCloudsNCD() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(UUEE);
     CloudInfo ci = r.getClouds();
 
@@ -337,7 +336,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseCloudsMass1() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
     CloudInfo ci = r.getClouds();
 
@@ -356,7 +355,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseCloudsMass3() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
     CloudInfo ci = r.getClouds();
 
@@ -387,7 +386,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseTemperatureAndDewPoint() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
 
     assertEquals(12, r.getTemperature());
@@ -396,7 +395,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseTemperatureAndDewPointMinus() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKTB);
 
     assertEquals(-8, r.getTemperature());
@@ -405,15 +404,15 @@ public class GenericFormatTest {
 
   @Test
   public void testParsePressure() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
 
-    assertEquals(996, r.getPressureInHpa());
+    assertEquals(996, (int)r.getPressureInHpa());
   }
 
   @Test
   public void testParseRecentPhenomena() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPD);
     PhenomenaInfo pi;
 
@@ -427,7 +426,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseRecentPhenomena2() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
     PhenomenaInfo pi;
 
@@ -448,7 +447,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseWindshearAll() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
 
     assertNotNull(r.getRunwayWindshears());
@@ -458,7 +457,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseWindshear() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
 
     assertNotNull(r.getRunwayWindshears());
@@ -471,7 +470,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseRunwayStateSNOCLO() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
 
     assertNotNull(r.getRunwayStatesInfo());
@@ -481,7 +480,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseRunwayState2() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
 
     assertNotNull(r.getRunwayStatesInfo());
@@ -507,7 +506,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseNosig() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPD);
 
     assertNotNull(r.getTrendInfo());
@@ -518,7 +517,7 @@ public class GenericFormatTest {
   @Test
   public void testParseOther() {
     String s = "METAR LKPR 131400Z VRB02KT CAVOK 08/M03 Q1024 NOSIG";
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r;
 
     r = p.parse(s);
@@ -527,14 +526,14 @@ public class GenericFormatTest {
   @Test
   public void testParseOtherA() {
     String s = "METAR LBGO 151000Z AUTO 29003KT 240V330 9999 SCT062/// OVC080/// 08/06 Q1024 R99/19//95 NOSIG";
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r;
     r = p.parse(s);
   }
 
   @Test
   public void testParseTrend() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
 
     assertNotNull(r.getTrendInfo());
@@ -547,7 +546,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseTrendVisibilityCavok() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKMT);
 
     assertNotNull(r.getTrendInfo());
@@ -565,7 +564,7 @@ public class GenericFormatTest {
 
   @Test
   public void testParseTrendVisibility() {
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r = p.parse(LKPR);
 
     assertNotNull(r.getTrendInfo());
@@ -581,7 +580,7 @@ public class GenericFormatTest {
   @Test
   public void testParseOtherC() {
     String s = "METAR LDSP 151000Z 09011KT CAVOK 16/M04 Q1026 BECMG 12008KT";
-    Parser p = new GenericParser();
+    Parser p = new EUParser();
     Report r;
     r = p.parse(s);
   }

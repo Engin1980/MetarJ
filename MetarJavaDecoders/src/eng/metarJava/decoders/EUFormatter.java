@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Marek Vajgl
  */
-public class EuropeFormatter implements Formatter {
+public class EUFormatter implements Formatter {
 
   @Override
   public String format(Report report) {
@@ -148,7 +148,7 @@ public class EuropeFormatter implements Formatter {
     if (vi.isCAVOK()) {
       sb.append("CAVOK");
     } else {
-      sb.append(String.format("%04d", (int) vi.getVisibilityInMeters()));
+      sb.append(String.format("%04.0f", vi.getVisibilityInMeters()));
       if (vi.isNoDirectionalVisibility()) {
         sb.append("NDV");
       }
@@ -185,11 +185,11 @@ public class EuropeFormatter implements Formatter {
               .append(rvr.getRunwayDesignator())
               .append("/");
       if (rvr.isVariating()) {
-        sb.append(String.format("%04dV%04d",
-                (int) rvr.getVariatingVisibilityInMeters().getFrom(),
-                (int) rvr.getVariatingVisibilityInMeters().getTo()));
+        sb.append(String.format("%04.0fV%04.0f",
+                rvr.getVariatingVisibilityInMeters().getFrom(),
+                rvr.getVariatingVisibilityInMeters().getTo()));
       } else {
-        sb.append(String.format("%04d", rvr.getVisibilityInMeters()));
+        sb.append(String.format("%04.0f", rvr.getVisibilityInMeters()));
       }
 
     }
@@ -307,7 +307,7 @@ public class EuropeFormatter implements Formatter {
 
   private String formatPressure(Report report, boolean appendSpace) {
     StringBuilder sb = new StringBuilder();
-    sb.append("Q").append(String.format("%04d", report.getPressureInHpa()));
+    sb.append("Q").append(String.format("%04.0f", report.getPressureInHpa()));
 
     if (appendSpace) {
       sb.append(" ");

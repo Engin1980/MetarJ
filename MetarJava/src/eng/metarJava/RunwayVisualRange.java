@@ -1,5 +1,6 @@
 package eng.metarJava;
 
+import eng.metarJava.enums.DistanceUnit;
 import eng.metarJava.exception.NonsenseRequestException;
 import eng.metarJava.support.Variation;
 
@@ -10,20 +11,20 @@ import eng.metarJava.support.Variation;
 public class RunwayVisualRange {
 
   private final String runwayDesignator;
-  private final Integer visibilityInMeters;
-  private final Variation<Integer> variatingVisibilityInMeters;
+  private final Double visibilityInMeters;
+  private final Variation<Double> variatingVisibilityInMeters;
 
-  public static RunwayVisualRange create(String runwayDesignator, int visibilityInMeters) {
+  public static RunwayVisualRange create(String runwayDesignator, double visibilityInMeters) {
     RunwayVisualRange ret = new RunwayVisualRange(runwayDesignator, visibilityInMeters);
     return ret;
   }
 
-  public static RunwayVisualRange create(String runwayDesignator, Variation<Integer> variatingVisibilityInMeters) {
+  public static RunwayVisualRange create(String runwayDesignator, Variation<Double> variatingVisibilityInMeters) {
     RunwayVisualRange ret = new RunwayVisualRange(runwayDesignator, variatingVisibilityInMeters);
     return ret;
   }
 
-  protected RunwayVisualRange(String runwayDesignator, Integer visibilityInMeters) {
+  protected RunwayVisualRange(String runwayDesignator, Double visibilityInMeters) {
     if (visibilityInMeters == null)
       throw new IllegalArgumentException("[visibilityInMeters] must be not null.");
     if (visibilityInMeters < 0)
@@ -34,7 +35,7 @@ public class RunwayVisualRange {
     this.variatingVisibilityInMeters = null;
   }
 
-  protected RunwayVisualRange(String runwayDesignator, Variation<Integer> variatingVisibilityInMeters) {
+  protected RunwayVisualRange(String runwayDesignator, Variation<Double> variatingVisibilityInMeters) {
     if (variatingVisibilityInMeters == null)
       throw new IllegalArgumentException("[variatingVisibilityInMeters] must be not null.");
     if (variatingVisibilityInMeters.getFrom() < 0 
@@ -51,19 +52,34 @@ public class RunwayVisualRange {
     return runwayDesignator;
   }
 
-  public int getVisibilityInMeters() {
+  public Double getVisibilityInMeters() {
     if (this.visibilityInMeters == null)
       throw new NonsenseRequestException(
               "Cannot obtain visibility in meters when visibility is variating. Check isVariating() function or call getVariatingVisibilityInMeters.");
     return visibilityInMeters;
   }
+  
+  public Double getVisibility(DistanceUnit unit){
+    Double inM = this.getVisibilityInMeters();
+    Double ret = DistanceUnit.convert(inM, DistanceUnit.meters, unit);
+    return ret;
+  }
 
-  public Variation<Integer> getVariatingVisibilityInMeters() {
-//    if (this.variatingVisibilityInMeters == null)
-//      throw new NonsenseRequestException(
-//        "Cannot obtaing variating visibility if only fixed visibility is set. Check isVariating() function or call getVisibilityInMeters().");
+  public Variation<Double> getVariatingVisibilityInMeters() {
+    if (this.variatingVisibilityInMeters == null)
+      throw new NonsenseRequestException(
+        "Cannot obtaing variating visibility if only fixed visibility is set. Check isVariating() function or call getVisibilityInMeters().");
     return variatingVisibilityInMeters;
   }
+  
+  public Variation<Double> getVariatingVisibility(DistanceUnit unit) {
+    Variation<Double> tmp = getVariatingVisibilityInMeters();
+    Variation<Double> ret = new Variation<>(
+            DistanceUnit.convert(tmp.getFrom(), DistanceUnit.meters, unit),
+            DistanceUnit.convert(tmp.getTo(), DistanceUnit.meters, unit)
+    );
+    return ret;
+  }  
 
   public boolean isVariating() {
     return this.variatingVisibilityInMeters != null;

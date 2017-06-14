@@ -338,7 +338,7 @@ public class Report {
     this.dewPoint = dewPoint;
   }
 
-  private int pressureInHpa = 1013;
+  private double pressureInHpa = 1013;
 
   /**
    * Gets pressure in Hpa. Mandatory. Default value is 1013.
@@ -346,8 +346,13 @@ public class Report {
    * @return
    */
   @DisplayLabelIndex(14)
-  public int getPressureInHpa() {
+  public double getPressureInHpa() {
     return pressureInHpa;
+  }
+  
+  public double getPressure(PressureUnit unit){
+    double ret = PressureUnit.convert(this.pressureInHpa, PressureUnit.hpa, unit);
+    return ret;
   }
 
   /**
@@ -355,8 +360,12 @@ public class Report {
    *
    * @param pressureInHpa
    */
-  public void setPressureInHpa(int pressureInHpa) {
+  public void setPressureInHpa(double pressureInHpa) {
     this.pressureInHpa = pressureInHpa;
+  }
+  
+  public void setPressure(double value, PressureUnit unit){
+    this.pressureInHpa = PressureUnit.convert(value, unit, PressureUnit.hpa);
   }
 
   private ReadOnlyList<PhenomenaInfo> recentPhenomenas = null;

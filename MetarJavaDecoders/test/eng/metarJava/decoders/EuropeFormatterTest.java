@@ -65,7 +65,7 @@ public class EuropeFormatterTest {
   @Test
   public void testFormatType() {
     Report ret = generateReport();
-    String s = new EuropeFormatter().format(ret);
+    String s = new EUFormatter().format(ret);
     assertStringStarts("METAR ", s);
   }
 
@@ -74,7 +74,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setCorrection(true);
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR COR ";
     assertStringStarts(exp, act);
   }
@@ -84,7 +84,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setNil(true);
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z NIL";
     assertStringStarts(exp, act);
   }
@@ -92,7 +92,7 @@ public class EuropeFormatterTest {
   @Test
   public void testFormatICAO() {
     Report ret = generateReport();
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT";
     assertStringStarts(exp, act);
   }
@@ -104,7 +104,7 @@ public class EuropeFormatterTest {
             new Heading(240),
             new Speed(13, SpeedUnit.KT)));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 24013KT";
     assertStringStarts(exp, act);
   }
@@ -114,7 +114,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setWind(null);
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z /////KT";
     assertStringStarts(exp, act);
   }
@@ -128,7 +128,7 @@ public class EuropeFormatterTest {
             new Speed(25, SpeedUnit.KT),
             new Variation<Heading>(new Heading(210), new Heading(250))));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 24013G25KT 210V250";
 
     assertStringStarts(exp, act);
@@ -137,7 +137,7 @@ public class EuropeFormatterTest {
   @Test
   public void testWindCalm() {
     Report ret = generateReport();
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT";
 
     assertStringStarts(exp, act);
@@ -148,7 +148,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setVisibility(VisibilityInfo.createCAVOK());
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK";
 
     assertStringStarts(exp, act);
@@ -159,7 +159,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setVisibility(VisibilityInfo.create(5000));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT 5000";
 
     assertStringStarts(exp, act);
@@ -170,7 +170,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setVisibility(VisibilityInfo.createWithNDV(5000));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT 5000NDV";
 
     assertStringStarts(exp, act);
@@ -184,7 +184,7 @@ public class EuropeFormatterTest {
                     5000,
                     VisibilityVariability.create(2000, Direction.north)));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT 5000 2000N";
 
     assertStringStarts(exp, act);
@@ -196,7 +196,7 @@ public class EuropeFormatterTest {
     ret.setRunwayVisualRanges(new ReadOnlyList(
             RunwayVisualRange.create("24C", 300)));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK R24C/0300";
 
     assertStringStarts(exp, act);
@@ -206,9 +206,9 @@ public class EuropeFormatterTest {
   public void testRunwayVisibilityVariating() {
     Report ret = generateReport();
     ret.setRunwayVisualRanges(new ReadOnlyList(
-            RunwayVisualRange.create("24C", new Variation<>(50, 200))));
+            RunwayVisualRange.create("24C", new Variation<>(50d, 200d))));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK R24C/0050V0200";
 
     assertStringStarts(exp, act);
@@ -218,10 +218,10 @@ public class EuropeFormatterTest {
   public void testRunwayVisibilityVariatingMultiple() {
     Report ret = generateReport();
     ret.setRunwayVisualRanges(new ReadOnlyList(
-            RunwayVisualRange.create("24C", new Variation<>(50, 200)),
+            RunwayVisualRange.create("24C", new Variation<>(50d, 200d)),
             RunwayVisualRange.create("06C", 150)));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK R24C/0050V0200 R06C/0150";
 
     assertStringStarts(exp, act);
@@ -233,7 +233,7 @@ public class EuropeFormatterTest {
     ret.setPhenomenas(
             new ReadOnlyList<>(PhenomenaInfo.create(PhenomenaIntensity.heavy, PhenomenaType.RA, false)));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK +RA";
 
     assertStringStarts(exp, act);
@@ -245,7 +245,7 @@ public class EuropeFormatterTest {
     ret.setPhenomenas(new ReadOnlyList<>(
             PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.TS, PhenomenaType.RA}, true)));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK VCTSRA";
 
     assertStringStarts(exp, act);
@@ -259,7 +259,7 @@ public class EuropeFormatterTest {
             PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.BL, PhenomenaType.SN}, true),
             PhenomenaInfo.create(PhenomenaIntensity.heavy, new PhenomenaType[]{PhenomenaType.SN, PhenomenaType.SH}, false)));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK -RA VCBLSN +SNSH";
 
     assertStringStarts(exp, act);
@@ -270,7 +270,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setClouds(CloudInfo.createNSC());
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NSC";
 
     assertStringStarts(exp, act);
@@ -281,7 +281,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setClouds(CloudInfo.createNCD());
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD";
 
     assertStringStarts(exp, act);
@@ -292,7 +292,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setClouds(CloudInfo.createWithVV((Integer) 300));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK VV300";
 
     assertStringStarts(exp, act);
@@ -303,7 +303,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setClouds(CloudInfo.createWithUnknownVV());
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK VV///";
 
     assertStringStarts(exp, act);
@@ -322,7 +322,7 @@ public class EuropeFormatterTest {
     cms.add(CloudMass.createWithoutAmountAndBaseHeightTCU());
     ret.setClouds(CloudInfo.create(cms));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK SCT040 OVC070TCU FEW090CB OVC100/// BKN120 //////CB //////TCU";
 
     assertStringStarts(exp, act);
@@ -334,7 +334,7 @@ public class EuropeFormatterTest {
     ret.setTemperature(10);
     ret.setDewPoint(5);
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 10/05";
 
     assertStringStarts(exp, act);
@@ -346,7 +346,7 @@ public class EuropeFormatterTest {
     ret.setTemperature(-10);
     ret.setDewPoint(-5);
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD M10/M05";
 
     assertStringStarts(exp, act);
@@ -357,7 +357,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setPressureInHpa(995);
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q0995";
 
     assertStringStarts(exp, act);
@@ -370,7 +370,7 @@ public class EuropeFormatterTest {
             PhenomenaInfo.create(PhenomenaIntensity.moderate, PhenomenaType.RA, false),
             PhenomenaInfo.create(PhenomenaIntensity.moderate, new PhenomenaType[]{PhenomenaType.SN, PhenomenaType.SH}, false)));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 RERA RESNSH";
 
     assertStringStarts(exp, act);
@@ -381,7 +381,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setRunwayWindshears(RunwayWindshearInfo.createAllRWY());
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 WS ALL RWY";
 
     assertStringStarts(exp, act);
@@ -392,7 +392,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setRunwayWindshears(RunwayWindshearInfo.create(new ReadOnlyList("06", "24L", "24R")));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 WS R06 WS R24L WS R24R";
 
     assertStringStarts(exp, act);
@@ -405,7 +405,7 @@ public class EuropeFormatterTest {
             RunwayStatesInfo.createSNOCLO()
     );
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 SNOCLO";
 
     assertStringStarts(exp, act);
@@ -421,7 +421,7 @@ public class EuropeFormatterTest {
             RunwayStatesInfo.create(rs)
     );
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 R24/312352 R06/////99";
 
     assertStringStarts(exp, act);
@@ -432,7 +432,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     ret.setTrendInfo(TrendInfo.createNOSIG());
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 NOSIG";
 
     assertStringStarts(exp, act);
@@ -445,7 +445,7 @@ public class EuropeFormatterTest {
     tr.setType(TrendReportType.BECMG);
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 BECMG";
 
     assertStringStarts(exp, act);
@@ -459,7 +459,7 @@ public class EuropeFormatterTest {
     tr.setTime(TrendReportTimeInfo.create(TrendReportTimeIndication.AT, new HourMinute(12, 20)));
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO AT1220";
 
     assertStringStarts(exp, act);
@@ -473,7 +473,7 @@ public class EuropeFormatterTest {
     tr.setWind(WindInfo.create(new Heading(100), new Speed(12, SpeedUnit.KT)));
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO 10012KT";
 
     assertStringStarts(exp, act);
@@ -487,7 +487,7 @@ public class EuropeFormatterTest {
     tr.setVisibility(TrendVisibilityInfo.createCAVOK());
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO CAVOK";
 
     assertStringStarts(exp, act);
@@ -501,7 +501,7 @@ public class EuropeFormatterTest {
     tr.setVisibility(TrendVisibilityInfo.create(9999));
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO 9999";
 
     assertStringStarts(exp, act);
@@ -515,7 +515,7 @@ public class EuropeFormatterTest {
     tr.setPhenomenas(TrendPhenomenaInfo.createNSW());
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO NSW";
 
     assertStringStarts(exp, act);
@@ -529,7 +529,7 @@ public class EuropeFormatterTest {
     tr.setPhenomenas(TrendPhenomenaInfo.createEmpty());
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO";
 
     assertStringStarts(exp, act);
@@ -542,7 +542,7 @@ public class EuropeFormatterTest {
     tr.setType(TrendReportType.TEMPO);
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO";
 
     assertStringStarts(exp, act);
@@ -564,7 +564,7 @@ public class EuropeFormatterTest {
     tr.setPhenomenas(TrendPhenomenaInfo.create(lst));
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO RA VCBLSN SNSH";
 
     assertStringStarts(exp, act);
@@ -578,7 +578,7 @@ public class EuropeFormatterTest {
     tr.setClouds(TrendCloudInfo.createNSC());
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO NSC";
 
     assertStringStarts(exp, act);
@@ -592,7 +592,7 @@ public class EuropeFormatterTest {
     tr.setClouds(TrendCloudInfo.createWithVV(300));
     ret.setTrendInfo(TrendInfo.create(tr));
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO VV300";
 
     assertStringStarts(exp, act);
@@ -614,7 +614,7 @@ public class EuropeFormatterTest {
     ret.setTrendInfo(TrendInfo.create(tr));
     
 
-    String act = new EuropeFormatter().format(ret);
+    String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD 00/00 Q1013 TEMPO SCT040 OVC070TCU FEW090CB BKN120";
 
     assertStringStarts(exp, act);
