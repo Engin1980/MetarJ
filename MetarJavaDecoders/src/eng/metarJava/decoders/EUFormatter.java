@@ -17,9 +17,13 @@ import eng.metarJava.VisibilityInfo;
 import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.exceptions.FormatException;
 import eng.metarJava.decoders.fields.ReportField;
+import eng.metarJava.decoders.support.EUFormatterHelper;
+import eng.metarJava.decoders.support.GenericFormatterHelper;
+import eng.metarJava.enums.DistanceUnit;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.enums.PhenomenaType;
+import eng.metarJava.enums.PressureUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,18 +58,18 @@ public class EUFormatter implements Formatter {
       if (report.isAuto()) {
         sb.append("AUTO ");
       }
-      sb.append(formatWind(report, true));
-      sb.append(formatVisibility(report, true));
-      sb.append(formatRunwayVisibility(report, true));
-      sb.append(formatPhenomenas(report, true));
-      sb.append(formatClouds(report, true));
-      sb.append(formatTemperatureDewPoint(report, true));
-      sb.append(formatPressure(report, true));
-      sb.append(formatRecentPhenomenas(report, true));
-      sb.append(formatWindShears(report, true));
-      sb.append(formatRunwayStatesInfo(report, true));
+      sb.append(EUFormatterHelper.formatWind(report.getWind(), SpeedUnit.KT, true));
+      sb.append(EUFormatterHelper.formatVisibility(report.getVisibility(), true));
+      sb.append(EUFormatterHelper.formatRunwayVisibility(report.getRunwayVisualRanges(), true));
+      sb.append(GenericFormatterHelper.formatPhenomenas(report.getPhenomenas(), true));
+      sb.append(GenericFormatterHelper.formatClouds(report.getClouds(), true));
+      sb.append(GenericFormatterHelper.formatTemperatureDewPoint(report.getTemperature(), report.getDewPoint(), true));
+      sb.append(EUFormatterHelper.formatPressure(report.getPressure(PressureUnit.hpa), true));
+      sb.append(GenericFormatterHelper.formatRecentPhenomenas(report.getRecentPhenomenas(), true));
+      sb.append(GenericFormatterHelper.formatWindShears(report.getRunwayWindshears(), true));
+      sb.append(GenericFormatterHelper.formatRunwayStatesInfo(report.getRunwayStatesInfo(), true));
       sb.append(formatTrendInfo(report, true));
-      sb.append(formatRemark(report));
+      sb.append(GenericFormatterHelper.formatRemark(report.getRemark()));
     }
 
     while (sb.charAt(sb.length() - 1) == ' ') {
@@ -110,304 +114,6 @@ public class EUFormatter implements Formatter {
     return errors;
   }
 
-  private String formatWind(Report report, boolean appendSpace) {
-    WindInfo wi = report.getWind();
-
-    StringBuilder sb = new StringBuilder();
-
-    if (wi == null) {
-      sb.append("/////KT");
-    } else {
-      if (wi.isVariable()) {
-        sb.append("VRB");
-      } else {
-        sb.append(String.format("%03d", wi.getDirection().getValue()));
-      }
-      sb.append(String.format("%02d", wi.getSpeed().getIntValue(SpeedUnit.KT)));
-      if (wi.isGusting()) {
-        sb.append(String.format("G%02d", wi.getGustingSpeed().getIntValue(SpeedUnit.KT)));
-      }
-      sb.append("KT");
-      if (wi.isVariating()) {
-        sb.append(String.format(" %03dV%03d",
-                wi.getVariation().getFrom().getValue(),
-                wi.getVariation().getTo().getValue()));
-      }
-    }
-
-    if (appendSpace) {
-      sb.append(" ");
-    }
-    return sb.toString();
-  }
-
-  private String formatVisibility(Report report, boolean appendSpace) {
-    StringBuilder sb = new StringBuilder();
-    VisibilityInfo vi = report.getVisibility();
-
-    if (vi.isCAVOK()) {
-      sb.append("CAVOK");
-    } else {
-      double vis = (vi.getVisibilityInMeters() > 9999) ? 9999 : vi.getVisibilityInMeters();
-      sb.append(String.format("%04.0f", vis));
-      if (vi.isNoDirectionalVisibility()) {
-        sb.append("NDV");
-      }
-      if (vi.isVariating()) {
-        sb
-                .append(" ")
-                .append(String.format("%04d", vi.getVariability().getVisibilityInMeters()))
-                .append(vi.getVariability().getDirection().toString());
-      }
-    }
-
-    if (appendSpace) {
-      sb.append(" ");
-    }
-    return sb.toString();
-  }
-
-  private String formatRunwayVisibility(Report report, boolean appendSpace) {
-    if (report.getRunwayVisualRanges() == null || report.getRunwayVisualRanges().isEmpty()) {
-      return "";
-    }
-
-    StringBuilder sb = new StringBuilder();
-    boolean isFirst = true;
-
-    for (RunwayVisualRange rvr : report.getRunwayVisualRanges()) {
-      if (isFirst) {
-        isFirst = false;
-      } else {
-        sb.append(" ");
-      }
-
-      sb.append("R")
-              .append(rvr.getRunwayDesignator())
-              .append("/");
-      if (rvr.isVariating()) {
-        sb.append(String.format("%04.0fV%04.0f",
-                rvr.getVariatingVisibilityInMeters().getFrom(),
-                rvr.getVariatingVisibilityInMeters().getTo()));
-      } else {
-        sb.append(String.format("%04.0f", rvr.getVisibilityInMeters()));
-      }
-
-    }
-
-    if (appendSpace) {
-      sb.append(" ");
-    }
-    return sb.toString();
-  }
-
-  private String formatPhenomenas(Report report, boolean appendSpace) {
-    if (report.getPhenomenas() == null || report.getPhenomenas().isEmpty()) {
-      return "";
-    }
-    boolean isFirst = true;
-
-    StringBuilder sb = new StringBuilder();
-    for (PhenomenaInfo p : report.getPhenomenas()) {
-      if (isFirst) {
-        isFirst = false;
-      } else {
-        sb.append(" ");
-      }
-
-      switch (p.getIntensity()) {
-        case heavy:
-          sb.append("+");
-          break;
-        case light:
-          sb.append("-");
-          break;
-      }
-      if (p.isInVicinity()) {
-        sb.append("VC");
-      }
-      for (PhenomenaType type : p.getTypes()) {
-        sb.append(type.toString());
-      }
-    }
-
-    if (appendSpace) {
-      sb.append(" ");
-    }
-    return sb.toString();
-  }
-
-  private String formatClouds(Report report, boolean appendSpace) {
-    boolean isFirst = true;
-
-    StringBuilder sb = new StringBuilder();
-    CloudInfo ci = report.getClouds();
-    if (ci.isNCD()) {
-      sb.append("NCD");
-    } else if (ci.isNSC()) {
-      sb.append("NSC");
-    } else if (ci.isVerticalVisibility()) {
-      if (ci.getVerticalVisibilityInHundredFeet() == null) {
-        sb.append("VV///");
-      } else {
-        sb.append("VV").append(String.format("%03d", ci.getVerticalVisibilityInHundredFeet()));
-      }
-    } else {
-      for (CloudMass cm : ci.getMasses()) {
-        if (isFirst) {
-          isFirst = false;
-        } else {
-          sb.append(" ");
-        }
-        if (cm.isAmountAndBaseHeightKnown()) {
-          sb
-                  .append(cm.getAmount().toString())
-                  .append(String.format("%03d", cm.getBaseHeightHundredFeet()));
-
-        } else {
-          sb.append("//////");
-        }
-        switch (cm.getSignificantFlag()) {
-          case CB:
-            sb.append("CB");
-            break;
-          case TCU:
-            sb.append("TCU");
-            break;
-          case undetected:
-            sb.append("///");
-            break;
-        }
-      }
-    }
-
-    if (appendSpace && sb.length() > 0) {
-      sb.append(" ");
-    }
-    return sb.toString();
-  }
-
-  private String formatTemperatureDewPoint(Report report, boolean appendSpace) {
-    StringBuilder sb = new StringBuilder();
-    if (report.getTemperature() < 0) {
-      sb.append("M");
-    }
-    sb.append(String.format("%02d", Math.abs(report.getTemperature())));
-    sb.append("/");
-    if (report.getDewPoint() < 0) {
-      sb.append("M");
-    }
-    sb.append(String.format("%02d", Math.abs(report.getDewPoint())));
-
-    if (appendSpace) {
-      sb.append(" ");
-    }
-
-    return sb.toString();
-  }
-
-  private String formatPressure(Report report, boolean appendSpace) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("Q").append(String.format("%04.0f", report.getPressureInHpa()));
-
-    if (appendSpace) {
-      sb.append(" ");
-    }
-
-    return sb.toString();
-  }
-
-  private String formatRecentPhenomenas(Report report, boolean appendSpace) {
-    if (report.getRecentPhenomenas() == null || report.getRecentPhenomenas().isEmpty()) {
-      return "";
-    }
-    boolean isFirst = true;
-
-    StringBuilder sb = new StringBuilder();
-    for (PhenomenaInfo p : report.getRecentPhenomenas()) {
-      if (isFirst) {
-        isFirst = false;
-      } else {
-        sb.append(" ");
-      }
-
-      sb.append("RE");
-
-      // recent phenomena does not have intensity
-      if (p.isInVicinity()) {
-        sb.append("VC");
-      }
-      for (PhenomenaType type : p.getTypes()) {
-        sb.append(type.toString());
-      }
-    }
-
-    if (appendSpace) {
-      sb.append(" ");
-    }
-    return sb.toString();
-  }
-
-  private String formatWindShears(Report report, boolean appendSpace) {
-    if (report.getRunwayWindshears() == null || report.getRunwayWindshears().isEmpty()) {
-      return "";
-    }
-
-    RunwayWindshearInfo rwi = report.getRunwayWindshears();
-    StringBuilder sb = new StringBuilder();
-    boolean isFirst = true;
-    if (rwi.isAllRunways()) {
-      sb.append("WS ALL RWY");
-    } else {
-      for (String rd : rwi.getRunwayDesignators()) {
-        if (isFirst) {
-          isFirst = false;
-        } else {
-          sb.append(" ");
-        }
-        sb.append("WS R").append(rd);
-      }
-    }
-
-    if (appendSpace) {
-      sb.append(" ");
-    }
-
-    return sb.toString();
-  }
-
-  private String formatRunwayStatesInfo(Report report, boolean appendSpace) {
-    RunwayStatesInfo rsi = report.getRunwayStatesInfo();
-    if (rsi == null || rsi.isEmpty()) {
-      return "";
-    }
-
-    boolean isFirst = true;
-    StringBuilder sb = new StringBuilder();
-    if (rsi.isSnowClosed()) {
-      sb.append("SNOCLO");
-    } else {
-      for (RunwayState rs : rsi.getRunwayStates()) {
-        if (isFirst) {
-          isFirst = false;
-        } else {
-          sb.append(" ");
-        }
-
-        sb.append("R").append(rs.getDesignator()).append("/");
-        sb.append(rs.getDeposit());
-        sb.append(rs.getContamination());
-        sb.append(rs.getDepositDepth());
-        sb.append(rs.getBrakingAction());
-      }
-    }
-
-    if (appendSpace) {
-      sb.append(" ");
-    }
-
-    return sb.toString();
-  }
 
   private String formatTrendInfo(Report report, boolean appendSpace) {
     if (report.getTrendInfo() == null) {
@@ -436,13 +142,7 @@ public class EUFormatter implements Formatter {
     return sb.toString();
   }
 
-  private String formatRemark(Report report) {
-    if (report.getRemark() != null) {
-      return "RMK " + report.getRemark();
-    } else {
-      return "";
-    }
-  }
+
 
   private String formatTrend(TrendReport trendReport, boolean appendSpace) {
     StringBuilder sb = new StringBuilder();

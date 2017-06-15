@@ -4,6 +4,7 @@ import eng.metarJava.decoders.support.USParserHelper;
 import eng.metarJava.Report;
 import eng.metarJava.TrendInfo;
 import eng.metarJava.TrendReport;
+import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.support.GenericParserHelper;
 import eng.metarJava.decoders.support.ReportLine;
 import eng.metarJava.decoders.support.TemperatureAndDewPoint;
@@ -13,7 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Parses text report into an instance of {@linkplain eng.metarJava.Report } using US format. To parse a report,
+ * use {@linkplain #parse(java.lang.String) } method. <br><br>
+ * Specific info:<br>
+ * <ul>
+ * <li>{@link eng.metarJava.Report#getType() Type} prefix is mandatory.</li>
+ * <li>{@link eng.metarJava.Report#getWind() Wind} is optional a can be null.</li>
+ * <li>{@link eng.metarJava.Report#getVisibility() Visibility } uses statute miles.</li>
+ * <li>{@link eng.metarJava.Report#getRunwayVisualRanges()  Runway-visual-range } uses feet as an distnace. It is limited to minimal 1000FT (represented as M1000 in the report) and maxima of 6000FT
+ * (represented as P6000FT in the report).</li>
+ * <li>{@link eng.metarJava.Report#getClouds() Clouds } cannot have CAVOK, have SKC instead of NCD. Can have unlimited number of cloud layers.</li>
+ * <li>{@link eng.metarJava.Report#getPressure(eng.metarJava.enums.PressureUnit) Pressure } is in inHg</li>
+ * </ul>
  * @author Marek Vajgl
  */
 public class USParser implements Parser {
@@ -36,7 +48,7 @@ public class USParser implements Parser {
     }
 
     ret.setAuto(GenericParserHelper.decodeAuto(rl));
-    ret.setWind(GenericParserHelper.decodeWind(rl, true));
+    ret.setWind(GenericParserHelper.decodeWind(rl, false));
     ret.setVisibility(USParserHelper.decodeVisibility(rl));
     ret.setRunwayVisualRanges(USParserHelper.decodeRunwayVisualRanges(rl));
     ret.setPhenomenas(GenericParserHelper.decodePhenomenas(rl));
@@ -57,45 +69,4 @@ public class USParser implements Parser {
 
     return ret;
   }
-  
-
-  private TrendInfo decodeTrendInfo(ReportLine rl, boolean isMandatory) {
-    if (GenericParserHelper.decodeFixedString(rl, "NOSIG")) {
-      return TrendInfo.createNOSIG();
-    } else {
-      List<TrendReport> reports = new ArrayList<>();
-      TrendReport report = decodeTrendReport(rl);
-      while (report != null) {
-        reports.add(report);
-        report = decodeTrendReport(rl);
-      }
-      if (!isMandatory && reports.isEmpty()) {
-        return null;
-      } else {
-        return TrendInfo.create(reports);
-      }
-    }
-  }
-
-  static TrendReport decodeTrendReport(ReportLine rl) {
-    TrendReport ret;
-    if (GenericParserHelper.decodeFixedString(rl, "BECMG")) {
-      ret = new TrendReport();
-      ret.setType(TrendReportType.BECMG);
-
-    } else if (GenericParserHelper.decodeFixedString(rl, "TEMPO")) {
-      ret = new TrendReport();
-      ret.setType(TrendReportType.TEMPO);
-    } else {
-      return null;
-    }
-
-    ret.setTime(GenericParserHelper.decodeTrendReportTime(rl, false));
-    ret.setWind(GenericParserHelper.decodeWind(rl, false));
-    ret.setVisibility(GenericParserHelper.decodeTrendVisibility(rl, false));
-    ret.setPhenomenas(GenericParserHelper.decodeTrendPhenomenas(rl));
-    ret.setClouds(GenericParserHelper.decodeTrendCloud(rl));
-    return ret;
-  }
-  
 }

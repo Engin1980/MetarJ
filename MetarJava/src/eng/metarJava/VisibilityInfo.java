@@ -24,7 +24,8 @@ public class VisibilityInfo extends TrendVisibilityInfo {
   
   /**
    * Creates new visibility info by distance in meters.
-   * @param visibilityInMeters
+   * @param visibility visibility in unit specified by second parameter
+   * @param unit distance unit of visibility
    * @return 
    */
   public static VisibilityInfo create(double visibility, DistanceUnit unit){

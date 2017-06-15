@@ -96,24 +96,31 @@ public class USParserHelper extends ParserHelper {
   public static RunwayVisualRange decodeRunwayVisualRange(ReportLine rl) {
     RunwayVisualRange ret;
 
-    String regex = "^R(\\d{2}[RLC]?)\\/(\\d{4})(V(\\d{4}))?FT";
+    String regex = "^R(\\d{2}[RLC]?)\\/(M)?(\\d{4})(V(P)?(\\d{4}))?FT";
     final Pattern pattern = Pattern.compile(regex);
     final Matcher matcher = pattern.matcher(rl.getPre());
     if (matcher.find()) {
       String rwy = matcher.group(1);
-      int visInFt = groupToInt(matcher.group(2));
-      Integer varVisInFt;
-      if (groupExist(matcher.group(3))) {
-        varVisInFt = groupToInt(matcher.group(4));
+      boolean isUnderMinimal = groupExist(matcher.group(2));
+      double vis = groupToInt(matcher.group(3));
+      Double varVis;
+      boolean isOverMaximal = false;
+      if (groupExist(matcher.group(4))) {
+        isOverMaximal = groupExist(matcher.group(5));
+        varVis = (double) groupToInt(matcher.group(6));
       } else {
-        varVisInFt = null;
+        varVis = null;
       }
-      double visInM = DistanceUnit.convert(visInFt, DistanceUnit.feet, DistanceUnit.meters);
-      if (varVisInFt == null) {
-        ret = RunwayVisualRange.create(rwy, visInM);
+      
+      if (isUnderMinimal)
+        vis = 900d; // minimal value is 1000;
+      
+      if (varVis == null) {
+        ret = RunwayVisualRange.create(rwy, vis, DistanceUnit.feet);
       } else {
-        double varVisInM = DistanceUnit.convert(varVisInFt, DistanceUnit.feet, DistanceUnit.meters);
-        ret = RunwayVisualRange.create(rwy, new Variation<>(visInM, varVisInM));
+        if (isOverMaximal)
+          varVis = 7000d; // maximal value is 6000;
+        ret = RunwayVisualRange.create(rwy, new Variation<>(vis, varVis), DistanceUnit.feet);
       }
 
       rl.move(matcher.group(0).length(), true);

@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import eng.metarJava.decoders.Parser;
+import eng.metarJava.decoders.USParser;
 
 /**
  *
@@ -52,10 +53,9 @@ public class MetarTesting {
   private static void runCheck(String inFile, String outFile,
           eng.metarJava.downloaders.Downloader downloader,
           eng.metarJava.decoders.Parser parser,
-          eng.metarJava.decoders.Formatter formatter) {
+          eng.metarJava.decoders.Formatter formatter, int maxErrorCount) {
     List<String> codes;
     List<String> errMetars = new ArrayList<>();
-    int MAX_ERROR_COUNT = 5;
     try {
       codes = java.nio.file.Files.readAllLines(Paths.get(inFile));
     } catch (IOException ex) {
@@ -70,7 +70,7 @@ public class MetarTesting {
     for (String code : codes) {
       r = null;
       e = null;
-      if (errMetars.size() >= MAX_ERROR_COUNT) {
+      if (errMetars.size() >= maxErrorCount) {
         break;
       }
       System.out.println(code);
@@ -114,12 +114,12 @@ public class MetarTesting {
   }
 
   private static void runFileTest() {
-    String inFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_E.txt";
-    String outFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_E_fails.txt";
+    String inFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_K.txt";
+    String outFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_K_fails.txt";
     Downloader d = new NoaaGovDownloader();
-    Parser p = new GenericParser();
-    Formatter f = new EUFormatter();
-    runCheck(inFile, outFile, d, p, f);
+    Parser p = new USParser();
+    Formatter f = null; //new EUFormatter();
+    runCheck(inFile, outFile, d, p, f, 10);
   }
 
 }

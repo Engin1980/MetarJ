@@ -1,5 +1,6 @@
 package eng.metarJava;
 
+import eng.metarJava.enums.DistanceUnit;
 import eng.metarJava.exception.NonsenseRequestException;
 
 /**
@@ -44,6 +45,16 @@ public class TrendVisibilityInfo {
       throw new NonsenseRequestException("Unable to get visibility distance for CAVOK visibility.");
     }
     return visibilityInMeters;
+  }
+  
+  /**
+   * Gets visibility in a specified unit.
+   * @param unit unit in which value should be returned
+   * @return value converted to specified unit
+   */
+  public double getVisibility(DistanceUnit unit){
+    double ret = DistanceUnit.convert(this.visibilityInMeters, DistanceUnit.meters, unit);
+    return ret;
   }
 
   /**
