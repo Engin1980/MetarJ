@@ -23,7 +23,7 @@ import java.util.List;
  * <li>{@link eng.metarJava.Report#getVisibility() Visibility } uses statute miles.</li>
  * <li>{@link eng.metarJava.Report#getRunwayVisualRanges()  Runway-visual-range } uses feet as an distnace. It is limited to minimal 1000FT (represented as M1000 in the report) and maxima of 6000FT
  * (represented as P6000FT in the report).</li>
- * <li>{@link eng.metarJava.Report#getClouds() Clouds } cannot have CAVOK, have SKC instead of NCD. Can have unlimited number of cloud layers.</li>
+ * <li>{@link eng.metarJava.Report#getClouds() Clouds } cannot have CAVOK, have CLR instead of NCD. Can have unlimited number of cloud layers.</li>
  * <li>{@link eng.metarJava.Report#getPressure(eng.metarJava.enums.PressureUnit) Pressure } is in inHg</li>
  * </ul>
  * @author Marek Vajgl
