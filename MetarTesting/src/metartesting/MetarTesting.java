@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import eng.metarJava.decoders.Parser;
+import eng.metarJava.decoders.USFormatter;
 import eng.metarJava.decoders.USParser;
 
 /**
@@ -118,7 +119,7 @@ public class MetarTesting {
     String outFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_K_fails.txt";
     Downloader d = new NoaaGovDownloader();
     Parser p = new USParser();
-    Formatter f = null; //new EUFormatter();
+    Formatter f = new USFormatter(); //new EUFormatter();
     runCheck(inFile, outFile, d, p, f, 10);
   }
 

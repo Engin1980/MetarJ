@@ -67,7 +67,7 @@ public class USFormatterHelper {
     double restPart = value - intPart;
 
     if (intPart > 0 && (restPart == 0 || intPart > 3)) {
-      sb.append(intPart + "SM");
+      sb.append(String.format("%.0fSM", intPart));
     } else if (intPart > 0) {
       sb.append(intPart + " ");
     }
@@ -164,8 +164,8 @@ public class USFormatterHelper {
   
   public static String formatPressure(double pressureInInHg, boolean appendSpace) {
     StringBuilder sb = new StringBuilder();
-    sb.append("A").append(String.format("%04.2f", pressureInInHg));
-
+    int tmp = (int) Math.abs(pressureInInHg * 100);
+    sb.append("A").append(String.format("%04d", tmp));
     if (appendSpace) {
       sb.append(" ");
     }
