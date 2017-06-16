@@ -10,7 +10,7 @@ import eng.metarJava.TrendReportTimeInfo;
 import eng.metarJava.TrendVisibilityInfo;
 import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.exceptions.FormatException;
-import eng.metarJava.decoders.fields.ReportField;
+import eng.metarJava.decoders.support.ReportField;
 import eng.metarJava.decoders.support.EUFormatterHelper;
 import eng.metarJava.decoders.support.GenericFormatterHelper;
 import eng.metarJava.enums.ReportType;

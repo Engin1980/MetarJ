@@ -1,4 +1,4 @@
-package eng.metarJava.decoders.fields;
+package eng.metarJava.decoders.support;
 
 /**
  *

@@ -1,6 +1,6 @@
 package eng.metarJava.decoders.exceptions;
 
-import eng.metarJava.decoders.fields.ReportField;
+import eng.metarJava.decoders.support.ReportField;
 
 /**
  *

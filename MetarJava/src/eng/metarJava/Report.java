@@ -6,7 +6,7 @@
 package eng.metarJava;
 
 import eng.metarJava.enums.*;
-import eng.metarJava.exception.NullArgumentException;
+import eng.metarJava.exceptions.NullArgumentException;
 import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.ReadOnlyList;
 import eng.objectTreeBuilder.attributes.DisplayLabelIndex;

@@ -10,7 +10,6 @@ import static eng.metarJava.decoders.support.ParserHelper.groupExist;
 import static eng.metarJava.decoders.support.ParserHelper.groupToInt;
 import eng.metarJava.decoders.exceptions.MissingFieldException;
 import eng.metarJava.decoders.exceptions.ParseException;
-import eng.metarJava.decoders.fields.ReportField;
 import static eng.metarJava.decoders.support.GenericParserHelper.decodeFixedString;
 import static eng.metarJava.decoders.support.ParserHelper.groupExist;
 import static eng.metarJava.decoders.support.ParserHelper.groupToInt;

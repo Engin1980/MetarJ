@@ -1,4 +1,4 @@
 /**
  * Represents exceptions used in eng.metarJava.* classes.
  */
-package eng.metarJava.exception;
+package eng.metarJava.exceptions;

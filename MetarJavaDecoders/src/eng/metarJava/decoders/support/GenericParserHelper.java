@@ -14,7 +14,6 @@ import eng.metarJava.VisibilityInfo;
 import eng.metarJava.VisibilityVariability;
 import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.exceptions.MissingFieldException;
-import eng.metarJava.decoders.fields.ReportField;
 import eng.metarJava.enums.CloudAmount;
 import eng.metarJava.enums.Direction;
 import eng.metarJava.enums.ReportType;

@@ -1,4 +1,4 @@
-package eng.metarJava.exception;
+package eng.metarJava.exceptions;
 
 /**
  * Raised when null value is passed into the function as a parameter.

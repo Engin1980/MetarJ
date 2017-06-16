@@ -1,7 +1,7 @@
 package eng.metarJava;
 
-import eng.metarJava.exception.NonsenseRequestException;
-import eng.metarJava.exception.NullArgumentException;
+import eng.metarJava.exceptions.NonsenseRequestException;
+import eng.metarJava.exceptions.NullArgumentException;
 import eng.metarJava.support.ReadOnlyList;
 import java.util.Arrays;
 import java.util.List;

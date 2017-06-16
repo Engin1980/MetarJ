@@ -1,6 +1,6 @@
 package eng.metarJava;
 
-import eng.metarJava.exception.NullArgumentException;
+import eng.metarJava.exceptions.NullArgumentException;
 import eng.metarJava.support.ReadOnlyList;
 import java.util.List;
 

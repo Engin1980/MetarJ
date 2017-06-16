@@ -6,7 +6,6 @@ import eng.metarJava.RunwayVisualRange;
 import eng.metarJava.VisibilityInfo;
 import eng.metarJava.VisibilityVariability;
 import eng.metarJava.decoders.exceptions.MissingFieldException;
-import eng.metarJava.decoders.fields.ReportField;
 import static eng.metarJava.decoders.support.GenericParserHelper.decodeFixedString;
 import static eng.metarJava.decoders.support.GenericParserHelper.groupToInt;
 import eng.metarJava.decoders.support.ReportLine;

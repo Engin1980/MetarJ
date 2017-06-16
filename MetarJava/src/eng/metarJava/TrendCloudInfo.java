@@ -1,7 +1,7 @@
 package eng.metarJava;
 
 import eng.metarJava.enums.CloudInfoSpecialStates;
-import eng.metarJava.exception.NonsenseRequestException;
+import eng.metarJava.exceptions.NonsenseRequestException;
 import eng.metarJava.support.ReadOnlyList;
 import java.util.List;
 

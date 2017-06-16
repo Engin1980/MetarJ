@@ -1,4 +1,4 @@
-package eng.metarJava.exception;
+package eng.metarJava.exceptions;
 
 /**
  * Exception used when a method (typically getXXX()) function is called when it is a nonsence to do so,

@@ -2,7 +2,7 @@ package eng.metarJava.decoders;
 
 import eng.metarJava.Report;
 import eng.metarJava.decoders.exceptions.FormatException;
-import eng.metarJava.decoders.fields.ReportField;
+import eng.metarJava.decoders.support.ReportField;
 import eng.metarJava.decoders.support.GenericFormatterHelper;
 import eng.metarJava.decoders.support.USFormatterHelper;
 import eng.metarJava.enums.PressureUnit;

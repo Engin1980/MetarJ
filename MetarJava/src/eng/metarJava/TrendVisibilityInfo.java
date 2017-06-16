@@ -1,7 +1,7 @@
 package eng.metarJava;
 
 import eng.metarJava.enums.DistanceUnit;
-import eng.metarJava.exception.NonsenseRequestException;
+import eng.metarJava.exceptions.NonsenseRequestException;
 
 /**
  *

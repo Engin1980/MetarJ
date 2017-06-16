@@ -1,6 +1,6 @@
 package eng.metarJava.support;
 
-import eng.metarJava.exception.NullArgumentException;
+import eng.metarJava.exceptions.NullArgumentException;
 
 /**
  * Represents variation of something.
