@@ -1,25 +1,10 @@
 package eng.metarJava.decoders;
 
-import eng.metarJava.CloudInfo;
-import eng.metarJava.CloudMass;
-import eng.metarJava.PhenomenaInfo;
 import eng.metarJava.Report;
-import eng.metarJava.RunwayState;
-import eng.metarJava.RunwayStatesInfo;
-import eng.metarJava.RunwayVisualRange;
-import eng.metarJava.RunwayWindshearInfo;
-import eng.metarJava.TrendCloudInfo;
-import eng.metarJava.TrendPhenomenaInfo;
-import eng.metarJava.TrendReport;
-import eng.metarJava.TrendReportTimeInfo;
-import eng.metarJava.TrendVisibilityInfo;
-import eng.metarJava.VisibilityInfo;
-import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.exceptions.FormatException;
 import eng.metarJava.decoders.fields.ReportField;
 import eng.metarJava.decoders.support.GenericFormatterHelper;
 import eng.metarJava.decoders.support.USFormatterHelper;
-import eng.metarJava.enums.PhenomenaType;
 import eng.metarJava.enums.PressureUnit;
 import eng.metarJava.enums.ReportType;
 import eng.metarJava.enums.SpeedUnit;

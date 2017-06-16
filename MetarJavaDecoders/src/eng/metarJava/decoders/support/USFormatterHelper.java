@@ -103,13 +103,15 @@ public class USFormatterHelper {
       }
     }
 
-    if (denominator / numerator == Math.floor(denominator / numerator)) {
-      denominator = denominator / numerator;
-      numerator = 1;
-    }
-    if (numerator == denominator) {
-      integer = integer + 1;
-      numerator = 0;
+    if (numerator != 0) {
+      if (denominator / numerator == Math.floor(denominator / numerator)) {
+        denominator = denominator / numerator;
+        numerator = 1;
+      }
+      if (numerator == denominator) {
+        integer = integer + 1;
+        numerator = 0;
+      }
     }
 
     if (numerator == 0 || integer >= 3) {
