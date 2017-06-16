@@ -27,6 +27,7 @@
                   <FlowPane>
                      <children>
                         <ComboBox fx:id="cmbParsers" prefWidth="150.0" />
+                        <CheckBox fx:id="chkStrict" mnemonicParsing="false" text="Is strict" />
                         <Button fx:id="btnDecode" mnemonicParsing="false" onAction="#btnDecode_onAction" text="Decode" />
                      </children>
                   </FlowPane>

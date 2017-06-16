@@ -9,7 +9,6 @@ import eng.metarJava.enums.*;
 import eng.metarJava.exception.NullArgumentException;
 import eng.metarJava.support.DayHourMinute;
 import eng.metarJava.support.ReadOnlyList;
-import eng.objectTreeBuilder.attributes.DisplayLabel;
 import eng.objectTreeBuilder.attributes.DisplayLabelIndex;
 import java.util.List;
 
@@ -198,8 +197,9 @@ public class Report {
   private VisibilityInfo visibility = VisibilityInfo.createCAVOK();
 
   /**
-   * Represents visibility information of report. Visibility is represented in meters, or CAVOK info when nothing to report. See
-   * {@linkplain VisibilityInfo}. Mandatory. Default value is CAVOK.
+   * Represents visibility information of report. Visibility is represented in meters, or CAVOK info when nothing to report. For US
+   * metars, where visibility is not mandatory and CAVOK is not reported, use CAVOK to represent that nothing interesting is here to be
+   * set. See {@linkplain VisibilityInfo}. Mandatory. Default value is CAVOK.
    *
    * @return
    */
@@ -349,8 +349,8 @@ public class Report {
   public double getPressureInHpa() {
     return pressureInHpa;
   }
-  
-  public double getPressure(PressureUnit unit){
+
+  public double getPressure(PressureUnit unit) {
     double ret = PressureUnit.convert(this.pressureInHpa, PressureUnit.hpa, unit);
     return ret;
   }
@@ -363,8 +363,8 @@ public class Report {
   public void setPressureInHpa(double pressureInHpa) {
     this.pressureInHpa = pressureInHpa;
   }
-  
-  public void setPressure(double value, PressureUnit unit){
+
+  public void setPressure(double value, PressureUnit unit) {
     this.pressureInHpa = PressureUnit.convert(value, unit, PressureUnit.hpa);
   }
 

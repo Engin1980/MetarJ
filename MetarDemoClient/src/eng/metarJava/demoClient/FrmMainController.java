@@ -14,7 +14,6 @@ import eng.metarJava.decoders.USParser;
 import eng.metarJava.downloaders.NoaaGovDownloader;
 import eng.objectTreeBuilder.ItemInfo;
 import eng.objectTreeBuilder.TreeNode;
-import java.awt.datatransfer.StringSelection;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -24,21 +23,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -102,6 +97,8 @@ public class FrmMainController implements Initializable {
   private TextField txtEncoded;
   @FXML
   private TextField txtPropertyOutFileName;
+  @FXML
+  private CheckBox chkStrict;
 
   /**
    * Initializes the controller class.
@@ -116,7 +113,7 @@ public class FrmMainController implements Initializable {
 
   @FXML
   public void btnDownload_onAction(ActionEvent event) {
-   clearException();
+    clearException();
     lblState.setText("... working");
     NoaaGovDownloader d = new NoaaGovDownloader();
     String icao = txtIcao.getText();
@@ -138,8 +135,8 @@ public class FrmMainController implements Initializable {
       txtEncoded.setText("Decode something first...");
     } else {
       eng.metarJava.decoders.Formatter fmt;
-      
-      switch (cmbFormatters.getSelectionModel().getSelectedIndex()){
+
+      switch (cmbFormatters.getSelectionModel().getSelectedIndex()) {
         case 0:
           fmt = new EUFormatter();
           break;
@@ -169,18 +166,20 @@ public class FrmMainController implements Initializable {
 
   @FXML
   protected void btnDecode_onAction(ActionEvent event) {
-clearException();
+    clearException();
     try {
       String metar = txtMetar.getText();
 
       eng.metarJava.decoders.Parser parser;
-      
-      switch(cmbParsers.getSelectionModel().getSelectedIndex()){
+            
+      boolean strict = chkStrict.isSelected();
+
+      switch (cmbParsers.getSelectionModel().getSelectedIndex()) {
         case 0:
           parser = new EUParser();
           break;
         case 1:
-          parser = new USParser();
+          parser = new USParser(strict);
           break;
         case 2:
           parser = new GenericParser();
@@ -371,10 +370,10 @@ clearException();
     return ret;
   }
 
-  private void clearException(){
+  private void clearException() {
     txtError.setText("");
   }
-  
+
   private void reportException(Throwable ex) {
     int indent = 0;
     StringBuilder sb = new StringBuilder();
@@ -407,7 +406,7 @@ clearException();
     }
 
     txtError.setText(sb.toString());
-    
+
     tabPane.getSelectionModel().select(2);
   }
 
@@ -451,7 +450,7 @@ clearException();
     TreeItem<ItemInfo> root = tvwG.getRoot();
     StringBuilder sb = new StringBuilder();
     appendItemToStringBuilder(root, sb, 0);
-    
+
     String fileName = txtPropertyOutFileName.getText();
 
     try {

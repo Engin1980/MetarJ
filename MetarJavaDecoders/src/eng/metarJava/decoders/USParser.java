@@ -2,16 +2,10 @@ package eng.metarJava.decoders;
 
 import eng.metarJava.decoders.support.USParserHelper;
 import eng.metarJava.Report;
-import eng.metarJava.TrendInfo;
-import eng.metarJava.TrendReport;
-import eng.metarJava.WindInfo;
 import eng.metarJava.decoders.support.GenericParserHelper;
 import eng.metarJava.decoders.support.ReportLine;
 import eng.metarJava.decoders.support.TemperatureAndDewPoint;
 import eng.metarJava.enums.PressureUnit;
-import eng.metarJava.enums.TrendReportType;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Parses text report into an instance of {@linkplain eng.metarJava.Report } using US format. To parse a report,
@@ -29,6 +23,20 @@ import java.util.List;
  * @author Marek Vajgl
  */
 public class USParser implements Parser {
+  
+  private final boolean strict;
+
+  public USParser(boolean strict) {
+    this.strict = strict;
+  }
+
+  public USParser() {
+    this(false);
+  }
+
+  public boolean isStrict() {
+    return strict;
+  }
   
   @Override
   public Report parse(String line) {
@@ -48,7 +56,7 @@ public class USParser implements Parser {
     }
 
     ret.setAuto(GenericParserHelper.decodeAuto(rl));
-    ret.setWind(GenericParserHelper.decodeWind(rl, false));
+    ret.setWind(GenericParserHelper.decodeWind(rl, strict));
     ret.setVisibility(USParserHelper.decodeVisibility(rl));
     ret.setRunwayVisualRanges(USParserHelper.decodeRunwayVisualRanges(rl));
     ret.setPhenomenas(GenericParserHelper.decodePhenomenas(rl));

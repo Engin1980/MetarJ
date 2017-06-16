@@ -28,8 +28,7 @@ public class USFormatterHelper {
   }
 
   /**
-   * Formats visibility. If CAVOK, fixed value as 15SM.
-   *
+   * Formats visibility. If CAVOK, returns empty string.
    * @param vi
    * @param appendSpace
    * @return
@@ -38,7 +37,7 @@ public class USFormatterHelper {
     StringBuilder sb = new StringBuilder();
 
     if (vi.isCAVOK()) {
-      sb.append("15SM");
+      return ""; // CAVOK means no significant visibility, and in US, in this case nothing is reported.
     } else {
       double vis = (vi.getVisibility(DistanceUnit.miles));
       String visAsString = convertDoubleValueToRational(vis);
@@ -183,6 +182,7 @@ public class USFormatterHelper {
         }
         sb.append(String.format("%04d", vis));
       }
+      sb.append("FT");
     }
 
     if (appendSpace) {

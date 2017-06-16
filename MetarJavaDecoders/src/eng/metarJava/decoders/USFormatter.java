@@ -16,7 +16,7 @@ import java.util.List;
  * @author Marek Vajgl
  */
 public class USFormatter implements Formatter {
-
+  
   @Override
   public String format(Report report) {
 

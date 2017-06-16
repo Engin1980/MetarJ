@@ -59,7 +59,7 @@ public class USParserHelper extends ParserHelper {
       rl.move(matcher.group(0).length(), true);
       ret = VisibilityInfo.create(visInSm, DistanceUnit.miles);
     } else {
-      throw new MissingFieldException(ReportField.visibility, rl.getPre(), rl.getPost());
+      ret = VisibilityInfo.createCAVOK();
     }
 
     return ret;
@@ -111,15 +111,16 @@ public class USParserHelper extends ParserHelper {
       } else {
         varVis = null;
       }
-      
-      if (isUnderMinimal)
+
+      if (isUnderMinimal) {
         vis = 900d; // minimal value is 1000;
-      
+      }
       if (varVis == null) {
         ret = RunwayVisualRange.create(rwy, vis, DistanceUnit.feet);
       } else {
-        if (isOverMaximal)
+        if (isOverMaximal) {
           varVis = 7000d; // maximal value is 6000;
+        }
         ret = RunwayVisualRange.create(rwy, new Variation<>(vis, varVis), DistanceUnit.feet);
       }
 
@@ -129,8 +130,8 @@ public class USParserHelper extends ParserHelper {
     }
     return ret;
   }
-  
-    public static CloudInfo decodeClouds(ReportLine rl) {
+
+  public static CloudInfo decodeClouds(ReportLine rl) {
     CloudInfo ret;
     if (decodeFixedString(rl, "NSC")) {
       ret = CloudInfo.createNSC();
