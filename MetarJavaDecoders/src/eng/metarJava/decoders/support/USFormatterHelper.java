@@ -219,7 +219,7 @@ public class USFormatterHelper {
 
   public static String formatPressure(double pressureInInHg, boolean appendSpace) {
     StringBuilder sb = new StringBuilder();
-    int tmp = (int) Math.abs(pressureInInHg * 100);
+    int tmp = (int) Math.round(pressureInInHg * 100);
     sb.append("A").append(String.format("%04d", tmp));
     if (appendSpace) {
       sb.append(" ");
