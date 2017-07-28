@@ -13,13 +13,13 @@ import static org.junit.Assert.*;
  *
  * @author Marek Vajgl
  */
-public class CanadaFormatterTest {
+public class USFormatterTest {
   
-    private Report generateReport() {
+private Report generateReport() {
     Report ret = new Report();
     ret.setType(ReportType.METAR);
     ret.setDayTime(new DayHourMinute(7, 15, 50));
-    ret.setIcao("CYVR");
+    ret.setIcao("KATL");
     ret.setWind(WindInfo.createCalm());
     ret.setVisibility(VisibilityInfo.createCAVOK());
     ret.setClouds(CloudInfo.createAsNoDetected());
@@ -32,22 +32,22 @@ public class CanadaFormatterTest {
     Report r = generateReport();
     CloudInfo ci = CloudInfo.createAsNoDetected();
     r.setClouds(ci);
-    Formatter f = new CanadaFormatter();
+    Formatter f = new USFormatter();
     
-    String exp = "METAR CYVR 071550Z 00000KT CLR 00/00 A2992";
+    String exp = "METAR KATL 071550Z 00000KT CLR 00/00 A2992";
     String act = f.format(r);
     
     assertEquals(exp, act);
   }
   
   @Test
-  public void testFormatSKC() {
+  public void testFormatNoClouds() {
     Report r = generateReport();
     CloudInfo ci = CloudInfo.createAsNoSignificant();
     r.setClouds(ci);
-    Formatter f = new CanadaFormatter();
+    Formatter f = new USFormatter();
 
-    String exp = "METAR CYVR 071550Z 00000KT SKC 00/00 A2992";
+    String exp = "METAR KATL 071550Z 00000KT 00/00 A2992";
     String act = f.format(r);
     
     assertEquals(exp, act);

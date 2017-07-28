@@ -70,8 +70,13 @@ public class CanadaFormatter implements Formatter {
 
   @Override
   public List<Exception> checkForErrors(Report report) {
-    List<Exception> ret = new ArrayList();
-    return ret;
+    List<Exception> errors = new ArrayList();
+
+    if (report.getClouds() == null) {
+      errors.add(new FormatException(ReportField.clouds, FormatException.ErrorType.IsNull, "Cloud cannot be empty."));
+    }
+
+    return errors;
   }
 
   private String formatClouds(CloudInfo clouds) {

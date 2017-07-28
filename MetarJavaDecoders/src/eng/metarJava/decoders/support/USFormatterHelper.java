@@ -204,7 +204,9 @@ public class USFormatterHelper {
     }
 
     StringBuilder sb = new StringBuilder();
-    if (ci.isNoDetected()) {
+    if (ci.isNoSignificant())
+      sb.append("");
+    else if (ci.isNoDetected()) {
       sb.append("CLR");
     } else {
       String tmp = GenericFormatterHelper.formatClouds(ci, false);

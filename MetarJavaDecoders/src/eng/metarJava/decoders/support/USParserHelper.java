@@ -124,18 +124,30 @@ public class USParserHelper extends ParserHelper {
     return ret;
   }
 
+  /**
+   * Decodes clouds from report line.
+   * @param rl
+   * @return Possibilities:
+   * <li>If empty, means no significant clouds are detected.</li>
+   * <li>If CLR, means no clouds detected below FL120.</li>
+   * <li>If VV..., means vertical visibility is announced.</li>
+   * <li>If OVC..., etc., means cloud layers are specified.</li>
+   */
   public static CloudInfo decodeClouds(ReportLine rl) {
     CloudInfo ret;
-    if (decodeFixedString(rl, "NSC")) {
-      ret = CloudInfo.createAsNoSignificant();
-    } else if (decodeFixedString(rl, "NCD") || decodeFixedString(rl, "CLR")) {
+    if (decodeFixedString(rl, "CLR")) {
       ret = CloudInfo.createAsNoDetected();
     } else if (rl.getPre().startsWith("VV")) {
       ret = GenericParserHelper.decodeCloudsWithVerticalVisibility(rl);
     } else {
       // cloud masses defined somehow
       List<CloudMass> cls = GenericParserHelper.decodeCloudAmounts(rl);
-      ret = CloudInfo.create(cls);
+
+      if (cls.size() == 0) {
+        ret = CloudInfo.createAsNoSignificant();
+      } else {
+        ret = CloudInfo.create(cls);
+      }
     }
     return ret;
   }
