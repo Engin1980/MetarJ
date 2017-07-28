@@ -6,6 +6,7 @@
 package metartesting;
 
 import eng.metarJava.Report;
+import eng.metarJava.decoders.CanadaParser;
 import eng.metarJava.decoders.EUFormatter;
 import eng.metarJava.decoders.Formatter;
 import eng.metarJava.decoders.GenericParser;
@@ -115,10 +116,10 @@ public class MetarTesting {
   }
 
   private static void runFileTest() {
-    String inFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_K.txt";
-    String outFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_K_fails.txt";
+    String inFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_CY.txt";
+    String outFile = "C:\\Users\\Marek Vajgl\\Documents\\NetBeansProjects\\_MetarJ\\MetarTesting\\src\\other\\ICAO_CY_fails.txt";
     Downloader d = new NoaaGovDownloader();
-    Parser p = new USParser();
+    Parser p = new CanadaParser();
     Formatter f = new USFormatter(); //new EUFormatter();
     runCheck(inFile, outFile, d, p, f, 10);
   }

@@ -108,9 +108,9 @@ public class GenericFormatterHelper {
     }
 
     StringBuilder sb = new StringBuilder();
-    if (ci.isNCD()) {
+    if (ci.isNoDetected()) {
       sb.append("NCD");
-    } else if (ci.isNSC()) {
+    } else if (ci.isNoSignificant()) {
       sb.append("NSC");
     } else if (ci.isVerticalVisibility()) {
       if (ci.getVerticalVisibilityInHundredFeet() == null) {

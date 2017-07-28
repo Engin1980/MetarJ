@@ -10,11 +10,11 @@ public enum CloudInfoSpecialStates {
    */
   none,
   /**
-   * No significant clouds.
+   * No significant clouds. Used when none or no significant clouds are present over area.
    */
-  NSC,
+  noSignificantClouds,
   /**
-   * No clouds detected or CLR for US metars.
+   * No clouds detected. Used when no clouds are detected by automated stations.
    */
-  NCD
+  noDetectedClouds
 }

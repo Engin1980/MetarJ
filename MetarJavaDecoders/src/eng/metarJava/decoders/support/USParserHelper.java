@@ -3,19 +3,13 @@ package eng.metarJava.decoders.support;
 import eng.metarJava.CloudInfo;
 import eng.metarJava.CloudMass;
 import eng.metarJava.RunwayVisualRange;
-import eng.metarJava.decoders.support.ParserHelper;
 import eng.metarJava.VisibilityInfo;
-import eng.metarJava.VisibilityVariability;
-import static eng.metarJava.decoders.support.ParserHelper.groupExist;
-import static eng.metarJava.decoders.support.ParserHelper.groupToInt;
 import eng.metarJava.decoders.exceptions.MissingFieldException;
 import eng.metarJava.decoders.exceptions.ParseException;
 import static eng.metarJava.decoders.support.GenericParserHelper.decodeFixedString;
 import static eng.metarJava.decoders.support.ParserHelper.groupExist;
 import static eng.metarJava.decoders.support.ParserHelper.groupToInt;
-import eng.metarJava.decoders.support.ReportLine;
 import eng.metarJava.enums.DistanceUnit;
-import eng.metarJava.enums.PressureUnit;
 import eng.metarJava.support.Variation;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,9 +127,9 @@ public class USParserHelper extends ParserHelper {
   public static CloudInfo decodeClouds(ReportLine rl) {
     CloudInfo ret;
     if (decodeFixedString(rl, "NSC")) {
-      ret = CloudInfo.createNSC();
+      ret = CloudInfo.createAsNoSignificant();
     } else if (decodeFixedString(rl, "NCD") || decodeFixedString(rl, "CLR")) {
-      ret = CloudInfo.createNCD();
+      ret = CloudInfo.createAsNoDetected();
     } else if (rl.getPre().startsWith("VV")) {
       ret = GenericParserHelper.decodeCloudsWithVerticalVisibility(rl);
     } else {

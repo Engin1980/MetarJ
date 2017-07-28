@@ -1,43 +1,29 @@
 package eng.metarJava.decoders;
 
-import eng.metarJava.decoders.support.USParserHelper;
+import eng.metarJava.CloudInfo;
 import eng.metarJava.Report;
+import eng.metarJava.decoders.support.EUParserHelper;
 import eng.metarJava.decoders.support.GenericParserHelper;
 import eng.metarJava.decoders.support.ReportLine;
 import eng.metarJava.decoders.support.TemperatureAndDewPoint;
+import eng.metarJava.decoders.support.USParserHelper;
 import eng.metarJava.enums.PressureUnit;
 
 /**
- * Parses text report into an instance of {@linkplain eng.metarJava.Report } using US format. To parse a report,
+ * Parses text report into an instance of {@linkplain eng.metarJava.Report } using Canada format. To parse a report,
  * use {@linkplain #parse(java.lang.String) } method. <br><br>
- * Specific info:<br>
+ * Specific info: very similar to {@link eng.metarJava.USParser US parser}, see its description for details. Differences
+ * from US parser:<br>
  * <ul>
- * <li>{@link eng.metarJava.Report#getType() Type} prefix is mandatory.</li>
- * <li>{@link eng.metarJava.Report#getWind() Wind} is optional a can be null.</li>
- * <li>{@link eng.metarJava.Report#getVisibility() Visibility } uses statute miles.</li>
- * <li>{@link eng.metarJava.Report#getRunwayVisualRanges()  Runway-visual-range } uses feet as an distnace. It is limited to minimal 1000FT (represented as M1000 in the report) and maxima of 6000FT
- * (represented as P6000FT in the report).</li>
- * <li>{@link eng.metarJava.Report#getClouds() Clouds } cannot have CAVOK (but have SKC instead), cannot have NCD (but have CLR instead). Can have unlimited number of cloud layers.</li>
- * <li>{@link eng.metarJava.Report#getPressure(eng.metarJava.enums.PressureUnit) Pressure } is in inHg</li>
+ * <li></li>
+ * <li>Pressure should be in hPa according to the specification, however in real life inHq is used, so this parser uses it too.</li>
+ * <li>Clouds can be defined as CLR what means "no clouds detected" ({@link eng.metarJava.CloudInfo#isNoDetected() NCD}) when no clouds
+ * are detected below FL100 on automated stations, or SKC when there are "no significant clouds" ({@link eng.metarJava.CloudInfo#isNSC() NSC}).
  * </ul>
  * @author Marek Vajgl
  */
-public class USParser implements Parser {
-  
-  private final boolean strict;
+public class CanadaParser implements Parser {
 
-  public USParser(boolean strict) {
-    this.strict = strict;
-  }
-
-  public USParser() {
-    this(false);
-  }
-
-  public boolean isStrict() {
-    return strict;
-  }
-  
   @Override
   public Report parse(String line) {
     /**
@@ -56,11 +42,14 @@ public class USParser implements Parser {
     }
 
     ret.setAuto(GenericParserHelper.decodeAuto(rl));
-    ret.setWind(GenericParserHelper.decodeWind(rl, strict));
+    ret.setWind(GenericParserHelper.decodeWind(rl, true));
     ret.setVisibility(USParserHelper.decodeVisibility(rl));
     ret.setRunwayVisualRanges(USParserHelper.decodeRunwayVisualRanges(rl));
     ret.setPhenomenas(GenericParserHelper.decodePhenomenas(rl));
-    ret.setClouds(USParserHelper.decodeClouds(rl));
+    
+    // specific
+    decodeClouds(rl, ret);    
+    
     TemperatureAndDewPoint tdp = GenericParserHelper.decodeTemperatureAndDewPoint(rl);
     ret.setTemperature(tdp.temperature);
     ret.setDewPoint(tdp.dewPoint);
@@ -77,4 +66,17 @@ public class USParser implements Parser {
 
     return ret;
   }
+
+  private void decodeClouds(ReportLine rl, Report ret) {
+    CloudInfo ci;
+    if (rl.getPre().startsWith("SKC"))
+    {
+      ci = CloudInfo.createAsNoSignificant();
+      rl.move(3, true);
+    } else {
+      ci = USParserHelper.decodeClouds(rl);
+    }
+    ret.setClouds(ci);
+  }
+  
 }

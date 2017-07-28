@@ -272,7 +272,7 @@ public class EUFormatter implements Formatter {
     TrendCloudInfo ci = tr.getClouds();
     if (ci == null || ci.isEmpty()) return "";
     
-    if (ci.isNSC()) {
+    if (ci.isNoSignificant()) {
       sb.append("NSC");
     } else if (ci.isVerticalVisibility()) {
       if (ci.getVerticalVisibilityInHundredFeet() == null) {

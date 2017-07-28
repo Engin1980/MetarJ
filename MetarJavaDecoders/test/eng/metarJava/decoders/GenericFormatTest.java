@@ -297,8 +297,8 @@ public class GenericFormatTest {
 
     assertNotNull(ci);
     assertTrue(ci.isVerticalVisibility());
-    assertFalse(ci.isNCD());
-    assertFalse(ci.isNSC());
+    assertFalse(ci.isNoDetected());
+    assertFalse(ci.isNoSignificant());
     assertFalse(ci.isSpecialState());
     assertFalse(ci.isWithMasses());
 
@@ -314,8 +314,8 @@ public class GenericFormatTest {
 
     assertNotNull(ci);
     assertFalse(ci.isVerticalVisibility());
-    assertFalse(ci.isNCD());
-    assertTrue(ci.isNSC());
+    assertFalse(ci.isNoDetected());
+    assertTrue(ci.isNoSignificant());
     assertTrue(ci.isSpecialState());
     assertFalse(ci.isWithMasses());
   }
@@ -328,8 +328,8 @@ public class GenericFormatTest {
 
     assertNotNull(ci);
     assertFalse(ci.isVerticalVisibility());
-    assertTrue(ci.isNCD());
-    assertFalse(ci.isNSC());
+    assertTrue(ci.isNoDetected());
+    assertFalse(ci.isNoSignificant());
     assertTrue(ci.isSpecialState());
     assertFalse(ci.isWithMasses());
   }
@@ -342,8 +342,8 @@ public class GenericFormatTest {
 
     assertNotNull(ci);
     assertFalse(ci.isVerticalVisibility());
-    assertFalse(ci.isNCD());
-    assertFalse(ci.isNSC());
+    assertFalse(ci.isNoDetected());
+    assertFalse(ci.isNoSignificant());
     assertFalse(ci.isSpecialState());
     assertNotNull(ci.getMasses());
     assertEquals(1, ci.getMasses().size());
@@ -361,8 +361,8 @@ public class GenericFormatTest {
 
     assertNotNull(ci);
     assertFalse(ci.isVerticalVisibility());
-    assertFalse(ci.isNCD());
-    assertFalse(ci.isNSC());
+    assertFalse(ci.isNoDetected());
+    assertFalse(ci.isNoSignificant());
     assertFalse(ci.isSpecialState());
     assertNotNull(ci.getMasses());
     assertEquals(3, ci.getMasses().size());

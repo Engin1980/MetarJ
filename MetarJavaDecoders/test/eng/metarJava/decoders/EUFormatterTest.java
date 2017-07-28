@@ -34,20 +34,16 @@ import eng.metarJava.support.ReadOnlyList;
 import eng.metarJava.support.Speed;
 import eng.metarJava.support.Variation;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author Marek Vajgl
  */
-public class EuropeFormatterTest {
+public class EUFormatterTest {
 
-  public EuropeFormatterTest() {
+  public EUFormatterTest() {
   }
 
   private Report generateReport() {
@@ -57,7 +53,7 @@ public class EuropeFormatterTest {
     ret.setIcao("LKMT");
     ret.setWind(WindInfo.createCalm());
     ret.setVisibility(VisibilityInfo.createCAVOK());
-    ret.setClouds(CloudInfo.createNCD());
+    ret.setClouds(CloudInfo.createAsNoDetected());
 
     return ret;
   }
@@ -268,7 +264,7 @@ public class EuropeFormatterTest {
   @Test
   public void testCloudNSC() {
     Report ret = generateReport();
-    ret.setClouds(CloudInfo.createNSC());
+    ret.setClouds(CloudInfo.createAsNoSignificant());
 
     String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NSC";
@@ -279,7 +275,7 @@ public class EuropeFormatterTest {
   @Test
   public void testCloudNCD() {
     Report ret = generateReport();
-    ret.setClouds(CloudInfo.createNCD());
+    ret.setClouds(CloudInfo.createAsNoDetected());
 
     String act = new EUFormatter().format(ret);
     String exp = "METAR LKMT 071550Z 00000KT CAVOK NCD";
@@ -575,7 +571,7 @@ public class EuropeFormatterTest {
     Report ret = generateReport();
     TrendReport tr = new TrendReport();
     tr.setType(TrendReportType.TEMPO);
-    tr.setClouds(TrendCloudInfo.createNSC());
+    tr.setClouds(TrendCloudInfo.createAsNoSignificant());
     ret.setTrendInfo(TrendInfo.create(tr));
 
     String act = new EUFormatter().format(ret);

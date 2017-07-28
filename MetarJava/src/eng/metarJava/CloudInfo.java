@@ -52,16 +52,16 @@ public class CloudInfo extends TrendCloudInfo {
    * Creates cloud info with NSC (no-significant-cloud) state.
    * @return Cloud info object
    */
-  public static CloudInfo createNSC(){
-    CloudInfo ret = new CloudInfo(null, false, null, CloudInfoSpecialStates.NSC);
+  public static CloudInfo createAsNoSignificant(){
+    CloudInfo ret = new CloudInfo(null, false, null, CloudInfoSpecialStates.noSignificantClouds);
     return ret;
   }
   /**
-   * Creates cloud info with NCD (no-cloud-detected) (CLR in US) state.
+   * Creates cloud info with NCD (no-cloud-detected) (CLR in US) state. Used by automated stations.
    * @return Cloud info object
    */
-  public static CloudInfo createNCD(){
-    CloudInfo ret = new CloudInfo(null, false, null, CloudInfoSpecialStates.NCD);
+  public static CloudInfo createAsNoDetected(){
+    CloudInfo ret = new CloudInfo(null, false, null, CloudInfoSpecialStates.noDetectedClouds);
     return ret;
   }
 /**
@@ -78,7 +78,7 @@ public class CloudInfo extends TrendCloudInfo {
     super(masses, isVerticalVisibility, verticalVisibilityInHundredFeet, specialState);
   }
   
-  public boolean isNCD(){
-    return super.getSpecialState() == CloudInfoSpecialStates.NCD;
+  public boolean isNoDetected(){
+    return super.getSpecialState() == CloudInfoSpecialStates.noDetectedClouds;
   }
 }

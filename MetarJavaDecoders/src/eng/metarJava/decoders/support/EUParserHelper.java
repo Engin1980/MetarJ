@@ -127,9 +127,9 @@ public class EUParserHelper extends ParserHelper {
   public static CloudInfo decodeClouds(ReportLine rl) {
     CloudInfo ret;
     if (decodeFixedString(rl, "NSC")) {
-      ret = CloudInfo.createNSC();
+      ret = CloudInfo.createAsNoSignificant();
     } else if (decodeFixedString(rl, "NCD")) {
-      ret = CloudInfo.createNCD();
+      ret = CloudInfo.createAsNoDetected();
     } else if (rl.getPre().startsWith("VV")) {
       ret = GenericParserHelper.decodeCloudsWithVerticalVisibility(rl);
     } else {

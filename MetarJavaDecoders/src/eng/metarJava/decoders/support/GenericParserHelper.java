@@ -505,7 +505,7 @@ public class GenericParserHelper extends ParserHelper {
   public static TrendCloudInfo decodeTrendCloud(ReportLine rl) {
     TrendCloudInfo ret;
     if (decodeFixedString(rl, "NSC")) {
-      ret = TrendCloudInfo.createNSC();
+      ret = TrendCloudInfo.createAsNoSignificant();
     } else {
       String vvRegex = "^VV(\\d{3})";
       final Pattern vvPattern = Pattern.compile(vvRegex);

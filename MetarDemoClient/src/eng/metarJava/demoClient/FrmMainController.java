@@ -6,9 +6,13 @@
 package eng.metarJava.demoClient;
 
 import eng.metarJava.Report;
+import eng.metarJava.decoders.CanadaFormatter;
+import eng.metarJava.decoders.CanadaParser;
 import eng.metarJava.decoders.EUFormatter;
 import eng.metarJava.decoders.EUParser;
 import eng.metarJava.decoders.GenericParser;
+import eng.metarJava.decoders.RussiaFormatter;
+import eng.metarJava.decoders.RussiaParser;
 import eng.metarJava.decoders.USFormatter;
 import eng.metarJava.decoders.USParser;
 import eng.metarJava.downloaders.NoaaGovDownloader;
@@ -105,9 +109,9 @@ public class FrmMainController implements Initializable {
    */
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-    cmbParsers.getItems().addAll("EU Parser", "US Parser", "Generic parser");
+    cmbParsers.getItems().addAll("EU parser", "US parser", "Canada parser", "Russia parser", "Generic parser");
     cmbParsers.getSelectionModel().select(0);
-    cmbFormatters.getItems().addAll("EU Formatter", "US Formatter");
+    cmbFormatters.getItems().addAll("EU Formatter", "US Formatter", "Canada formatter", "Russia formatter");
     cmbFormatters.getSelectionModel().select(0);
   }
 
@@ -142,6 +146,12 @@ public class FrmMainController implements Initializable {
           break;
         case 1:
           fmt = new USFormatter();
+          break;
+        case 2:
+          fmt = new CanadaFormatter();
+          break;
+        case 3:
+          fmt = new RussiaFormatter();
           break;
         default:
           throw new UnsupportedOperationException();
@@ -182,6 +192,12 @@ public class FrmMainController implements Initializable {
           parser = new USParser(strict);
           break;
         case 2:
+          parser = new CanadaParser();
+          break;
+        case 3:
+          parser = new RussiaParser();
+          break;
+        case 4:
           parser = new GenericParser();
           break;
         default:
