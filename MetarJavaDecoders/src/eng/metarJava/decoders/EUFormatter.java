@@ -65,9 +65,8 @@ public class EUFormatter implements Formatter {
       sb.append(GenericFormatterHelper.formatRemark(report.getRemark()));
     }
 
-    while (sb.charAt(sb.length() - 1) == ' ') {
-      sb.deleteCharAt(sb.length() - 1);
-    }
+    removeDoubleSpaces(sb);
+    trimEnd(sb);        
 
     return sb.toString();
   }
@@ -313,5 +312,20 @@ public class EUFormatter implements Formatter {
       sb.append(" ");
     }
     return sb.toString();
+  }
+
+  private void trimEnd(StringBuilder sb) {
+    while (sb.charAt(sb.length() - 1) == ' ') {
+      sb.deleteCharAt(sb.length() - 1);
+    }
+  }
+
+  private void removeDoubleSpaces(StringBuilder sb) {
+    int index;
+    index = sb.toString().indexOf("  ");
+    while (index >= 0){
+      sb.deleteCharAt(index);
+      index = sb.toString().indexOf("  ");
+    }
   }
 }
