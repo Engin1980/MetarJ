@@ -9,12 +9,42 @@ import eng.metarJava.enums.SpeedUnit;
 import eng.metarJava.exceptions.NullArgumentException;
 import eng.metarJava.support.ReadOnlyList;
 import eng.metarJava.support.Variation;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author Marek Vajgl
  */
 public class USFormatterHelper {
+
+  private static Map<Double, String> smFractionValues = new HashMap<>();
+
+  static {
+    smFractionValues.put(1 / 16d, "1/16");
+    smFractionValues.put(2 / 16d, "1/8");
+    smFractionValues.put(3 / 16d, "3/16");
+    smFractionValues.put(4 / 16d, "1/4");
+    smFractionValues.put(5 / 16d, "5/16");
+    smFractionValues.put(6 / 16d, "3/8");
+    smFractionValues.put(4 / 8d, "1/2");
+    smFractionValues.put(5 / 8d, "5/8");
+    smFractionValues.put(6 / 8d, "3/4");
+    smFractionValues.put(7 / 8d, "7/8");
+    smFractionValues.put(8 / 8d, "1");
+    smFractionValues.put(9 / 8d, "1 1/8");
+    smFractionValues.put(10 / 8d, "1 1/4");
+    smFractionValues.put(11 / 8d, "1 3/8");
+    smFractionValues.put(12 / 8d, "1 1/2");
+    smFractionValues.put(13 / 8d, "1 5/8");
+    smFractionValues.put(14 / 8d, "1 3/4");
+    smFractionValues.put(15 / 8d, "1 7/8");
+    smFractionValues.put(16 / 8d, "2");
+    smFractionValues.put(9 / 4d, "2 1/4");
+    smFractionValues.put(10 / 4d, "2 1/2");
+    smFractionValues.put(11 / 4d, "2 3/4");
+    smFractionValues.put(12 / 4d, "3");
+  }
 
   public static String formatWind(WindInfo wi, SpeedUnit unit, boolean appendSpace) {
 
@@ -29,6 +59,7 @@ public class USFormatterHelper {
 
   /**
    * Formats visibility. If CAVOK, returns empty string.
+   *
    * @param vi
    * @param appendSpace
    * @return
@@ -60,82 +91,24 @@ public class USFormatterHelper {
   private static String convertDoubleValueToRational(double value) {
     StringBuilder sb = new StringBuilder();
 
-//    double integer = 0;
-//    double numerator = 0;
-//    double denominator = 0;
-//    integer = (int) Math.floor(value);
-//    value = value - integer;
-//
-//    {
-//      denominator = 16;
-//      double maxDiff = Double.MAX_VALUE;
-//      for (int i = 0; i < 16; i++) {
-//        double fraction = i / 16d;
-//        double diff = Math.abs(value - fraction);
-//        if (diff < maxDiff) {
-//          maxDiff = diff;
-//          numerator = i;
-//        }
-//      }
-//    }
-//    
-//    // vykraceni
-//    if (denominator / numerator == Math.floor(denominator / numerator)){
-//      denominator = denominator / numerator;
-//      numerator = 1;
-//    }
-    int integer = (int) Math.floor(value);
-    double decimal = value - integer;
-    int numerator = 0;
-    int denominator = 0;
-
-    if (decimal != 0) {
-      if (value <= 3 / 8d) {
-        numerator = findNearestFraction(decimal, 16);
-        denominator = 16;
-      } else if (value <= 2) {
-        numerator = findNearestFraction(decimal, 8);
-        denominator = 8;
-      } else { // if (value <= 3)
-        numerator = findNearestFraction(decimal, 4);
-        denominator = 4;
-      }
-    }
-
-    if (numerator != 0) {
-      if (denominator / numerator == Math.floor(denominator / numerator)) {
-        denominator = denominator / numerator;
-        numerator = 1;
-      }
-      if (numerator == denominator) {
-        integer = integer + 1;
-        numerator = 0;
-      }
-    }
-
-    if (numerator == 0 || integer >= 3) {
-      sb.append(integer).append("SM");
+    if (value > 3) {
+      sb.append((int) Math.floor(value + 0.2));
     } else {
-      if (integer > 0) {
-        sb.append(integer).append(" ");
+      String minFrac = "";
+      double minDiff = Double.MAX_VALUE;
+      for (Double key : smFractionValues.keySet()) {
+        double diff = Math.abs(value - key);
+        if (diff < minDiff){
+          minDiff = diff;
+          minFrac = smFractionValues.get(key);
+        }
       }
-      sb.append(numerator).append("/").append(denominator).append("SM");
+      sb.append(minFrac);
     }
+    
+    sb.append("SM");
 
     return sb.toString();
-  }
-
-  private static int findNearestFraction(double number, int fractionSize) {
-    double fraction = 1 / (double) fractionSize;
-    double maxDiff = fraction / 2;
-    for (int i = 0; i < 10; i++) {
-      double curr = i * fraction;
-      double diff = Math.abs(number - curr);
-      if (diff < maxDiff) {
-        return i;
-      }
-    }
-    throw new UnsupportedOperationException("You are not supposed to be here.");
   }
 
   public static String formatRunwayVisibility(ReadOnlyList<RunwayVisualRange> runwayVisualRanges, boolean appendSpace) {
@@ -204,9 +177,9 @@ public class USFormatterHelper {
     }
 
     StringBuilder sb = new StringBuilder();
-    if (ci.isNoSignificant())
+    if (ci.isNoSignificant()) {
       sb.append("");
-    else if (ci.isNoDetected()) {
+    } else if (ci.isNoDetected()) {
       sb.append("CLR");
     } else {
       String tmp = GenericFormatterHelper.formatClouds(ci, false);
