@@ -17,11 +17,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * US parser helper containing methods used to decode METAR according to the US standards.
  * @author Marek Vajgl
  */
 public class USParserHelper extends ParserHelper {
 
+  /**
+   * Decodes visibility in fractions of statual miles.
+   * @param rl Report line with cursor before visibility position.
+   * @return VisibilityInfo
+   */
   public static VisibilityInfo decodeVisibility(ReportLine rl) {
     VisibilityInfo ret;
 
@@ -58,6 +63,11 @@ public class USParserHelper extends ParserHelper {
     return ret;
   }
 
+  /**
+   * Decodes pressure in inches of Hg
+   * @param rl Report line with cursor before pressure position.
+   * @return Value of pressure in inHg
+   */
   public static double decodePressureInInchesHg(ReportLine rl) {
     double ret;
     String regex = "^A(\\d{4})";
@@ -73,6 +83,11 @@ public class USParserHelper extends ParserHelper {
     return ret;
   }
 
+  /**
+   * Decodes runway visual ranges (if exist). Never returns null.
+   * @param rl Report line with the cursor before runway visual range definition (if exist)
+   * @return List of decoded visual ranges. If no runway visual range specified, empty list is returned.
+   */
   public static List<RunwayVisualRange> decodeRunwayVisualRanges(ReportLine rl) {
     RunwayVisualRange rvr;
     List<RunwayVisualRange> lst = new ArrayList();
@@ -86,6 +101,12 @@ public class USParserHelper extends ParserHelper {
     return lst;
   }
 
+  /**
+   * Decodes one ruwnay visual range. If no range found, returns null.<br>
+   * Decoding is done according to the US standards. Minimal value is 1000FT, maximal value is 6000FT. 
+   * @param rl Report line with the curosr before runway visual range definition (if exist)
+   * @return Instace of {@linkplain RunwayVisualRange} if exist.
+   */
   public static RunwayVisualRange decodeRunwayVisualRange(ReportLine rl) {
     RunwayVisualRange ret;
 
@@ -125,13 +146,16 @@ public class USParserHelper extends ParserHelper {
   }
 
   /**
-   * Decodes clouds from report line.
-   * @param rl
-   * @return Possibilities:
+   * Decodes clouds from report line<br>
+   * Possibilities:<br>
+   * <ul>
    * <li>If empty, means no significant clouds are detected.</li>
    * <li>If CLR, means no clouds detected below FL120.</li>
    * <li>If VV..., means vertical visibility is announced.</li>
    * <li>If OVC..., etc., means cloud layers are specified.</li>
+   * </ul>
+   * @param rl
+   * @return Returns instance of cloud info. See method description for further info.
    */
   public static CloudInfo decodeClouds(ReportLine rl) {
     CloudInfo ret;

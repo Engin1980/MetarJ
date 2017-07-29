@@ -164,13 +164,6 @@ public class USFormatterHelper {
     return sb.toString();
   }
 
-  /**
-   * NCD is CLR in US
-   *
-   * @param report
-   * @param appendSpace
-   * @return
-   */
   public static String formatClouds(CloudInfo ci, boolean appendSpace) {
     if (ci == null) {
       throw new NullArgumentException("ci");

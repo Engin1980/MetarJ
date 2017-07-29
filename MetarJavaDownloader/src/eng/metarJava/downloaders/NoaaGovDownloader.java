@@ -10,14 +10,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
+ * Downloads METAR report from noaa.gov server.
  * @author Marek Vajgl
  */
-public class NoaaGovDownloader extends Downloader {
+public class NoaaGovDownloader implements Downloader {
 
   private final static String URL = "ftp://tgftp.nws.noaa.gov/data/observations/metar/stations/%S.TXT";
 

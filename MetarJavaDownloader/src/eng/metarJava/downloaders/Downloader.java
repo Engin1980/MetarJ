@@ -9,9 +9,17 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 /**
- *
+ * Represents generic METAR report downloading interface.
  * @author Marek Vajgl
  */
-public abstract class Downloader {
+public interface Downloader {
+  
+  /**
+   * Downloads the report from the source.
+   * @param icao ICAO code of the required station report.
+   * @return String representing METAR report
+   * @throws MalformedURLException thrown when the resulting URL asking on the web does not make sence. Typically when icao parameter is invalid.
+   * @throws IOException thrown when any IO exception occurs during communication.
+   */
   public abstract String download (String icao) throws MalformedURLException, IOException;
 }

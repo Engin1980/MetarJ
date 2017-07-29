@@ -6,8 +6,6 @@
 package metartesting;
 
 import eng.metarJava.Report;
-import eng.metarJava.decoders.CanadaFormatter;
-import eng.metarJava.decoders.CanadaParser;
 import eng.metarJava.decoders.EUFormatter;
 import eng.metarJava.decoders.EUParser;
 import eng.metarJava.decoders.Formatter;
@@ -19,8 +17,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import eng.metarJava.decoders.Parser;
-import eng.metarJava.decoders.USFormatter;
-import eng.metarJava.decoders.USParser;
 
 /**
  *

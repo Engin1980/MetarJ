@@ -12,13 +12,13 @@ import eng.metarJava.enums.PressureUnit;
 /**
  * Parses text report into an instance of {@linkplain eng.metarJava.Report } using Canada format. To parse a report,
  * use {@linkplain #parse(java.lang.String) } method. <br><br>
- * Specific info: very similar to {@link eng.metarJava.USParser US parser}, see its description for details. Differences
+ * Specific info: very similar to {@link eng.metarJava.decoders.USParser US parser}, see its description for details. Differences
  * from US parser:<br>
  * <ul>
  * <li></li>
  * <li>Pressure should be in hPa according to the specification, however in real life inHq is used, so this parser uses it too.</li>
- * <li>Clouds can be defined as CLR what means "no clouds detected" ({@link eng.metarJava.CloudInfo#isNoDetected() NCD}) when no clouds
- * are detected below FL100 on automated stations, or SKC when there are "no significant clouds" ({@link eng.metarJava.CloudInfo#isNSC() NSC}).
+ * <li>Clouds can be defined as CLR what means "no clouds detected" ({@link eng.metarJava.CloudInfo#isNoDetected() isNoDetected}) when no clouds
+ * are detected below FL100 on automated stations, or SKC when there are "no significant clouds" ({@link eng.metarJava.CloudInfo#isNoSignificant() () isNoSignificant}).
  * </ul>
  * @author Marek Vajgl
  */
