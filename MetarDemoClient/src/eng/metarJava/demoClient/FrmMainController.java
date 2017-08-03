@@ -366,8 +366,20 @@ public class FrmMainController implements Initializable {
   }
 
   private List<Field> getPrivateFields(Object o) {
+    List<Field> privateFields = getPrivateFields(o.getClass());
+    return privateFields;
+  }
+  
+  private List<Field> getPrivateFields(Class c) {
     List<Field> privateFields = new ArrayList<>();
-    Field[] allFields = o.getClass().getDeclaredFields();
+    
+    Class sCls = c.getSuperclass();
+    if (sCls != null){
+      List<Field> tmp = getPrivateFields(sCls);
+      privateFields.addAll(tmp);
+    }
+    
+    Field[] allFields = c.getDeclaredFields();
     for (Field field : allFields) {
       if (Modifier.isPrivate(field.getModifiers())) {
         privateFields.add(field);

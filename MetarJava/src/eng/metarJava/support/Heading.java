@@ -51,5 +51,9 @@ public class Heading {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return this.value + "°";
+  }
   
 }

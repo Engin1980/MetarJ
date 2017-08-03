@@ -135,9 +135,13 @@ public class TreePropertyFactory {
     return ret;
   }
 
-  private static List<Getter> getGetters(Object obj) {
-    List<Getter> ret = new ArrayList();
+  private static List<Getter> getGetters(Object obj){
     Class cls = obj.getClass();
+    List<Getter> ret = getGetters(cls);
+    return ret;
+  }
+  private static List<Getter> getGetters(Class cls) {
+    List<Getter> ret = new ArrayList();
     Method[] methods = cls.getMethods();
     for (Method method : methods) {
       if (isGetterName(method.getName()) == false) {
@@ -156,6 +160,7 @@ public class TreePropertyFactory {
       Getter getter = new Getter(name, method);
       ret.add(getter);
     }
+    
     Collections.sort(ret);
     return ret;
   }

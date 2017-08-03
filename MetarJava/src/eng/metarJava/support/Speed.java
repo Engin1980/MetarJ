@@ -65,4 +65,11 @@ public class Speed {
     }
     return true;
   }
+
+  @Override
+  public String toString() {
+    return valueInKmh + " kph";
+  }
+  
+  
 }
