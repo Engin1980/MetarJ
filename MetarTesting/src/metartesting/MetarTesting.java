@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import eng.metarJava.decoders.Parser;
+import eng.metarJava.downloaders.support.AsyncResult;
 
 /**
  *
@@ -29,7 +30,9 @@ public class MetarTesting {
    */
   public static void main(String[] args) {
 
-    runFileTest();
+    asyncCallTest();
+    
+    //runFileTest();
     //runSimpleTest();
     
   }
@@ -120,6 +123,22 @@ public class MetarTesting {
     Parser p = new EUParser();
     Formatter f = new EUFormatter(); //new EUFormatter();
     runCheck(inFile, outFile, d, p, f, 10);
+  }
+
+  private static void asyncCallTest() {
+    Downloader d = new NoaaGovDownloader();
+    String icao = "LKKKT";
+    System.out.println("Async starting");
+    d.downloadAsync(icao, new AsyncResult<String>() {
+      @Override
+      public void finished(AsyncResult.eState state, String value, Throwable exception) {
+        System.out.println("Async finished");
+        System.out.println("State: " + state);
+        System.out.println("Value: " + value);
+        System.out.println("Excep: " + exception);
+      }
+    });
+    System.out.println("Async started");
   }
 
 }

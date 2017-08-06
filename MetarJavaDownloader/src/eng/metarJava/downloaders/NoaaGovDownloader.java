@@ -15,7 +15,7 @@ import java.net.URL;
  * Downloads METAR report from noaa.gov server.
  * @author Marek Vajgl
  */
-public class NoaaGovDownloader implements Downloader {
+public class NoaaGovDownloader extends Downloader {
 
   private final static String URL = "ftp://tgftp.nws.noaa.gov/data/observations/metar/stations/%S.TXT";
 
